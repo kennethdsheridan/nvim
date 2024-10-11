@@ -11,6 +11,9 @@ return require('packer').startup(function(use)
   -- Completion engine
   use 'hrsh7th/nvim-cmp'
 
+  -- Cmp Treesitter
+  use 'ray-x/cmp-treesitter'
+
     -- TabNine plugin
 --  use { 'codota/tabnine-nvim', run = "./dl_binaries.sh" }
 
@@ -19,6 +22,9 @@ return require('packer').startup(function(use)
   -- Snippet engine and snippets
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
+    
+  -- LSP signature
+  use 'hrsh7th/cmp-nvim-lsp-signature-help'
 
   -- LSP configurations and tools
   use 'neovim/nvim-lspconfig'           -- LSP configurations
@@ -187,6 +193,9 @@ return require('packer').startup(function(use)
       { name = 'luasnip' },        -- Snippet source
       { name = 'buffer' },         -- Buffer source
       { name = 'path' },           -- Path source
+      { name = 'nvim_lua' },       -- Lua completion 
+      { name = 'nvim_lsp_signature_help' },       -- Lua completion 
+      { name = 'treesitter' },       -- Lua completion 
       
       -- Add other sources if needed
     }),
