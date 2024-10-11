@@ -3,12 +3,16 @@
 -- Load the lsp-zero library with the 'recommended' preset
 local lsp = require('lsp-zero').preset('recommended')
 
--- Ensure the specified language servers are installed
-lsp.ensure_installed({
-  'tsserver',       -- TypeScript server
-  'eslint',         -- ESLint for linting
-  'lua_ls',         -- Lua language server
-  'rust_analyzer',  -- Rust language server
+-- Mason setup for installing and managing LSP servers
+require('mason').setup()
+require('mason-lspconfig').setup({
+  ensure_installed = {
+    'tsserver',
+    'eslint',
+    'lua_ls',
+    'rust_analyzer',
+  },
+  automatic_installation = true, -- Optional, automatically install LSP servers
 })
 
 -- Require necessary modules
@@ -39,45 +43,56 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
   ['<Tab>']     = cmp.mapping.confirm({ select = true }),   -- Confirm selection with Tab
 })
 
--- Adjust   
-
 -- Adjust the completion sources and their priorities
-lsp.setup_nvim_cmp({
+cmp.setup({
   mapping = cmp_mappings,
-  sources = cmp.config.sources({
-    { name = 'cmp_tabnine', priority = 1000 }, -- TabNine source with highest priority
-    { name = 'nvim_lsp',     priority = 750 }, -- LSP source
-    { name = 'buffer',       priority = 500 }, -- Buffer source
-    -- Add other sources if needed
-  }),
+  sources = {
+    { name = 'cmp_tabnine', priority = 1000 },
+    { name = 'nvim_lsp', priority = 750 },
+    { name = 'buffer', priority = 500 },
+  },
+  
+  -- Formatting block for custom icons and source display
   formatting = {
     format = function(entry, vim_item)
-      -- Set up icons and labels using lspkind
-      vim_item.kind = lspkind.presets.default[vim_item.kind] .. ' ' .. vim_item.kind
+      -- Use default lspkind icons, with a fallback to empty if none exists
+      vim_item.kind = lspkind.presets.default[vim_item.kind] or ""
+
+      -- Add Rust-specific icon 🦀 for rust_analyzer LSP items (e.g., Rust modules)
+      if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module' and entry.completion_item.label:find("::") then
+        vim_item.kind = '🦀'  -- Rust crab emoji for Rust modules
+      end
 
       -- Customize appearance for cmp_tabnine suggestions
       if entry.source.name == 'cmp_tabnine' then
         local detail = (entry.completion_item.data or {}).detail
-        vim_item.kind = '' -- Icon for TabNine
-        if detail and detail:find('.*%%.*') then
-          vim_item.kind = vim_item.kind .. ' ' .. detail -- Append detail if available
-        end
-        if (entry.completion_item.data or {}).multiline then
-          vim_item.kind = vim_item.kind .. ' ' .. '[ML]' -- Indicate multiline suggestion
-        end
-      end
+        vim_item.kind = '' -- Lightning bolt icon for TabNine suggestions
 
-      -- Set the source name in the completion menu
-      vim_item.menu = ({
-        buffer = "[Buffer]",
-        nvim_lsp = "[LSP]",
-        cmp_tabnine = "[TabNine]",
-      })[entry.source.name]
+        -- Append detail information if available
+        if detail then
+          vim_item.menu = "[TabNine: " .. detail .. "]"
+        else
+          vim_item.menu = "[TabNine]"
+        end
+
+        -- Indicate if the suggestion is multi-line
+        if (entry.completion_item.data or {}).multiline then
+          vim_item.menu = vim_item.menu .. ' [ML]'  -- Elegant multiline indicator
+        end
+      else
+        -- For other sources, keep menu display simple and clean
+        vim_item.menu = ({
+          buffer = "[Buffer]",
+          nvim_lsp = "[LSP]",
+          path = "[Path]",
+          luasnip = "[Snippet]",
+        })[entry.source.name] or ""
+      end
 
       return vim_item
     end,
   },
-})
+}) -- This was missing its closing parenthesis
 
 -- Configure LSP client on attachment to buffer
 lsp.on_attach(function(client, bufnr)

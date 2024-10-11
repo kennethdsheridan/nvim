@@ -237,46 +237,54 @@ return require('packer').startup(function(use)
   })
 
   -- Setup crates.nvim
-  require('crates').setup({
-    smart_insert = true,          -- Automatically insert a version if none is specified
-    avoid_prerelease = true,      -- Avoid updating to pre-release versions
-    autoload = true,              -- Automatically load crate information
-    autoupdate = true,            -- Refresh information on edit
-    loading_indicator = true,     -- Show a loading indicator while fetching data
-    date_format = "%Y-%m-%d",     -- Date format for displaying crate versions
-    disable_invalid_feature_diagnostic = false, -- Enable diagnostics for invalid features
+require('crates').setup({
+  smart_insert = true,          -- Automatically insert a version if none is specified
+  autoload = true,              -- Automatically load crate information when editing a file
+  autoupdate = true,            -- Automatically refresh crate information on every edit
+  loading_indicator = true,     -- Show a loading indicator while fetching crate data
+  date_format = "%Y-%m-%d",     -- Date format for displaying crate versions
+  -- `avoid_prerelease` and `disable_invalid_feature_diagnostic` are deprecated and removed
+
+  -- Custom text for various stages
+  text = {
+    loading = "   Loading...", -- Text shown when crate info is being loaded
+    version = "   %s",         -- Format for displaying the current version
+    prerelease = "   %s",      -- Format for showing pre-release versions
+    yanked = "   %s",          -- Format for displaying yanked versions
+    nomatch = "   No match",   -- Text shown when no matching crate is found
+    upgrade = "   %s",         -- Format for displaying upgradeable versions
+    error = "   Error fetching crate", -- Error message text
+  },
+
+  -- Popup window settings for displaying crate information
+  popup = {
+    autofocus = false,          -- Do not auto-focus the popup window
+    style = "minimal",          -- Use a minimal style for the popup window
+    border = "rounded",         -- Use rounded borders for the popup window
+    show_version_date = true,   -- Display the release date of each version
+    max_height = 30,            -- Set maximum height for the popup window
+    min_width = 20,             -- Set minimum width for the popup window
+    -- Simplified popup text configuration, removed deprecated keys
     text = {
-      loading = "   Loading...", -- Text displayed while loading
-      version = "   %s",         -- Format for the current version
-      prerelease = "   %s",      -- Format for pre-release versions
-      yanked = "   %s",          -- Format for yanked versions
-      nomatch = "   No match",   -- Text when no match is found
-      upgrade = "   %s",         -- Format for upgradeable versions
-      error = "   Error fetching crate", -- Error message
+      title = " %s",           -- Format for the popup title
+      version = "   %s",        -- Format for the version field
+      date = "   %s",           -- Format for the date field
+      features = " • Features", -- Heading for the features section
+      dependencies = " • Dependencies", -- Heading for dependencies
     },
-    popup = {
-      autofocus = false,          -- Focus the popup window when opened
-      style = "minimal",          -- Style of the popup window
-      border = "rounded",         -- Border style ("single", "double", "rounded", etc.)
-      show_version_date = true,   -- Display release date of versions
-      max_height = 30,            -- Max height of the popup window
-      min_width = 20,             -- Min width of the popup window
-      text = {
-        title = " %s",           -- Title format
-        version = "   %s",        -- Version format
-        date = "   %s",           -- Date format
-        features = " • Features", -- Features heading
-        dependencies = " • Dependencies", -- Dependencies heading
-      },
-    },
-    src = {
-      insert_closing_quote = true, -- Auto-insert closing quote after version
-    },
-    null_ls = {
-      enabled = false,             -- Disable integration with null-ls
-      name = "crates.nvim",        -- Source name for null-ls
-    },
-  })
+  },
+
+  -- `completion` replaces the deprecated `src` field
+  completion = {
+    insert_closing_quote = true, -- Automatically insert the closing quote after a version
+  },
+
+  null_ls = {
+    enabled = false,             -- Disable integration with null-ls
+    name = "crates.nvim",        -- The source name for null-ls if integration is enabled
+  },
+})
+
 
   -- Setup nvim-lightbulb
   require('nvim-lightbulb').setup({
