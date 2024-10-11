@@ -22,7 +22,10 @@ return require('packer').startup(function(use)
   -- Snippet engine and snippets
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
-    
+
+  -- Cmp Emoji (for emoji's)
+  use 'hrsh7th/cmp-emoji'
+
   -- LSP signature
   use 'hrsh7th/cmp-nvim-lsp-signature-help'
 
@@ -196,6 +199,7 @@ return require('packer').startup(function(use)
       { name = 'nvim_lua' },       -- Lua completion 
       { name = 'nvim_lsp_signature_help' },       -- Lua completion 
       { name = 'treesitter' },       -- Lua completion 
+      { name = 'emoji' },       -- Lua completion 
       
       -- Add other sources if needed
     }),
