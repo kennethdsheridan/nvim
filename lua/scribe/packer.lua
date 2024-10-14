@@ -45,6 +45,38 @@ return require('packer').startup(function(use)
       {'L3MON4D3/LuaSnip'},
     }
   }
+    
+    
+  -- Neo-tree plugin
+use {
+  "nvim-neo-tree/neo-tree.nvim",
+  branch = "v3.x",
+  requires = {
+    "nvim-lua/plenary.nvim",
+    "nvim-tree/nvim-web-devicons", -- Not strictly required, but recommended
+    "MunifTanjim/nui.nvim",
+  },
+  config = function()
+    require("neo-tree").setup({
+      -- Your neo-tree configuration here
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+          hide_by_name = {
+            ".DS_Store",
+            "thumbs.db",
+          },
+          never_show = {
+            ".DS_Store",
+            "thumbs.db",
+          },
+        },
+      },
+    })
+  end
+}
+
 
   -- Additional completion sources
   use 'hrsh7th/cmp-nvim-lsp'            -- LSP completion source
@@ -109,8 +141,16 @@ return require('packer').startup(function(use)
   -- VIM Fugitive
   use 'tpope/vim-fugitive'
 
+    
   -- Notify Plugin Configuration
-  use 'rcarriga/nvim-notify'
+use {
+  'rcarriga/nvim-notify',
+  config = function()
+    require("notify").setup({
+      background_colour = "#000000", -- Set your desired background color here
+    })
+  end
+}
 
   -- Cloak
   use 'laytan/cloak.nvim'
@@ -144,7 +184,7 @@ return require('packer').startup(function(use)
   -- Setup mason (LSP Installer)
   require('mason').setup()
   require('mason-lspconfig').setup({
-    ensure_installed = {'pyright', 'rust_analyzer', 'tsserver'},
+    ensure_installed = {'pyright', 'rust_analyzer' },
     automatic_installation = true,
   })
 
