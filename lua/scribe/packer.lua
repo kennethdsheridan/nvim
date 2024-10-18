@@ -12,7 +12,7 @@ return require('packer').startup(function(use)
   use 'rafamadriz/friendly-snippets'
 
   -- LSP signature
- -- use 'hrsh7th/cmp-nvim-lsp-signature-help'
+  use 'hrsh7th/cmp-nvim-lsp-signature-help'
 
   -- LSP configurations and tools
   use 'neovim/nvim-lspconfig'           -- LSP configurations

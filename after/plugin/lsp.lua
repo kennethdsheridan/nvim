@@ -1,5 +1,3 @@
--- lsp.lua
-
 -- Load the lsp-zero library with the 'recommended' preset
 local lsp = require('lsp-zero').preset('recommended')
 
@@ -19,20 +17,6 @@ require('mason-lspconfig').setup({
 local cmp = require('cmp')         -- Completion engine
 local lspkind = require('lspkind') -- Adds icons to completion items
 
--- Configure cmp_tabnine before setting up nvim-cmp
-local cmp_tabnine = require('cmp_tabnine.config')
-cmp_tabnine:setup({
-  max_lines = 1000,                -- Max lines to parse
-  max_num_results = 10,            -- Max number of suggestions
-  sort = true,                     -- Enable sorting of suggestions
-  run_on_every_keystroke = true,   -- Update suggestions on every keystroke
-  snippet_placeholder = '..',      -- Placeholder for snippets
-  ignored_file_types = {},         -- Ignore suggestions for specified file types
-  show_prediction_strength = true, -- Display prediction strength
-  debounce_ms = 100,               -- Debounce time in milliseconds
-  -- log_file_path = '/tmp/tabnine.log',  -- Enable logging if needed
-})
-
 -- Configure completion behavior and mappings
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
@@ -47,9 +31,9 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 cmp.setup({
   mapping = cmp_mappings,
   sources = {
-    { name = 'cmp_tabnine', priority = 1000 },
     { name = 'nvim_lsp', priority = 750 },
     { name = 'buffer', priority = 500 },
+    { name = 'path', priority = 300 },
   },
   
   -- Formatting block for custom icons and source display
@@ -63,31 +47,13 @@ cmp.setup({
         vim_item.kind = '🦀'  -- Rust crab emoji for Rust modules
       end
 
-      -- Customize appearance for cmp_tabnine suggestions
-      if entry.source.name == 'cmp_tabnine' then
-        local detail = (entry.completion_item.data or {}).detail
-        vim_item.kind = '' -- Lightning bolt icon for TabNine suggestions
-
-        -- Append detail information if available
-        if detail then
-          vim_item.menu = "[TabNine: " .. detail .. "]"
-        else
-          vim_item.menu = "[TabNine]"
-        end
-
-        -- Indicate if the suggestion is multi-line
-        if (entry.completion_item.data or {}).multiline then
-          vim_item.menu = vim_item.menu .. ' [ML]'  -- Elegant multiline indicator
-        end
-      else
-        -- For other sources, keep menu display simple and clean
-        vim_item.menu = ({
-          buffer = "[Buffer]",
-          nvim_lsp = "[LSP]",
-          path = "[Path]",
-          luasnip = "[Snippet]",
-        })[entry.source.name] or ""
-      end
+      -- For other sources, keep menu display simple and clean
+      vim_item.menu = ({
+        buffer = "[Buffer]",
+        nvim_lsp = "[LSP]",
+        path = "[Path]",
+        luasnip = "[Snippet]",
+      })[entry.source.name] or ""
 
       return vim_item
     end,
@@ -112,4 +78,5 @@ end)
 
 -- Initialize the lsp setup
 lsp.setup()
+
 
