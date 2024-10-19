@@ -27,34 +27,34 @@ require('mason').setup()
 -- Ensure the desired LSP servers are installed
 require('mason-lspconfig').setup({
     ensure_installed = {
-        'bashls',    -- Bash
-        'dockerls',  -- Docker
-        'gopls',     -- Go
-        'jsonls',    -- JSON
-        'lua_ls',    -- Lua
-        'marksman',  -- Markdown
-        'pyright',   -- Python
+        'bashls',        -- Bash
+        'dockerls',      -- Docker
+        'gopls',         -- Go
+        'jsonls',        -- JSON
+        'lua_ls',        -- Lua
+        'marksman',      -- Markdown
+        'pyright',       -- Python
         'rust_analyzer', -- Rust
-        'sqlls',     -- SQL
-        'taplo',     -- TOML
-        'tsserver',  -- TypeScript/JavaScript
-        'yamlls',    -- YAML
+        'sqlls',         -- SQL
+        'taplo',         -- TOML
+        --        'tsserver',  -- TypeScript/JavaScript
+        'yamlls',        -- YAML
         -- Add any other servers you need
     },
-    automatic_installation = true,
+    automatic_installation = false,
 })
 
 -- **Common `on_attach` function**
 local on_attach = function(client, bufnr)
     -- Key mappings
     local opts = { noremap = true, silent = true, buffer = bufnr }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)        -- Go to definition
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)              -- Hover documentation
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)    -- Go to implementation
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)    -- Rename symbol
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)        -- Find references
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)      -- Previous diagnostic
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)      -- Next diagnostic
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)          -- Go to definition
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)                -- Hover documentation
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)      -- Go to implementation
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)      -- Rename symbol
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)          -- Find references
+    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)        -- Previous diagnostic
+    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)        -- Next diagnostic
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts) -- Code actions
     vim.keymap.set('n', '<leader>f', function()
         vim.lsp.buf.format { async = true }
