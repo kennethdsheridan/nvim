@@ -89,6 +89,11 @@ _G.packer_plugins = {
     path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/cloak.nvim",
     url = "https://github.com/laytan/cloak.nvim"
   },
+  ["cmp-buffer"] = {
+    loaded = true,
+    path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/cmp-buffer",
+    url = "https://github.com/hrsh7th/cmp-buffer"
+  },
   ["cmp-nvim-lsp"] = {
     loaded = true,
     path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/cmp-nvim-lsp",
@@ -165,7 +170,7 @@ _G.packer_plugins = {
     url = "https://github.com/williamboman/mason.nvim"
   },
   ["neo-tree.nvim"] = {
-    config = { "\27LJ\2\n›\2\0\0\6\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\n\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\3=\3\v\2B\0\2\1K\0\1\0\15filesystem\1\0\1\15filesystem\0\19filtered_items\1\0\1\19filtered_items\0\15never_show\1\3\0\0\14.DS_Store\14thumbs.db\17hide_by_name\1\3\0\0\14.DS_Store\14thumbs.db\1\0\4\20hide_gitignored\1\18hide_dotfiles\1\15never_show\0\17hide_by_name\0\nsetup\rneo-tree\frequire\0" },
+    config = { "\27LJ\2\n›\2\0\0\6\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\n\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\3=\3\v\2B\0\2\1K\0\1\0\15filesystem\1\0\1\15filesystem\0\19filtered_items\1\0\1\19filtered_items\0\15never_show\1\3\0\0\14.DS_Store\14thumbs.db\17hide_by_name\1\3\0\0\14.DS_Store\14thumbs.db\1\0\4\15never_show\0\17hide_by_name\0\20hide_gitignored\1\18hide_dotfiles\1\nsetup\rneo-tree\frequire\0" },
     loaded = true,
     path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/neo-tree.nvim",
     url = "https://github.com/nvim-neo-tree/neo-tree.nvim"
@@ -242,6 +247,11 @@ _G.packer_plugins = {
     path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/rust-tools.nvim",
     url = "https://github.com/simrat39/rust-tools.nvim"
   },
+  ["rust.vim"] = {
+    loaded = true,
+    path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/rust.vim",
+    url = "https://github.com/rust-lang/rust.vim"
+  },
   ["tabnine-nvim"] = {
     loaded = true,
     path = "/Users/kennysheridan/.local/share/nvim/site/pack/packer/start/tabnine-nvim",
@@ -291,22 +301,22 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: noice.nvim
-time([[Config for noice.nvim]], true)
-try_loadstring("\27LJ\2\n3\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\nnoice\frequire\0", "config", "noice.nvim")
-time([[Config for noice.nvim]], false)
 -- Config for: neo-tree.nvim
 time([[Config for neo-tree.nvim]], true)
-try_loadstring("\27LJ\2\n›\2\0\0\6\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\n\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\3=\3\v\2B\0\2\1K\0\1\0\15filesystem\1\0\1\15filesystem\0\19filtered_items\1\0\1\19filtered_items\0\15never_show\1\3\0\0\14.DS_Store\14thumbs.db\17hide_by_name\1\3\0\0\14.DS_Store\14thumbs.db\1\0\4\20hide_gitignored\1\18hide_dotfiles\1\15never_show\0\17hide_by_name\0\nsetup\rneo-tree\frequire\0", "config", "neo-tree.nvim")
+try_loadstring("\27LJ\2\n›\2\0\0\6\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\n\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\3=\3\v\2B\0\2\1K\0\1\0\15filesystem\1\0\1\15filesystem\0\19filtered_items\1\0\1\19filtered_items\0\15never_show\1\3\0\0\14.DS_Store\14thumbs.db\17hide_by_name\1\3\0\0\14.DS_Store\14thumbs.db\1\0\4\15never_show\0\17hide_by_name\0\20hide_gitignored\1\18hide_dotfiles\1\nsetup\rneo-tree\frequire\0", "config", "neo-tree.nvim")
 time([[Config for neo-tree.nvim]], false)
--- Config for: nvim-notify
-time([[Config for nvim-notify]], true)
-try_loadstring("\27LJ\2\nU\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0B\0\2\1K\0\1\0\1\0\1\22background_colour\f#000000\nsetup\vnotify\frequire\0", "config", "nvim-notify")
-time([[Config for nvim-notify]], false)
 -- Config for: trouble.nvim
 time([[Config for trouble.nvim]], true)
 try_loadstring("\27LJ\2\n9\0\0\3\0\3\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\0\0B\0\2\1K\0\1\0\nsetup\ftrouble\frequire\0", "config", "trouble.nvim")
 time([[Config for trouble.nvim]], false)
+-- Config for: nvim-notify
+time([[Config for nvim-notify]], true)
+try_loadstring("\27LJ\2\nU\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0B\0\2\1K\0\1\0\1\0\1\22background_colour\f#000000\nsetup\vnotify\frequire\0", "config", "nvim-notify")
+time([[Config for nvim-notify]], false)
+-- Config for: noice.nvim
+time([[Config for noice.nvim]], true)
+try_loadstring("\27LJ\2\n3\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\nnoice\frequire\0", "config", "noice.nvim")
+time([[Config for noice.nvim]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then
