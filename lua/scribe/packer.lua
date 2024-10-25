@@ -11,6 +11,13 @@ return require('packer').startup(function(use)
     use 'L3MON4D3/LuaSnip'
     use 'rafamadriz/friendly-snippets'
 
+    use {
+        'mrcjkb/rustaceanvim',
+        version = '^5',
+        lazy = false,
+    }
+
+
     -- LSP signature
     use 'hrsh7th/cmp-nvim-lsp-signature-help'
 
