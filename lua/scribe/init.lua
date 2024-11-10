@@ -37,7 +37,6 @@ require('mason-lspconfig').setup({
         'rust_analyzer', -- Rust
         'sqlls',         -- SQL
         'taplo',         -- TOML
-        --        'tsserver',  -- TypeScript/JavaScript
         'yamlls',        -- YAML
         -- Add any other servers you need
     },
@@ -85,7 +84,6 @@ local servers = {
     'pyright',
     'sqlls',
     'taplo',
-    'tsserver',
     'yamlls',
     -- Add any other servers you need
 }

@@ -11,11 +11,129 @@ return require('packer').startup(function(use)
     use 'L3MON4D3/LuaSnip'
     use 'rafamadriz/friendly-snippets'
 
-    --    use {
-    --        'mrcjkb/rustaceanvim',
-    --        version = '^5',
-    --        lazy = false,
-    --    }
+    use {
+        'mrcjkb/rustaceanvim',
+        version = '^5',
+        ft = { 'rust' },
+        config = function()
+            local mason_registry = require('mason-registry')
+            local codelldb = mason_registry.get_package("codelldb")
+            local extension_path = codelldb:get_install_path() .. "/extension/"
+            local codelldb_path = extension_path .. "adapter/codelldb"
+            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
+            local cfg = require('rustaceanvim.config')
+            vim.g.rustaceanvim = {
+                dap = {
+                    adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+                },
+                server = {
+                    settings = {
+                        ['rust-analyzer'] = {
+                            checkOnSave = {
+                                command = "clippy",
+                            },
+                        },
+                    },
+                },
+            }
+        end
+    }
+
+    -- DAP and DAP UI setup
+    use {
+        'mfussenegger/nvim-dap',
+        requires = {
+            'rcarriga/nvim-dap-ui',
+            'nvim-neotest/nvim-nio'
+        },
+        config = function()
+            local dap = require('dap')
+            local dapui = require('dapui')
+
+            -- Configure DAP UI
+            dapui.setup({
+                layouts = {
+                    {
+                        elements = {
+                            'scopes',
+                            'breakpoints',
+                            'stacks',
+                            'watches',
+                        },
+                        size = 40,
+                        position = 'left',
+                    },
+                    {
+                        elements = {
+                            'repl',
+                            'console',
+                        },
+                        size = 10,
+                        position = 'bottom',
+                    },
+                },
+            })
+
+            -- Add Rust configurations
+            dap.configurations.rust = {
+                {
+                    name = "Debug Rust",
+                    type = "rt_lldb", -- Changed from codelldb to rt_lldb
+                    request = "launch",
+                    program = function()
+                        -- First try to find the `target/debug` executable with the same name as the package
+                        local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
+                        local metadata = vim.fn.json_decode(metadata_json)
+                        local target_name = metadata.packages[1].targets[1].name
+                        local cargo_path = "target/debug/" .. target_name
+
+                        if vim.fn.executable(cargo_path) == 1 then
+                            return cargo_path
+                        end
+
+                        -- If the above fails, ask the user
+                        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+                    end,
+                    cwd = '${workspaceFolder}',
+                    stopOnEntry = false,
+                    args = function()
+                        local args_string = vim.fn.input('Arguments: ')
+                        return vim.fn.split(args_string, " ", true)
+                    end,
+                },
+                {
+                    name = "Debug Rust Tests",
+                    type = "rt_lldb", -- Changed from codelldb to rt_lldb
+                    request = "launch",
+                    program = function()
+                        -- Get the test executable path
+                        local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
+                        local metadata = vim.fn.json_decode(metadata_json)
+                        local target_name = metadata.packages[1].targets[1].name
+                        return vim.fn.input('Path to test executable: ',
+                            vim.fn.getcwd() .. '/target/debug/' .. target_name .. '-', 'file')
+                    end,
+                    cwd = '${workspaceFolder}',
+                    stopOnEntry = false,
+                    args = function()
+                        local args_string = vim.fn.input('Arguments: ')
+                        return vim.fn.split(args_string, " ", true)
+                    end,
+                }
+            }
+
+            -- Set up DAP UI listeners
+            dap.listeners.after.event_initialized["dapui_config"] = function()
+                dapui.open()
+            end
+            dap.listeners.before.event_terminated["dapui_config"] = function()
+                dapui.close()
+            end
+            dap.listeners.before.event_exited["dapui_config"] = function()
+                dapui.close()
+            end
+        end
+    }
 
 
     -- LSP signature
@@ -37,7 +155,7 @@ return require('packer').startup(function(use)
     }
 
     -- Add RustaceanVim Plugin
-    use 'rust-lang/rust.vim'
+    -- use 'rust-lang/rust.vim'
 
 
     -- Autocompletion
