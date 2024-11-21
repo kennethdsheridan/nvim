@@ -114,22 +114,22 @@ lspconfig.lua_ls.setup({
 })
 
 -- **Rust Analyzer (specific settings)**
-lspconfig.rust_analyzer.setup({
-    on_attach = on_attach,
-    settings = {
-        ["rust-analyzer"] = {
-            cargo = {
-                allFeatures = true,
-            },
-            procMacro = {
-                enable = true,
-            },
-            checkOnSave = {
-                command = "clippy",
-            },
-        },
-    },
-})
+--lspconfig.rust_analyzer.setup({
+--    on_attach = on_attach,
+--    settings = {
+--        ["rust-analyzer"] = {
+--            cargo = {
+--                allFeatures = true,
+--            },
+--            procMacro = {
+--                enable = true,
+--            },
+--            checkOnSave = {
+--                command = "clippy",
+--            },
+--        },
+--    },
+--})
 
 -- **Tabnine Configuration**
 require('tabnine').setup({
