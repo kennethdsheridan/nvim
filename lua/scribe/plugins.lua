@@ -43,25 +43,61 @@ return {
             }
         end,
     },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- Markdown
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- install with yarn or npm
+    {
+        "iamcco/markdown-preview.nvim",
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        build = "cd app && yarn install",
+        init = function()
+            vim.g.mkdp_filetypes = { "markdown" }
+        end,
+        ft = { "markdown" },
+    },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- LuaLine
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' }
+    },
+
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Apha NVIM
     -- ─────────────────────────────────────────────────────────────────────────────
-   {
-    "goolord/alpha-nvim",
-    event = "VimEnter",
-    lazy = true,
-    enabled = true,
-    opts = function()
-      return require("scribe.alfa-nvim").opts()     -- calls M.opts()
-    end,
-    config = function(_, dashboard)
-      require("scribe.alfa-nvim").config(_, dashboard)  -- calls M.config()
-    end,
-    dependencies = {
-      -- if you need icons or other dependencies
-      -- "nvim-tree/nvim-web-devicons",
+    {
+        "goolord/alpha-nvim",
+        event = "VimEnter",
+        lazy = true,
+        enabled = true,
+        opts = function()
+            return require("scribe.alfa-nvim").opts() -- calls M.opts()
+        end,
+        config = function(_, dashboard)
+            require("scribe.alfa-nvim").config(_, dashboard) -- calls M.config()
+        end,
+        dependencies = {
+            -- if you need icons or other dependencies
+            -- "nvim-tree/nvim-web-devicons",
+        },
     },
-  },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- TODO Comments
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        "folke/todo-comments.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        opts = {
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+        }
+    },
     -- ─────────────────────────────────────────────────────────────────────────────
     -- DAP & DAP UI
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -388,6 +424,338 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     { "theprimeagen/harpoon" },
     { "mbbill/undotree" },
+
+    {
+        -- Automatically close and rename HTML/JSX/TSX tags
+        "windwp/nvim-ts-autotag",
+        opts = {},
+    },
+
+    {
+        -- Easily delete buffers without closing your window layout
+        "famiu/bufdelete.nvim",
+        event = "VeryLazy",
+        config = function()
+            vim.keymap.set("n", "Q", ":lua require('bufdelete').bufdelete(0, false)<cr>", {
+                noremap = true,
+                silent = true,
+                desc = "Delete buffer",
+            })
+        end,
+    },
+
+    {
+        -- Commenting plugin that works with treesitter for better context detection
+        "numToStr/Comment.nvim",
+        opts = {},
+        lazy = false,
+    },
+    {
+        -- Context-aware commenting (useful for files with embedded languages)
+        "joosepalviste/nvim-ts-context-commentstring",
+        lazy = true,
+    },
+
+    {
+        -- Improves the default vim.ui interfaces, such as input and select menus
+        "stevearc/dressing.nvim",
+        dependencies = { "MunifTanjim/nui.nvim" },
+        opts = {},
+        config = function()
+            require("dressing").setup()
+        end,
+    },
+
+    -- Uncomment and enable if you want an LSP progress notification plugin
+    {
+        "j-hui/fidget.nvim",
+        branch = "legacy",
+        enabled = false,
+        config = function()
+            require("fidget").setup({
+                window = { blend = 0 },
+            })
+        end,
+    },
+
+    {
+        -- Smooth scrolling animations
+        "karb94/neoscroll.nvim",
+        config = function()
+            require("neoscroll").setup({
+                stop_eof = true,
+                easing_function = "sine",
+                hide_cursor = true,
+                cursor_scrolls_alone = true,
+            })
+        end,
+    },
+
+    {
+        -- Find and replace across files, with a user-friendly interface
+        "windwp/nvim-spectre",
+        enabled = false,
+        event = "BufRead",
+        keys = {
+            {
+                "<leader>Rr",
+                function()
+                    require("spectre").open()
+                end,
+                desc = "Replace",
+            },
+            {
+                "<leader>Rw",
+                function()
+                    require("spectre").open_visual({ select_word = true })
+                end,
+                desc = "Replace Word",
+            },
+            {
+                "<leader>Rf",
+                function()
+                    require("spectre").open_file_search()
+                end,
+                desc = "Replace Buffer",
+            },
+        },
+    },
+
+    {
+        -- Easily add/change/delete surrounding brackets, quotes, etc.
+        "kylechui/nvim-surround",
+        version = "*",
+        event = "VeryLazy",
+        config = function()
+            require("nvim-surround").setup()
+        end,
+    },
+
+    {
+        -- Automatically detect indentation settings
+        "tpope/vim-sleuth",
+    },
+
+    {
+        -- Helper plugin for Neovim plugin development; includes completions for Lua
+        "folke/lazydev.nvim",
+        ft = "lua",
+        opts = {
+            library = {
+                -- Example config for pulling in external library definitions
+                { path = "luvit-meta/library", words = { "vim%.uv" } },
+            },
+        },
+    },
+    {
+        "Bilal2453/luvit-meta",
+        lazy = true,
+    },
+    {
+        -- Example: adding a custom completion source for 'lazydev'
+        "hrsh7th/nvim-cmp",
+        opts = function(_, opts)
+            opts.sources = opts.sources or {}
+            table.insert(opts.sources, {
+                name = "lazydev",
+                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+            })
+        end,
+    },
+
+    {
+        -- Visually display indent levels with thin vertical lines
+        "lukas-reineke/indent-blankline.nvim",
+        enabled = false,
+        event = { "BufReadPost", "BufNewFile" },
+        version = "2.1.0",
+        opts = {
+            char = "┊",
+            filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+            show_trailing_blankline_indent = false,
+            show_current_context = false,
+        },
+    },
+
+    {
+        -- Supports EditorConfig files to maintain consistent coding styles
+        "editorconfig/editorconfig-vim",
+    },
+
+    {
+        -- Enhanced f/t motions that work well with Leap
+        "ggandor/flit.nvim",
+        keys = function()
+            local ret = {}
+            for _, key in ipairs({ "f", "F", "t", "T" }) do
+                ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
+            end
+            return ret
+        end,
+        opts = { labeled_modes = "nx" },
+    },
+    {
+        -- Motion plugin that replaces the need to use a mouse for quick jumps
+        "ggandor/leap.nvim",
+        keys = {
+            { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
+            { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
+            { "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+        },
+        config = function(_, opts)
+            local leap = require("leap")
+            for k, v in pairs(opts) do
+                leap.opts[k] = v
+            end
+            leap.add_default_mappings(true)
+            vim.keymap.del({ "x", "o" }, "x")
+            vim.keymap.del({ "x", "o" }, "X")
+        end,
+    },
+
+    {
+        -- Display file path/breadcrumbs in a winbar
+        "utilyre/barbecue.nvim",
+        name = "barbecue",
+        version = "*",
+        dependencies = {
+            "SmiteshP/nvim-navic",
+            "nvim-tree/nvim-web-devicons", -- optional icons
+        },
+        opts = {},
+        config = function()
+            require("barbecue").setup({
+                create_autocmd = false, -- manually control updates
+            })
+
+            vim.api.nvim_create_autocmd({
+                "WinScrolled",
+                "BufWinEnter",
+                "CursorHold",
+                "InsertLeave",
+                -- "BufModifiedSet",
+            }, {
+                group = vim.api.nvim_create_augroup("barbecue.updater", {}),
+                callback = function()
+                    require("barbecue.ui").update()
+                end,
+            })
+        end,
+    },
+
+    {
+        -- Simple session management (auto-save and restore sessions)
+        "folke/persistence.nvim",
+        event = "BufReadPre",
+        opts = {},
+    },
+
+    {
+        -- Generate docstrings or annotations for functions, classes, etc.
+        "danymat/neogen",
+        enabled = false,
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter",
+            "L3MON4D3/LuaSnip",
+        },
+        config = function()
+            local neogen = require("neogen")
+
+            neogen.setup({
+                snippet_engine = "luasnip",
+            })
+        end,
+        keys = {
+            {
+                "<leader>ng",
+                function()
+                    require("neogen").generate()
+                end,
+                desc = "Generate code annotations",
+            },
+            {
+                "<leader>nf",
+                function()
+                    require("neogen").generate({ type = "func" })
+                end,
+                desc = "Generate Function Annotation",
+            },
+            {
+                "<leader>nt",
+                function()
+                    require("neogen").generate({ type = "type" })
+                end,
+                desc = "Generate Type Annotation",
+            },
+        },
+    },
+
+    {
+        -- Collection of minimal yet feature-rich plugins (mini.*)
+        "echasnovski/mini.nvim",
+        config = function()
+            -- AI: better around/inside text objects
+            require("mini.ai").setup({ n_lines = 500 })
+            -- Surround: add/change/delete surrounding brackets, quotes, etc.
+            require("mini.surround").setup()
+            -- Pairs: auto insert matching brackets/quotes
+            require("mini.pairs").setup()
+            -- Statusline: a minimal but useful statusline
+            local statusline = require("mini.statusline")
+            statusline.setup({
+                use_icons = vim.g.have_nerd_font,
+            })
+            ---@diagnostic disable-next-line: duplicate-set-field
+            statusline.section_location = function()
+                return "%2l:%-2v"
+            end
+        end,
+    },
+
+    {
+        -- Minimal Icons for use by mini.* or other plugins if devicons is not present
+        "echasnovski/mini.icons",
+        enabled = true,
+        lazy = true,
+        opts = {},
+    },
+
+    {
+        -- Syntax highlighting for kitty terminal config files
+        "fladson/vim-kitty",
+        -- Additional UI library
+        "MunifTanjim/nui.nvim",
+    },
+
+    {
+        -- Customizable notifications with optional animations
+        "rcarriga/nvim-notify",
+        config = function()
+            require("notify").setup({
+                background_colour = "#000000",
+            })
+        end,
+    },
+
+    {
+        -- Displays a popup of recent key presses (helpful for demos or screen sharing)
+        "nvchad/showkeys",
+        cmd = "ShowkeysToggle",
+        opts = {
+            timeout = 1,
+            maxkeys = 6,
+            position = "bottom-right", -- can be: 'bottom-left', 'bottom-center', etc.
+        },
+        keys = {
+            {
+                "<leader>kt",
+                function()
+                    vim.cmd("ShowkeysToggle")
+                end,
+                desc = "Show key presses",
+            },
+        },
+    },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- CLOAK
