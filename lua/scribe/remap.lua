@@ -144,3 +144,11 @@ vim.keymap.set('n', '<leader>fg', function() require('telescope.builtin').live_g
 -- Visual mode adjustments: Move selected block of text up and down
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected text down' })
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected text up' })
+
+-- Debugger
+vim.keymap.set("n", "<F5>", require("dap").continue)
+vim.keymap.set("n", "<F9>", require("dap").toggle_breakpoint)
+vim.keymap.set("n", "<F10>", require("dap").step_over)
+vim.keymap.set("n", "<F11>", require("dap").step_into)
+
+vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = '', linehl = '', numhl = '' })

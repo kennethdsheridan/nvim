@@ -39,8 +39,7 @@ return require("packer").startup(function(use)
             }
         end,
     })
-
-    -- DAP and DAP UI setup
+  -- DAP and DAP UI setup
     use({
         "mfussenegger/nvim-dap",
         requires = {
@@ -82,7 +81,7 @@ return require("packer").startup(function(use)
                     type = "rt_lldb", -- Changed from codelldb to rt_lldb
                     request = "launch",
                     program = function()
-                        -- First try to find the `target/debug` executable with the same name as the package
+                        -- First try to find the target/debug executable with the same name as the package
                         local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
                         local metadata = vim.fn.json_decode(metadata_json)
                         local target_name = metadata.packages[1].targets[1].name
@@ -125,6 +124,21 @@ return require("packer").startup(function(use)
                     end,
                 },
             }
+
+            -- Packer
+            use({
+                "jackMort/ChatGPT.nvim",
+                config = function()
+                    require("chatgpt").setup()
+                end,
+                requires = {
+                    "MunifTanjim/nui.nvim",
+                    "nvim-lua/plenary.nvim",
+                    "folke/trouble.nvim",
+                    "nvim-telescope/telescope.nvim"
+                }
+            })
+
 
             -- Set up DAP UI listeners
             dap.listeners.after.event_initialized["dapui_config"] = function()

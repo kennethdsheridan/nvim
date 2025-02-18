@@ -1,30 +1,60 @@
--- Initial print statements for debugging
+-- File: lua/scribe/init.lua
+
+-------------------------------------------------------------------------------
+-- 1. LAZY.NVIM BOOTSTRAP
+-------------------------------------------------------------------------------
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+    vim.fn.system({
+        "git", "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        "--branch=stable", -- latest stable release
+        lazypath,
+    })
+end
+vim.opt.rtp:prepend(lazypath)
+
+-------------------------------------------------------------------------------
+-- 2. SET UP LAZY.NVIM WITH OUR PLUGIN SPECS
+-------------------------------------------------------------------------------
+-- (Assuming you created lua/scribe/plugins.lua with your plugin table)
+require("lazy").setup("scribe.plugins")
+
+-------------------------------------------------------------------------------
+-- 3. BASIC DEBUG/INFORMATION PRINT
+-------------------------------------------------------------------------------
 print("Hello, from Scribe, starting configuration and requirement imports")
 
--- Import key remaps, packer config, and editor settings
-require("scribe.remap")  -- import keyremaps
-require("scribe.packer") -- import packer config
-require("scribe.set")    -- import editor settings
+-------------------------------------------------------------------------------
+-- 4. IMPORT YOUR REMAPS AND SETTINGS
+-------------------------------------------------------------------------------
+require("scribe.remap") -- Import your keyremaps
+require("scribe.set")   -- Import your editor settings
 
-print("Completed importing requirements for Scribe configuration")
-
--- Enable clipboard integration with NeoVim and the system clipboard
-vim.o.clipboard = "unnamedplus"
-
--- Automatically run ColorMyPencils() on VimEnter
-vim.api.nvim_create_autocmd('VimEnter', {
-    command = 'lua ColorMyPencils()',
+-------------------------------------------------------------------------------
+-- 5. OPTIONAL: AUTOCMD / COLOR SETUP
+-------------------------------------------------------------------------------
+-- Automatically run ColorMyPencils() on VimEnter if you have that function defined
+vim.api.nvim_create_autocmd("VimEnter", {
+    command = "lua ColorMyPencils()",
 })
 
--- Keybinding to dismiss all notifications (assuming you use the 'notify' plugin)
+-- Keybinding to dismiss all notifications
 vim.keymap.set("n", "<leader>nd", function()
-    require('notify').dismiss()
+    require("notify").dismiss()
 end, { desc = "Dismiss all notifications" })
 
--- **Mason LSP management**
+-------------------------------------------------------------------------------
+-- 6. CLIPBOARD INTEGRATION
+-------------------------------------------------------------------------------
+vim.o.clipboard = "unnamedplus"
+
+-------------------------------------------------------------------------------
+-- 7. MASON SETUP (FOR LSP INSTALLATION)
+-------------------------------------------------------------------------------
 require('mason').setup()
 
--- Ensure the desired LSP servers are installed
 require('mason-lspconfig').setup({
     ensure_installed = {
         'bashls',        -- Bash
@@ -43,23 +73,25 @@ require('mason-lspconfig').setup({
     automatic_installation = false,
 })
 
--- **Common `on_attach` function**
+-------------------------------------------------------------------------------
+-- 8. DEFINE A COMMON ON_ATTACH FOR LSP
+-------------------------------------------------------------------------------
 local on_attach = function(client, bufnr)
     -- Key mappings
     local opts = { noremap = true, silent = true, buffer = bufnr }
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)          -- Go to definition
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)                -- Hover documentation
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)                -- Hover doc
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)      -- Go to implementation
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)      -- Rename symbol
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)          -- Find references
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)        -- Previous diagnostic
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)          -- References
+    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)        -- Prev diagnostic
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)        -- Next diagnostic
-    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts) -- Code actions
+    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts) -- Code action
     vim.keymap.set('n', '<leader>f', function()
         vim.lsp.buf.format { async = true }
     end, opts) -- Format code
 
-    -- Format on save if the server supports it
+    -- Format on save (if the server supports it)
     if client.server_capabilities.documentFormattingProvider then
         vim.api.nvim_create_autocmd("BufWritePre", {
             group = vim.api.nvim_create_augroup("LspFormatting", { clear = true }),
@@ -71,10 +103,11 @@ local on_attach = function(client, bufnr)
     end
 end
 
--- **Set up LSP servers with `lspconfig`**
+-------------------------------------------------------------------------------
+-- 9. SET UP LSPCONFIG SERVERS
+-------------------------------------------------------------------------------
 local lspconfig = require('lspconfig')
 
--- Configure servers with default settings
 local servers = {
     'bashls',
     'dockerls',
@@ -85,16 +118,14 @@ local servers = {
     'sqlls',
     'taplo',
     'yamlls',
-    -- Add any other servers you need
 }
-
 for _, server in ipairs(servers) do
     lspconfig[server].setup({
         on_attach = on_attach,
     })
 end
 
--- **Lua Language Server (special configuration)**
+-- Special config for Lua
 lspconfig.lua_ls.setup({
     on_attach = on_attach,
     settings = {
@@ -103,7 +134,7 @@ lspconfig.lua_ls.setup({
                 globals = { 'vim' }, -- Recognize the `vim` global
             },
             workspace = {
-                library = vim.api.nvim_get_runtime_file("", true), -- Make the server aware of Neovim runtime files
+                library = vim.api.nvim_get_runtime_file("", true),
                 checkThirdParty = false,
             },
             telemetry = {
@@ -113,25 +144,27 @@ lspconfig.lua_ls.setup({
     },
 })
 
--- **Rust Analyzer (specific settings)**
---lspconfig.rust_analyzer.setup({
---    on_attach = on_attach,
---    settings = {
---        ["rust-analyzer"] = {
---            cargo = {
---                allFeatures = true,
---            },
---            procMacro = {
---                enable = true,
---            },
---            checkOnSave = {
---                command = "clippy",
---            },
---        },
---    },
---})
+-- If you want to enable Rust manually (rather than via rust-tools):
+-- lspconfig.rust_analyzer.setup({
+--   on_attach = on_attach,
+--   settings = {
+--     ["rust-analyzer"] = {
+--       cargo = {
+--         allFeatures = true,
+--       },
+--       procMacro = {
+--         enable = true,
+--       },
+--       checkOnSave = {
+--         command = "clippy",
+--       },
+--     },
+--   },
+-- })
 
--- **Tabnine Configuration**
+-------------------------------------------------------------------------------
+-- 10. TABNINE CONFIGURATION
+-------------------------------------------------------------------------------
 require('tabnine').setup({
     disable_auto_comment = true,
     accept_keymap = "<Tab>",
@@ -139,15 +172,12 @@ require('tabnine').setup({
     debounce_ms = 800,
     suggestion_color = { gui = "#808080", cterm = 244 },
     exclude_filetypes = { "TelescopePrompt", "NvimTree" },
-    log_file_path = nil, -- Absolute path to Tabnine log file
+    log_file_path = nil,
     ignore_certificate_errors = false,
 })
 
--- **Optional: lsp-zero setup**
--- If you're using lsp-zero and want to keep it, configure it as needed
--- require('lsp-zero').setup({
---     -- Add specific configurations or tweaks for lsp-zero here
--- })
-
--- **Final print statement for debugging**
+-------------------------------------------------------------------------------
+-- 11. FINAL DEBUG PRINT
+-------------------------------------------------------------------------------
+print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
