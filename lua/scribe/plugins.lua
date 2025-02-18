@@ -1,4 +1,4 @@
--- lazy.lua (example)
+--plugins.lua
 return {
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -43,7 +43,25 @@ return {
             }
         end,
     },
-
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- Apha NVIM
+    -- ─────────────────────────────────────────────────────────────────────────────
+   {
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    lazy = true,
+    enabled = true,
+    opts = function()
+      return require("scribe.alfa-nvim").opts()     -- calls M.opts()
+    end,
+    config = function(_, dashboard)
+      require("scribe.alfa-nvim").config(_, dashboard)  -- calls M.config()
+    end,
+    dependencies = {
+      -- if you need icons or other dependencies
+      -- "nvim-tree/nvim-web-devicons",
+    },
+  },
     -- ─────────────────────────────────────────────────────────────────────────────
     -- DAP & DAP UI
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -340,11 +358,11 @@ return {
                     },
                 },
                 presets = {
-                    bottom_search = true, -- use a classic bottom cmdline for search
-                    command_palette = true, -- position the cmdline and popupmenu together
+                    bottom_search = true,         -- use a classic bottom cmdline for search
+                    command_palette = true,       -- position the cmdline and popupmenu together
                     long_message_to_split = true, -- long messages will be sent to a split
-                    inc_rename = false, -- disable inc-rename.nvim integration
-                    lsp_doc_border = true, -- add a border to hover docs and signature help
+                    inc_rename = false,           -- disable inc-rename.nvim integration
+                    lsp_doc_border = true,        -- add a border to hover docs and signature help
                 },
             })
         end,
