@@ -23,6 +23,8 @@ vim.opt.rtp:prepend(lazypath)
 -- (Assuming you created lua/scribe/plugins.lua with your plugin table)
 require("lazy").setup("scribe.plugins")
 
+-- require("after.plugin.treesitter")
+
 -------------------------------------------------------------------------------
 -- 3. BASIC DEBUG/INFORMATION PRINT
 -------------------------------------------------------------------------------
@@ -31,8 +33,11 @@ print("Hello, from Scribe, starting configuration and requirement imports")
 -------------------------------------------------------------------------------
 -- 4. IMPORT YOUR REMAPS AND SETTINGS
 -------------------------------------------------------------------------------
-require("scribe.remap") -- Import your keyremaps
-require("scribe.set")   -- Import your editor settings
+require("scribe.remap")    -- Import your keyremaps
+require("scribe.set")      -- Import your editor settings
+require("scribe.rust")     -- Import your rust settings
+require("scribe.markdown") -- Import your rust settings
+require("scribe.configs")  -- Import your rust settings
 
 -------------------------------------------------------------------------------
 -- 5. OPTIONAL: AUTOCMD / COLOR SETUP

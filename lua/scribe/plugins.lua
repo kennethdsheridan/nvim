@@ -43,6 +43,36 @@ return {
             }
         end,
     },
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- Project management
+    -- ─────────────────────────────────────────────────────────────────────────────
+
+    {
+        "ahmedkhalf/project.nvim",
+        config = function()
+            require("project_nvim").setup {
+                -- Use pattern-based detection for project roots
+                detection_methods = { "pattern" },
+                -- List of files or directories that signal a project root
+                patterns = {
+                    ".git",          -- Git repo (common fallback)
+                    "Cargo.toml",    -- Rust
+                    "go.mod",        -- Go
+                    "package.json",  -- Node.js / TypeScript
+                    "tsconfig.json", -- TypeScript
+                    "init.lua",      -- Lua projects (e.g., Neovim configs)
+                    ".bashrc",       -- Bash (or any other marker you may want)
+                },
+                -- Optionally, you can disable changing the directory silently:
+                silent_chdir = false,
+            }
+            -- Optionally load the Telescope extension (if you're using telescope.nvim)
+            pcall(function()
+                require("telescope").load_extension("projects")
+            end)
+        end,
+    },
+
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Markdown
@@ -768,17 +798,62 @@ return {
     {
         "simrat39/rust-tools.nvim",
         config = function()
+            local capabilities = require("cmp_nvim_lsp").default_capabilities()
             local rt = require("rust-tools")
+
             rt.setup({
+                tools = {
+                    hover_actions = {
+                        auto_focus = true,
+                        border = "rounded",
+                    },
+                    inlay_hints = {
+                        auto = true,
+                        show_parameter_hints = true,
+                        parameter_hints_prefix = "<- ",
+                        other_hints_prefix = "-> ",
+                    },
+
+                    -- Add this block to enable Runnables
+                    runnables = {
+                        use_telescope = true, -- if you use telescope, it’ll show runnables in a picker
+                    },
+                },
                 server = {
                     on_attach = function(_, bufnr)
+                        -- Existing keymaps
                         vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-                        vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+                        vim.keymap.set("n", "<Leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
+
+                        -- Keymap to invoke Runnables
+                        vim.keymap.set("n", "<Leader>rr", rt.runnables.runnables, { buffer = bufnr })
                     end,
+                    capabilities = capabilities,
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {
+                                allFeatures = true,
+                            },
+                            checkOnSave = {
+                                command = "clippy",
+                            },
+                            completion = {
+                                autoimport = {
+                                    enable = true,
+                                },
+                            },
+                            -- (Optional) Enable CodeLens (see below)
+                            lens = {
+                                enable = true,
+                            },
+                        },
+                    },
                 },
             })
         end,
     },
+
+
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },
