@@ -12,39 +12,15 @@ vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, { desc = "Go to im
 vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, { desc = "Show documentation hover" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 
--- Nvim DAP (Debugger) mappings
-vim.keymap.set("n", "<Leader>dl", function()
-    require('dap').step_into()
-end, { desc = "Debugger step into" })
+-- NVIM DapBreakpoint
+vim.keymap.set("n", "<F5>", require("dap").continue)
+vim.keymap.set("n", "<F10>", require("dap").step_over)
+vim.keymap.set("n", "<F11>", require("dap").step_into)
+vim.keymap.set("n", "<F12>", require("dap").step_out)
+vim.keymap.set("n", "<Leader>b", require("dap").toggle_breakpoint)
+vim.keymap.set("n", "<Leader>dt", require("dap").terminate)
 
-vim.keymap.set("n", "<Leader>dj", function()
-    require('dap').step_over()
-end, { desc = "Debugger step over" })
 
-vim.keymap.set("n", "<Leader>dk", function()
-    require('dap').step_out()
-end, { desc = "Debugger step out" })
-
-vim.keymap.set("n", "<Leader>dc", function()
-    require('dap').continue()
-end, { desc = "Debugger continue" })
-
-vim.keymap.set("n", "<Leader>db", function()
-    require('dap').toggle_breakpoint()
-end, { desc = "Debugger toggle breakpoint" })
-
-vim.keymap.set("n", "<Leader>dd", function()
-    local condition = vim.fn.input('Breakpoint condition: ')
-    require('dap').set_breakpoint(condition)
-end, { desc = "Debugger set conditional breakpoint" })
-
-vim.keymap.set("n", "<Leader>de", function()
-    require('dap').terminate()
-end, { desc = "Debugger reset" })
-
-vim.keymap.set("n", "<Leader>dr", function()
-    require('dap').run_last()
-end, { desc = "Debugger run last" })
 
 -- Rustacean vim mapping
 vim.keymap.set("n", "<Leader>dt", function()

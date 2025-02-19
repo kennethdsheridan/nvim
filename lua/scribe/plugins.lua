@@ -135,13 +135,39 @@ return {
         "mfussenegger/nvim-dap",
         dependencies = {
             "rcarriga/nvim-dap-ui",
-            "nvim-neotest/nvim-nio", -- If you actually need nvim-nio
+            "nvim-neotest/nvim-nio", -- now required by nvim-dap-ui
         },
         config = function()
             local dap = require("dap")
             local dapui = require("dapui")
+            local mason_registry = require("mason-registry")
 
-            -- Configure DAP UI
+            ----------------------------------------------------------------------------
+            -- 1. Retrieve the CodeLLDB paths from Mason
+            ----------------------------------------------------------------------------
+            local codelldb = mason_registry.get_package("codelldb")
+            local extension_path = codelldb:get_install_path() .. "/extension/"
+            local codelldb_path = extension_path .. "adapter/codelldb"
+            -- Adjust for your OS:
+            local liblldb_path = extension_path .. "lldb/lib/liblldb.so" -- Linux
+            -- local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- macOS
+            -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll" -- Windows
+
+            ----------------------------------------------------------------------------
+            -- 2. Define the DAP adapter "rt_lldb" for Rust debugging
+            ----------------------------------------------------------------------------
+            dap.adapters.rt_lldb = {
+                type = "server",
+                port = "${port}",
+                executable = {
+                    command = codelldb_path,
+                    args = { "--port", "${port}" },
+                },
+            }
+
+            ----------------------------------------------------------------------------
+            -- 3. DAP UI setup
+            ----------------------------------------------------------------------------
             dapui.setup({
                 layouts = {
                     {
@@ -165,11 +191,13 @@ return {
                 },
             })
 
-            -- Add Rust configurations
+            ----------------------------------------------------------------------------
+            -- 4. Rust DAP configurations using the "rt_lldb" adapter
+            ----------------------------------------------------------------------------
             dap.configurations.rust = {
                 {
                     name = "Debug Rust",
-                    type = "rt_lldb", -- using 'rt_lldb' as in your config
+                    type = "rt_lldb",
                     request = "launch",
                     program = function()
                         local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
@@ -197,6 +225,7 @@ return {
                         local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
                         local metadata = vim.fn.json_decode(metadata_json)
                         local target_name = metadata.packages[1].targets[1].name
+
                         return vim.fn.input(
                             "Path to test executable: ",
                             vim.fn.getcwd() .. "/target/debug/" .. target_name .. "-",
@@ -212,7 +241,9 @@ return {
                 },
             }
 
-            -- Set up DAP UI listeners
+            ----------------------------------------------------------------------------
+            -- 5. Auto-open/close DAP UI on debug sessions
+            ----------------------------------------------------------------------------
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
