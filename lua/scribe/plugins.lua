@@ -13,6 +13,50 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- Git Signs Integration
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- Gitsigns
+    {
+        "lewis6991/gitsigns.nvim",
+        config = function()
+            require("gitsigns").setup({
+                signs = {
+                    add          = { text = "┃" },
+                    change       = { text = "┃" },
+                    delete       = { text = "_" },
+                    topdelete    = { text = "‾" },
+                    changedelete = { text = "~" },
+                    untracked    = { text = "┆" },
+                },
+                current_line_blame = true,
+                current_line_blame_formatter_opts = {
+                    relative_time = true,
+                },
+            })
+            vim.keymap.set("n", "<leader>gp", "Gitsigns preview_hunk<CR>", {})
+        end,
+    },
+
+    -- Vim-fugitive
+    {
+        "tpope/vim-fugitive",
+        -- Optionally limit load with 'cmd' if you don’t want it always:
+        -- cmd = { "Git", "Gdiffsplit", "Gvdiffsplit", "Gwrite", "Gread", "GMove", "GDelete", "GBrowse", "GRemove", "GRename" },
+        -- Or just leave it bare if you want it loaded at startup:
+        -- config = function() ... end (most use cases don’t need special config for fugitive)
+    },
+
+    -- Diffview
+    {
+        "sindrets/diffview.nvim",
+        config = function()
+            require("diffview").setup({
+                -- See :help diffview-config for possible settings
+            })
+        end,
+    },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- RUSTACEANVIM
     -- ─────────────────────────────────────────────────────────────────────────────
     {
