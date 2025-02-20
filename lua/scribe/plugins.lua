@@ -1,4 +1,4 @@
---plugins.lua
+-- plugins.lua
 return {
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -13,7 +13,7 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- Git Signs Integration
+    -- Git Signs, Fugitive, and Diffview Integration
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Gitsigns
     {
@@ -29,23 +29,20 @@ return {
                     untracked    = { text = "┆" },
                 },
                 current_line_blame = true,
-                current_line_blame_formatter_opts = {
-                    relative_time = true,
-                },
+                -- If you see a warning about `current_line_blame_formatter_opts`, remove it or update gitsigns.
+                -- current_line_blame_formatter_opts = {
+                --   relative_time = true,
+                -- },
             })
-            vim.keymap.set("n", "<leader>gp", "Gitsigns preview_hunk<CR>", {})
+            vim.keymap.set("n", "<leader>gp", "<cmd>Gitsigns preview_hunk<CR>", {})
+            vim.keymap.set("n", "<leader>gt", "<cmd>Gitsigns toggle_current_line_blame<CR>", {})
         end,
     },
-
     -- Vim-fugitive
     {
         "tpope/vim-fugitive",
-        -- Optionally limit load with 'cmd' if you don’t want it always:
-        -- cmd = { "Git", "Gdiffsplit", "Gvdiffsplit", "Gwrite", "Gread", "GMove", "GDelete", "GBrowse", "GRemove", "GRename" },
-        -- Or just leave it bare if you want it loaded at startup:
-        -- config = function() ... end (most use cases don’t need special config for fugitive)
+        -- cmd = { "Git", "Gdiffsplit", ... } -- optionally lazy‐load
     },
-
     -- Diffview
     {
         "sindrets/diffview.nvim",
@@ -87,61 +84,46 @@ return {
             }
         end,
     },
+
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Project management
     -- ─────────────────────────────────────────────────────────────────────────────
-
     {
         "ahmedkhalf/project.nvim",
         config = function()
             require("project_nvim").setup {
-                -- Use pattern-based detection for project roots
                 detection_methods = { "pattern" },
-                -- List of files or directories that signal a project root
                 patterns = {
-                    ".git",          -- Git repo (common fallback)
-                    "Cargo.toml",    -- Rust
-                    "go.mod",        -- Go
-                    "package.json",  -- Node.js / TypeScript
-                    "tsconfig.json", -- TypeScript
-                    "init.lua",      -- Lua projects (e.g., Neovim configs)
-                    ".bashrc",       -- Bash (or any other marker you may want)
+                    ".git",
+                    "Cargo.toml",
+                    "go.mod",
+                    "package.json",
+                    "tsconfig.json",
+                    "init.lua",
+                    ".bashrc",
                 },
-                -- Optionally, you can disable changing the directory silently:
                 silent_chdir = false,
             }
-            -- Optionally load the Telescope extension (if you're using telescope.nvim)
             pcall(function()
                 require("telescope").load_extension("projects")
             end)
         end,
     },
 
-
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- Markdown
+    -- (Removed the duplicated 'iamcco/markdown-preview.nvim' block here)
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- install with yarn or npm
-    {
-        "iamcco/markdown-preview.nvim",
-        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        build = "cd app && yarn install",
-        init = function()
-            vim.g.mkdp_filetypes = { "markdown" }
-        end,
-        ft = { "markdown" },
-    },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- LuaLine
     -- ─────────────────────────────────────────────────────────────────────────────
     {
-        'nvim-lualine/lualine.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons' }
+        "nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- Apha NVIM
+    -- Alpha NVIM
     -- ─────────────────────────────────────────────────────────────────────────────
     {
         "goolord/alpha-nvim",
@@ -155,8 +137,7 @@ return {
             require("scribe.alfa-nvim").config(_, dashboard) -- calls M.config()
         end,
         dependencies = {
-            -- if you need icons or other dependencies
-            -- "nvim-tree/nvim-web-devicons",
+            -- e.g., "nvim-tree/nvim-web-devicons",
         },
     },
 
@@ -166,12 +147,9 @@ return {
     {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
-        opts = {
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
-        }
+        opts = {},
     },
+
     -- ─────────────────────────────────────────────────────────────────────────────
     -- DAP & DAP UI
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -179,27 +157,26 @@ return {
         "mfussenegger/nvim-dap",
         dependencies = {
             "rcarriga/nvim-dap-ui",
-            "nvim-neotest/nvim-nio", -- now required by nvim-dap-ui
+            "nvim-neotest/nvim-nio", -- required by nvim-dap-ui
         },
         config = function()
             local dap = require("dap")
             local dapui = require("dapui")
             local mason_registry = require("mason-registry")
 
-            ----------------------------------------------------------------------------
-            -- 1. Retrieve the CodeLLDB paths from Mason
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
+            -- 1. Retrieve CodeLLDB paths from Mason
+            ------------------------------------------------------------------------
             local codelldb = mason_registry.get_package("codelldb")
             local extension_path = codelldb:get_install_path() .. "/extension/"
             local codelldb_path = extension_path .. "adapter/codelldb"
-            -- Adjust for your OS:
             local liblldb_path = extension_path .. "lldb/lib/liblldb.so" -- Linux
             -- local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- macOS
             -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll" -- Windows
 
-            ----------------------------------------------------------------------------
-            -- 2. Define the DAP adapter "rt_lldb" for Rust debugging
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
+            -- 2. Define the DAP adapter
+            ------------------------------------------------------------------------
             dap.adapters.rt_lldb = {
                 type = "server",
                 port = "${port}",
@@ -209,9 +186,9 @@ return {
                 },
             }
 
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
             -- 3. DAP UI setup
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
             dapui.setup({
                 layouts = {
                     {
@@ -235,9 +212,9 @@ return {
                 },
             })
 
-            ----------------------------------------------------------------------------
-            -- 4. Rust DAP configurations using the "rt_lldb" adapter
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
+            -- 4. Rust DAP configurations
+            ------------------------------------------------------------------------
             dap.configurations.rust = {
                 {
                     name = "Debug Rust",
@@ -285,9 +262,9 @@ return {
                 },
             }
 
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
             -- 5. Auto-open/close DAP UI on debug sessions
-            ----------------------------------------------------------------------------
+            ------------------------------------------------------------------------
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
@@ -323,36 +300,41 @@ return {
             })
         end,
     },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- LSP Zero
+    -- ─────────────────────────────────────────────────────────────────────────────
     {
         "VonHeikemen/lsp-zero.nvim",
         branch = "v3.x",
         dependencies = {
+            "neovim/nvim-lspconfig",
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
-            "neovim/nvim-lspconfig",
             "L3MON4D3/LuaSnip",
         },
         config = function()
             local lsp = require("lsp-zero").preset("recommended")
 
-            lsp.on_attach(function(client, bufnr)
-                vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+            -- If you want custom config for servers:
+            lsp.configure("rust_analyzer", {
+                settings = {
+                    ["rust-analyzer"] = {
+                        cargo = { allFeatures = true },
+                        checkOnSave = { command = "clippy" },
+                    },
+                },
+            })
 
-                local bufopts = { noremap = true, silent = true, buffer = bufnr }
-                vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-                vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-                vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-                vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-                vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
-                vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
-                vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
-                vim.keymap.set("n", "<space>wl", function()
-                    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-                end, bufopts)
-                vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
-                vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
-                vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
-                vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+            lsp.on_attach(function(client, bufnr)
+                local opts = { noremap = true, silent = true, buffer = bufnr }
+                vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+                vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+                vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+                vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+                vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
+                vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, opts)
+                -- etc...
             end)
 
             lsp.setup()
@@ -416,37 +398,45 @@ return {
 
     -- Icons / UI improvements for completion
     { "onsails/lspkind-nvim" },
-
     -- LSP UI enhancements (lspsaga)
     { "glepnir/lspsaga.nvim" },
 
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- FILE EXPLORER (NEO-TREE)
+    -- FILE EXPLORER (Nvim-Tree)
     -- ─────────────────────────────────────────────────────────────────────────────
     {
-        "nvim-neo-tree/neo-tree.nvim",
-        branch = "v3.x",
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-tree/nvim-web-devicons",
-            "MunifTanjim/nui.nvim",
-        },
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("neo-tree").setup({
-                filesystem = {
-                    filtered_items = {
-                        hide_dotfiles = false,
-                        hide_gitignored = false,
-                        hide_by_name = {
-                            ".DS_Store",
-                            "thumbs.db",
-                        },
-                        never_show = {
-                            ".DS_Store",
-                            "thumbs.db",
-                        },
-                    },
+            require("nvim-tree").setup({
+                filters = {
+                    dotfiles = false,
+                    custom = { ".DS_Store", "thumbs.db" },
                 },
+                git = {
+                    enable = true,
+                    ignore = false,
+                },
+                renderer = {
+                    highlight_opened_files = "all",
+                },
+                view = {
+                    width = 30,
+                },
+            })
+
+            -- Auto-open on startup
+            vim.api.nvim_create_autocmd("VimEnter", {
+                callback = function()
+                    require("nvim-tree.api").tree.open()
+                end,
+            })
+
+            -- Toggle with <leader>ft
+            vim.keymap.set("n", "<leader>ft", "<cmd>NvimTreeToggle<CR>", {
+                silent = true,
+                noremap = true,
+                desc = "Toggle NvimTree",
             })
         end,
     },
@@ -454,7 +444,7 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- GIT / DIFF / TROUBLE
     -- ─────────────────────────────────────────────────────────────────────────────
-    { "sindrets/diffview.nvim" },
+    -- (Removed duplicates for diffview & fugitive here)
     {
         "folke/trouble.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -462,7 +452,6 @@ return {
             require("trouble").setup({})
         end,
     },
-    { "tpope/vim-fugitive" },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- TELESCOPE
@@ -480,18 +469,13 @@ return {
         "folke/noice.nvim",
         event = "VeryLazy",
         enabled = true,
-        opts = {
-            -- Add any Noice-specific options here if you like
-        },
         dependencies = {
             "MunifTanjim/nui.nvim",
-            -- If you want the notification view, also include:
             "rcarriga/nvim-notify",
         },
         config = function()
             require("noice").setup({
                 lsp = {
-                    -- Override markdown rendering so that cmp and other plugins use treesitter
                     override = {
                         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
                         ["vim.lsp.util.stylize_markdown"] = true,
@@ -499,15 +483,16 @@ return {
                     },
                 },
                 presets = {
-                    bottom_search = true,         -- use a classic bottom cmdline for search
-                    command_palette = true,       -- position the cmdline and popupmenu together
-                    long_message_to_split = true, -- long messages will be sent to a split
-                    inc_rename = false,           -- disable inc-rename.nvim integration
-                    lsp_doc_border = true,        -- add a border to hover docs and signature help
+                    bottom_search = true,
+                    command_palette = true,
+                    long_message_to_split = true,
+                    inc_rename = false,
+                    lsp_doc_border = true,
                 },
             })
         end,
     },
+
     -- ─────────────────────────────────────────────────────────────────────────────
     -- COLORS & THEMES
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -529,40 +514,31 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     { "theprimeagen/harpoon" },
     { "mbbill/undotree" },
-
     {
-        -- Automatically close and rename HTML/JSX/TSX tags
         "windwp/nvim-ts-autotag",
         opts = {},
     },
-
     {
-        -- Easily delete buffers without closing your window layout
         "famiu/bufdelete.nvim",
         event = "VeryLazy",
         config = function()
-            vim.keymap.set("n", "Q", ":lua require('bufdelete').bufdelete(0, false)<cr>", {
+            vim.keymap.set("n", "Q", ":lua require('bufdelete').bufdelete(0, false)<CR>", {
                 noremap = true,
                 silent = true,
                 desc = "Delete buffer",
             })
         end,
     },
-
     {
-        -- Commenting plugin that works with treesitter for better context detection
         "numToStr/Comment.nvim",
         opts = {},
         lazy = false,
     },
     {
-        -- Context-aware commenting (useful for files with embedded languages)
         "joosepalviste/nvim-ts-context-commentstring",
         lazy = true,
     },
-
     {
-        -- Improves the default vim.ui interfaces, such as input and select menus
         "stevearc/dressing.nvim",
         dependencies = { "MunifTanjim/nui.nvim" },
         opts = {},
@@ -570,8 +546,6 @@ return {
             require("dressing").setup()
         end,
     },
-
-    -- Uncomment and enable if you want an LSP progress notification plugin
     {
         "j-hui/fidget.nvim",
         branch = "legacy",
@@ -582,9 +556,7 @@ return {
             })
         end,
     },
-
     {
-        -- Smooth scrolling animations
         "karb94/neoscroll.nvim",
         config = function()
             require("neoscroll").setup({
@@ -595,9 +567,7 @@ return {
             })
         end,
     },
-
     {
-        -- Find and replace across files, with a user-friendly interface
         "windwp/nvim-spectre",
         enabled = false,
         event = "BufRead",
@@ -625,9 +595,7 @@ return {
             },
         },
     },
-
     {
-        -- Easily add/change/delete surrounding brackets, quotes, etc.
         "kylechui/nvim-surround",
         version = "*",
         event = "VeryLazy",
@@ -635,20 +603,15 @@ return {
             require("nvim-surround").setup()
         end,
     },
-
     {
-        -- Automatically detect indentation settings
         "tpope/vim-sleuth",
     },
-
     {
-        -- Helper plugin for Neovim plugin development; includes completions for Lua
         "folke/lazydev.nvim",
         ft = "lua",
         opts = {
             library = {
-                -- Example config for pulling in external library definitions
-                { path = "luvit-meta/library", words = { "vim%.uv" } },
+                -- Example: { path = "luvit-meta/library", words = { "vim%.uv" } },
             },
         },
     },
@@ -657,19 +620,16 @@ return {
         lazy = true,
     },
     {
-        -- Example: adding a custom completion source for 'lazydev'
         "hrsh7th/nvim-cmp",
         opts = function(_, opts)
             opts.sources = opts.sources or {}
             table.insert(opts.sources, {
                 name = "lazydev",
-                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+                group_index = 0,
             })
         end,
     },
-
     {
-        -- Visually display indent levels with thin vertical lines
         "lukas-reineke/indent-blankline.nvim",
         enabled = false,
         event = { "BufReadPost", "BufNewFile" },
@@ -681,14 +641,10 @@ return {
             show_current_context = false,
         },
     },
-
     {
-        -- Supports EditorConfig files to maintain consistent coding styles
         "editorconfig/editorconfig-vim",
     },
-
     {
-        -- Enhanced f/t motions that work well with Leap
         "ggandor/flit.nvim",
         keys = function()
             local ret = {}
@@ -700,7 +656,6 @@ return {
         opts = { labeled_modes = "nx" },
     },
     {
-        -- Motion plugin that replaces the need to use a mouse for quick jumps
         "ggandor/leap.nvim",
         keys = {
             { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
@@ -713,13 +668,12 @@ return {
                 leap.opts[k] = v
             end
             leap.add_default_mappings(true)
+            -- Optional: remove 'x' and 'X' if you prefer
             vim.keymap.del({ "x", "o" }, "x")
             vim.keymap.del({ "x", "o" }, "X")
         end,
     },
-
     {
-        -- Display file path/breadcrumbs in a winbar
         "utilyre/barbecue.nvim",
         name = "barbecue",
         version = "*",
@@ -732,7 +686,6 @@ return {
             require("barbecue").setup({
                 create_autocmd = false, -- manually control updates
             })
-
             vim.api.nvim_create_autocmd({
                 "WinScrolled",
                 "BufWinEnter",
@@ -747,16 +700,12 @@ return {
             })
         end,
     },
-
     {
-        -- Simple session management (auto-save and restore sessions)
         "folke/persistence.nvim",
         event = "BufReadPre",
         opts = {},
     },
-
     {
-        -- Generate docstrings or annotations for functions, classes, etc.
         "danymat/neogen",
         enabled = false,
         dependencies = {
@@ -764,9 +713,7 @@ return {
             "L3MON4D3/LuaSnip",
         },
         config = function()
-            local neogen = require("neogen")
-
-            neogen.setup({
+            require("neogen").setup({
                 snippet_engine = "luasnip",
             })
         end,
@@ -794,18 +741,13 @@ return {
             },
         },
     },
-
     {
-        -- Collection of minimal yet feature-rich plugins (mini.*)
         "echasnovski/mini.nvim",
         config = function()
-            -- AI: better around/inside text objects
             require("mini.ai").setup({ n_lines = 500 })
-            -- Surround: add/change/delete surrounding brackets, quotes, etc.
             require("mini.surround").setup()
-            -- Pairs: auto insert matching brackets/quotes
             require("mini.pairs").setup()
-            -- Statusline: a minimal but useful statusline
+
             local statusline = require("mini.statusline")
             statusline.setup({
                 use_icons = vim.g.have_nerd_font,
@@ -816,24 +758,18 @@ return {
             end
         end,
     },
-
     {
-        -- Minimal Icons for use by mini.* or other plugins if devicons is not present
         "echasnovski/mini.icons",
         enabled = true,
         lazy = true,
         opts = {},
     },
-
     {
-        -- Syntax highlighting for kitty terminal config files
         "fladson/vim-kitty",
         -- Additional UI library
         "MunifTanjim/nui.nvim",
     },
-
     {
-        -- Customizable notifications with optional animations
         "rcarriga/nvim-notify",
         config = function()
             require("notify").setup({
@@ -841,15 +777,13 @@ return {
             })
         end,
     },
-
     {
-        -- Displays a popup of recent key presses (helpful for demos or screen sharing)
         "nvchad/showkeys",
         cmd = "ShowkeysToggle",
         opts = {
             timeout = 1,
             maxkeys = 6,
-            position = "bottom-right", -- can be: 'bottom-left', 'bottom-center', etc.
+            position = "bottom-right",
         },
         keys = {
             {
@@ -865,7 +799,9 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- CLOAK
     -- ─────────────────────────────────────────────────────────────────────────────
-    { "laytan/cloak.nvim" },
+    {
+        "laytan/cloak.nvim",
+    },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUST TOOLS & CRATES
@@ -888,19 +824,14 @@ return {
                         parameter_hints_prefix = "<- ",
                         other_hints_prefix = "-> ",
                     },
-
-                    -- Add this block to enable Runnables
                     runnables = {
-                        use_telescope = true, -- if you use telescope, it’ll show runnables in a picker
+                        use_telescope = true,
                     },
                 },
                 server = {
                     on_attach = function(_, bufnr)
-                        -- Existing keymaps
                         vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
                         vim.keymap.set("n", "<Leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
-
-                        -- Keymap to invoke Runnables
                         vim.keymap.set("n", "<Leader>rr", rt.runnables.runnables, { buffer = bufnr })
                     end,
                     capabilities = capabilities,
@@ -913,11 +844,8 @@ return {
                                 command = "clippy",
                             },
                             completion = {
-                                autoimport = {
-                                    enable = true,
-                                },
+                                autoimport = { enable = true },
                             },
-                            -- (Optional) Enable CodeLens (see below)
                             lens = {
                                 enable = true,
                             },
@@ -927,8 +855,6 @@ return {
             })
         end,
     },
-
-
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },
@@ -974,23 +900,19 @@ return {
 
     -- Lightbulb on CursorHold
     {
-        -- Using a separate spec only to attach the autocmd; could be merged elsewhere
         "kosayoda/nvim-lightbulb",
         config = function()
             require("nvim-lightbulb").setup({
-                sign = {
-                    enabled = false,
-                },
+                sign = { enabled = false },
                 virtual_text = {
                     enabled = true,
                     text = "💡",
                     virt_text_pos = "eol",
                 },
             })
-
             vim.cmd([[
-        autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb()
-      ]])
+              autocmd CursorHold,CursorHoldI * lua require('nvim-lightbulb').update_lightbulb()
+            ]])
         end,
     },
 
@@ -1006,8 +928,13 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     {
         "iamcco/markdown-preview.nvim",
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        ft = { "markdown" },
+        init = function()
+            vim.g.mkdp_filetypes = { "markdown" }
+        end,
         build = function()
-            -- Lazy.nvim allows a Lua build function:
+            -- This is the Lua-friendly approach recommended by the plugin
             vim.fn["mkdp#util#install"]()
         end,
     },
@@ -1017,3 +944,4 @@ return {
     { "junegunn/goyo.vim" },
 
 }
+
