@@ -828,33 +828,36 @@ return {
                         use_telescope = true,
                     },
                 },
-                server = {
-                    on_attach = function(_, bufnr)
-                        vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-                        vim.keymap.set("n", "<Leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
-                        vim.keymap.set("n", "<Leader>rr", rt.runnables.runnables, { buffer = bufnr })
-                    end,
-                    capabilities = capabilities,
-                    settings = {
-                        ["rust-analyzer"] = {
-                            cargo = {
-                                allFeatures = true,
-                            },
-                            checkOnSave = {
-                                command = "clippy",
-                            },
-                            completion = {
-                                autoimport = { enable = true },
-                            },
-                            lens = {
-                                enable = true,
-                            },
-                        },
-                    },
-                },
+                -- Comment out the entire `server` block so lsp-zero can take care of rust_analyzer
+                -- server = {
+                --   on_attach = function(_, bufnr)
+                --     vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+                --     vim.keymap.set("n", "<Leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
+                --     vim.keymap.set("n", "<Leader>rr", rt.runnables.runnables, { buffer = bufnr })
+                --   end,
+                --   capabilities = capabilities,
+                --   settings = {
+                --     ["rust-analyzer"] = {
+                --       cargo = {
+                --         allFeatures = true,
+                --       },
+                --       checkOnSave = {
+                --         command = "clippy",
+                --       },
+                --       completion = {
+                --         autoimport = { enable = true },
+                --       },
+                --       lens = {
+                --         enable = true,
+                --       },
+                --     },
+                --   },
+                -- },
             })
         end,
     },
+
+
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },
@@ -944,4 +947,3 @@ return {
     { "junegunn/goyo.vim" },
 
 }
-
