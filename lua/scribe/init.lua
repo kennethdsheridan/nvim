@@ -3,13 +3,13 @@
 -- ======================================================================
 
 -------------------------------------------------------------------------------
--- 0. SET MAPLEADER FIRST
+-- SET MAPLEADER FIRST
 -------------------------------------------------------------------------------
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -------------------------------------------------------------------------------
--- 1. LAZY.NVIM BOOTSTRAP
+-- LAZY.NVIM BOOTSTRAP
 -------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -24,18 +24,18 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -------------------------------------------------------------------------------
--- 2. SET UP LAZY.NVIM WITH OUR PLUGIN SPECS
+-- SET UP LAZY.NVIM WITH OUR PLUGIN SPECS
 -------------------------------------------------------------------------------
 -- (Assuming you created lua/scribe/plugins.lua with your plugin specs)
 require("lazy").setup("scribe.plugins")
 
 -------------------------------------------------------------------------------
--- 3. DEBUG/INFORMATION PRINT
+-- DEBUG/INFORMATION PRINT
 -------------------------------------------------------------------------------
 print("Hello, from Scribe, starting configuration and requirement imports")
 
 -------------------------------------------------------------------------------
--- 4. IMPORT REMAPS AND SETTINGS
+-- IMPORT REMAPS AND SETTINGS
 -------------------------------------------------------------------------------
 require("scribe.remap")
 require("scribe.set")
@@ -44,7 +44,7 @@ require("scribe.markdown")
 require("scribe.configs")
 
 -------------------------------------------------------------------------------
--- 5. OPTIONAL: AUTOCMD / COLOR SETUP
+-- OPTIONAL: AUTOCMD / COLOR SETUP
 -------------------------------------------------------------------------------
 -- Automatically run ColorMyPencils() on VimEnter if you have that function
 vim.api.nvim_create_autocmd("VimEnter", {
@@ -57,12 +57,12 @@ vim.keymap.set("n", "<leader>nd", function()
 end, { desc = "Dismiss all notifications" })
 
 -------------------------------------------------------------------------------
--- 6. CLIPBOARD INTEGRATION
+-- CLIPBOARD INTEGRATION
 -------------------------------------------------------------------------------
 vim.o.clipboard = "unnamedplus"
 
 -------------------------------------------------------------------------------
--- 7. MASON SETUP (FOR LSP + DAP INSTALLATION)
+-- MASON SETUP (FOR LSP + DAP INSTALLATION)
 -------------------------------------------------------------------------------
 require('mason').setup()
 
@@ -95,7 +95,7 @@ if mason_nvim_dap_ok then
 end
 
 -------------------------------------------------------------------------------
--- 8. DEFINE A COMMON ON_ATTACH FOR LSP
+-- DEFINE A COMMON ON_ATTACH FOR LSP
 -------------------------------------------------------------------------------
 local on_attach = function(client, bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr }
@@ -123,7 +123,7 @@ local on_attach = function(client, bufnr)
 end
 
 -------------------------------------------------------------------------------
--- 9. SET UP LSPCONFIG SERVERS MANUALLY
+-- SET UP LSPCONFIG SERVERS MANUALLY
 -------------------------------------------------------------------------------
 local lspconfig = require('lspconfig')
 
@@ -174,7 +174,7 @@ lspconfig.rust_analyzer.setup({
 })
 
 -------------------------------------------------------------------------------
--- 10. TABNINE CONFIGURATION (if used)
+-- TABNINE CONFIGURATION (if used)
 -------------------------------------------------------------------------------
 require('tabnine').setup({
     disable_auto_comment = true,
@@ -188,7 +188,7 @@ require('tabnine').setup({
 })
 
 -------------------------------------------------------------------------------
--- 11. FILETYPE OVERRIDES (HUJSON -> jsonc)
+-- FILETYPE OVERRIDES (HUJSON -> jsonc)
 -------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
     pattern = { "policy.hujson" },
@@ -198,8 +198,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 })
 
 -------------------------------------------------------------------------------
--- 12. FINAL DEBUG PRINT
+-- FINAL DEBUG PRINT
 -------------------------------------------------------------------------------
 print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
-
