@@ -13,6 +13,12 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- HA Proxy
+    -- ─────────────────────────────────────────────────────────────────────────────
+    { 'Joorem/vim-haproxy' },
+
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- Git Signs, Fugitive, and Diffview Integration
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Gitsigns
@@ -36,6 +42,9 @@ return {
             })
             vim.keymap.set("n", "<leader>gp", "<cmd>Gitsigns preview_hunk<CR>", {})
             vim.keymap.set("n", "<leader>gt", "<cmd>Gitsigns toggle_current_line_blame<CR>", {})
+            vim.keymap.set("n", "<leader>gb", "<cmd>Gitsigns blame_line<CR>", {
+                desc = "Show Git blame for current line",
+            })
         end,
     },
     -- Vim-fugitive
@@ -56,34 +65,34 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUSTACEANVIM
     -- ─────────────────────────────────────────────────────────────────────────────
-    {
-        "mrcjkb/rustaceanvim",
-        version = "^5",
-        ft = { "rust" },
-        config = function()
-            local mason_registry = require("mason-registry")
-            local codelldb = mason_registry.get_package("codelldb")
-            local extension_path = codelldb:get_install_path() .. "/extension/"
-            local codelldb_path = extension_path .. "adapter/codelldb"
-            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
-            local cfg = require("rustaceanvim.config")
-
-            vim.g.rustaceanvim = {
-                dap = {
-                    adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
-                },
-                server = {
-                    settings = {
-                        ["rust-analyzer"] = {
-                            checkOnSave = {
-                                command = "clippy",
-                            },
-                        },
-                    },
-                },
-            }
-        end,
-    },
+    --    {
+    --        "mrcjkb/rustaceanvim",
+    --        version = "^5",
+    --        ft = { "rust" },
+    --        config = function()
+    --            local mason_registry = require("mason-registry")
+    --            local codelldb = mason_registry.get_package("codelldb")
+    --            local extension_path = codelldb:get_install_path() .. "/extension/"
+    --            local codelldb_path = extension_path .. "adapter/codelldb"
+    --            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
+    --            local cfg = require("rustaceanvim.config")
+    --
+    --            vim.g.rustaceanvim = {
+    --                dap = {
+    --                    adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+    --                },
+    --                server = {
+    --                    settings = {
+    --                        ["rust-analyzer"] = {
+    --                            checkOnSave = {
+    --                                command = "clippy",
+    --                            },
+    --                        },
+    --                    },
+    --                },
+    --            }
+    --        end,
+    --    },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Project management
@@ -316,15 +325,24 @@ return {
         config = function()
             local lsp = require("lsp-zero").preset("recommended")
 
-            -- If you want custom config for servers:
             lsp.configure("rust_analyzer", {
                 settings = {
                     ["rust-analyzer"] = {
-                        cargo = { allFeatures = true },
-                        checkOnSave = { command = "clippy" },
+                        cargo = {
+                            allFeatures = true,
+                        },
+                        -- Enable procedural macros
+                        procMacro = {
+                            enable = true,
+                        },
+                        -- If you also want to run Clippy on save:
+                        checkOnSave = {
+                            command = "clippy",
+                        },
                     },
                 },
             })
+
 
             lsp.on_attach(function(client, bufnr)
                 local opts = { noremap = true, silent = true, buffer = bufnr }

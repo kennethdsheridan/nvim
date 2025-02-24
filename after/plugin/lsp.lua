@@ -21,9 +21,9 @@ local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
     ['<C-p>']     = cmp.mapping.select_prev_item(cmp_select), -- Select previous item
     ['<C-n>']     = cmp.mapping.select_next_item(cmp_select), -- Select next item
-    ['<C-y>']     = cmp.mapping.confirm({ select = true }), -- Confirm selection
-    ['<C-Space>'] = cmp.mapping.complete(),                 -- Trigger completion
-    ['<Tab>']     = cmp.mapping.confirm({ select = true }), -- Confirm selection with Tab
+    ['<C-y>']     = cmp.mapping.confirm({ select = true }),   -- Confirm selection
+    ['<C-Space>'] = cmp.mapping.complete(),                   -- Trigger completion
+    ['<Tab>']     = cmp.mapping.confirm({ select = true }),   -- Confirm selection with Tab
 })
 
 -- Adjust the completion sources and their priorities
@@ -63,17 +63,32 @@ cmp.setup({
 lsp.on_attach(function(client, bufnr)
     -- Set up key mappings for LSP functions
     local opts = { buffer = bufnr, remap = false }
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)              -- Go to definition
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)                    -- Hover for info
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)                -- Go to definition
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)                      -- Hover for info
     vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts) -- Workspace symbols
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)   -- Open diagnostics
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)            -- Next diagnostic
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)            -- Previous diagnostic
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)    -- Code action
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)     -- References
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)         -- Rename symbol
-    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)       -- Signature help
+    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)     -- Open diagnostics
+    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)              -- Next diagnostic
+    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)              -- Previous diagnostic
+    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)      -- Code action
+    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)       -- References
+    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)           -- Rename symbol
+    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)         -- Signature help
 end)
+
+
+-- Tell rust-analyzer to enable proc macros and build all features
+lsp.configure('rust_analyzer', {
+    settings = {
+        ['rust-analyzer'] = {
+            cargo = {
+                allFeatures = true,
+            },
+            procMacro = {
+                enable = true
+            },
+        }
+    }
+})
 
 -- Initialize the lsp setup
 lsp.setup()
