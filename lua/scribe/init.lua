@@ -26,7 +26,6 @@ vim.opt.rtp:prepend(lazypath)
 -------------------------------------------------------------------------------
 -- SET UP LAZY.NVIM WITH OUR PLUGIN SPECS
 -------------------------------------------------------------------------------
--- (Assuming you created lua/scribe/plugins.lua with your plugin specs)
 require("lazy").setup("scribe.plugins")
 
 -------------------------------------------------------------------------------
@@ -46,7 +45,6 @@ require("scribe.configs")
 -------------------------------------------------------------------------------
 -- OPTIONAL: AUTOCMD / COLOR SETUP
 -------------------------------------------------------------------------------
--- Automatically run ColorMyPencils() on VimEnter if you have that function
 vim.api.nvim_create_autocmd("VimEnter", {
     command = "lua ColorMyPencils()",
 })
@@ -64,9 +62,25 @@ vim.o.clipboard = "unnamedplus"
 -------------------------------------------------------------------------------
 -- MASON SETUP (FOR LSP + DAP INSTALLATION)
 -------------------------------------------------------------------------------
+-- Make sure 'mason' is set up *before* we configure 'mason-lspconfig'
 require('mason').setup()
 
--- LSP servers
+-- DAP tools (optional)
+local mason_nvim_dap_ok, mason_nvim_dap = pcall(require, "mason-nvim-dap")
+if mason_nvim_dap_ok then
+    mason_nvim_dap.setup({
+        ensure_installed = { "codelldb" }, -- for Rust debugging
+        automatic_installation = true,
+    })
+end
+
+-------------------------------------------------------------------------------
+-- LSP-ZERO SETUP
+-------------------------------------------------------------------------------
+-- 1) Load lsp-zero with the "recommended" preset (which configures many defaults)
+local lsp = require('lsp-zero').preset('recommended')
+
+-- 2) Ensure certain servers are installed via mason-lspconfig
 require('mason-lspconfig').setup({
     ensure_installed = {
         'bashls',
@@ -84,20 +98,8 @@ require('mason-lspconfig').setup({
     automatic_installation = false,
 })
 
--- DAP tools
--- Make sure you have mason-nvim-dap in your plugin list if you want this:
-local mason_nvim_dap_ok, mason_nvim_dap = pcall(require, "mason-nvim-dap")
-if mason_nvim_dap_ok then
-    mason_nvim_dap.setup({
-        ensure_installed = { "codelldb" }, -- crucial for Rust debugging
-        automatic_installation = true,
-    })
-end
-
--------------------------------------------------------------------------------
--- DEFINE A COMMON ON_ATTACH FOR LSP
--------------------------------------------------------------------------------
-local on_attach = function(client, bufnr)
+-- 3) Customize what happens when an LSP server attaches to a buffer
+lsp.on_attach(function(client, bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr }
 
     -- Some typical LSP keybinds
@@ -120,33 +122,22 @@ local on_attach = function(client, bufnr)
             end,
         })
     end
-end
+end)
 
--------------------------------------------------------------------------------
--- SET UP LSPCONFIG SERVERS MANUALLY
--------------------------------------------------------------------------------
-local lspconfig = require('lspconfig')
+-- 4) Optional: Fine-tune specific servers
+--    (For example, Rust Analyzer advanced config)
+lsp.configure('rust_analyzer', {
+    settings = {
+        ["rust-analyzer"] = {
+            cargo = { allFeatures = true },
+            procMacro = { enable = true },
+            checkOnSave = { command = "clippy" },
+        },
+    },
+})
 
-local servers = {
-    'bashls',
-    'dockerls',
-    'gopls',
-    'jsonls',
-    'marksman',
-    'pyright',
-    'sqlls',
-    'taplo',
-    'yamlls',
-}
-for _, server in ipairs(servers) do
-    lspconfig[server].setup({
-        on_attach = on_attach,
-    })
-end
-
--- Special config for Lua
-lspconfig.lua_ls.setup({
-    on_attach = on_attach,
+-- 5) For Lua, you can add extra workspace settings, etc.
+lsp.configure('lua_ls', {
     settings = {
         Lua = {
             diagnostics = {
@@ -161,20 +152,11 @@ lspconfig.lua_ls.setup({
     },
 })
 
--- (Optional) Rust Analyzer manual config
-lspconfig.rust_analyzer.setup({
-    on_attach = on_attach,
-    settings = {
-        ["rust-analyzer"] = {
-            cargo = { allFeatures = true },
-            procMacro = { enable = true },
-            checkOnSave = { command = "clippy" },
-        },
-    },
-})
+-- 6) Finally, initialize lsp-zero, which will set up all servers
+lsp.setup()
 
 -------------------------------------------------------------------------------
--- TABNINE CONFIGURATION (if used)
+-- TABNINE CONFIGURATION (IF USED)
 -------------------------------------------------------------------------------
 require('tabnine').setup({
     disable_auto_comment = true,
@@ -202,3 +184,4 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 -------------------------------------------------------------------------------
 print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
+
