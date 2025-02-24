@@ -1,4 +1,3 @@
--- plugins.lua
 return {
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -9,7 +8,6 @@ return {
         dependencies = {
             "rafamadriz/friendly-snippets",
         },
-        -- (Optionally) config = function() ... end
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -17,11 +15,9 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     { 'Joorem/vim-haproxy' },
 
-
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Git Signs, Fugitive, and Diffview Integration
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- Gitsigns
     {
         "lewis6991/gitsigns.nvim",
         config = function()
@@ -35,10 +31,6 @@ return {
                     untracked    = { text = "┆" },
                 },
                 current_line_blame = true,
-                -- If you see a warning about `current_line_blame_formatter_opts`, remove it or update gitsigns.
-                -- current_line_blame_formatter_opts = {
-                --   relative_time = true,
-                -- },
             })
             vim.keymap.set("n", "<leader>gp", "<cmd>Gitsigns preview_hunk<CR>", {})
             vim.keymap.set("n", "<leader>gt", "<cmd>Gitsigns toggle_current_line_blame<CR>", {})
@@ -47,52 +39,27 @@ return {
             })
         end,
     },
-    -- Vim-fugitive
     {
         "tpope/vim-fugitive",
-        -- cmd = { "Git", "Gdiffsplit", ... } -- optionally lazy‐load
     },
-    -- Diffview
     {
         "sindrets/diffview.nvim",
         config = function()
-            require("diffview").setup({
-                -- See :help diffview-config for possible settings
-            })
+            require("diffview").setup({})
         end,
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- RUSTACEANVIM
+    -- RUSTACEANVIM (Commented Out)
     -- ─────────────────────────────────────────────────────────────────────────────
-    --    {
-    --        "mrcjkb/rustaceanvim",
-    --        version = "^5",
-    --        ft = { "rust" },
-    --        config = function()
-    --            local mason_registry = require("mason-registry")
-    --            local codelldb = mason_registry.get_package("codelldb")
-    --            local extension_path = codelldb:get_install_path() .. "/extension/"
-    --            local codelldb_path = extension_path .. "adapter/codelldb"
-    --            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
-    --            local cfg = require("rustaceanvim.config")
-    --
-    --            vim.g.rustaceanvim = {
-    --                dap = {
-    --                    adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
-    --                },
-    --                server = {
-    --                    settings = {
-    --                        ["rust-analyzer"] = {
-    --                            checkOnSave = {
-    --                                command = "clippy",
-    --                            },
-    --                        },
-    --                    },
-    --                },
-    --            }
-    --        end,
-    --    },
+    -- {
+    --     "mrcjkb/rustaceanvim",
+    --     version = "^5",
+    --     ft = { "rust" },
+    --     config = function()
+    --         -- ...
+    --     end,
+    -- },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Project management
@@ -120,10 +87,6 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- (Removed the duplicated 'iamcco/markdown-preview.nvim' block here)
-    -- ─────────────────────────────────────────────────────────────────────────────
-
-    -- ─────────────────────────────────────────────────────────────────────────────
     -- LuaLine
     -- ─────────────────────────────────────────────────────────────────────────────
     {
@@ -140,14 +103,12 @@ return {
         lazy = true,
         enabled = true,
         opts = function()
-            return require("scribe.alfa-nvim").opts() -- calls M.opts()
+            return require("scribe.alfa-nvim").opts()
         end,
         config = function(_, dashboard)
-            require("scribe.alfa-nvim").config(_, dashboard) -- calls M.config()
+            require("scribe.alfa-nvim").config(_, dashboard)
         end,
-        dependencies = {
-            -- e.g., "nvim-tree/nvim-web-devicons",
-        },
+        dependencies = {},
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -173,9 +134,6 @@ return {
             local dapui = require("dapui")
             local mason_registry = require("mason-registry")
 
-            ------------------------------------------------------------------------
-            -- 1. Retrieve CodeLLDB paths from Mason
-            ------------------------------------------------------------------------
             local codelldb = mason_registry.get_package("codelldb")
             local extension_path = codelldb:get_install_path() .. "/extension/"
             local codelldb_path = extension_path .. "adapter/codelldb"
@@ -183,9 +141,6 @@ return {
             -- local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- macOS
             -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll" -- Windows
 
-            ------------------------------------------------------------------------
-            -- 2. Define the DAP adapter
-            ------------------------------------------------------------------------
             dap.adapters.rt_lldb = {
                 type = "server",
                 port = "${port}",
@@ -195,9 +150,6 @@ return {
                 },
             }
 
-            ------------------------------------------------------------------------
-            -- 3. DAP UI setup
-            ------------------------------------------------------------------------
             dapui.setup({
                 layouts = {
                     {
@@ -221,9 +173,6 @@ return {
                 },
             })
 
-            ------------------------------------------------------------------------
-            -- 4. Rust DAP configurations
-            ------------------------------------------------------------------------
             dap.configurations.rust = {
                 {
                     name = "Debug Rust",
@@ -271,9 +220,6 @@ return {
                 },
             }
 
-            ------------------------------------------------------------------------
-            -- 5. Auto-open/close DAP UI on debug sessions
-            ------------------------------------------------------------------------
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
@@ -286,7 +232,6 @@ return {
         end,
     },
 
-    -- LSP signature help source for nvim-cmp
     { "hrsh7th/cmp-nvim-lsp-signature-help" },
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -303,6 +248,7 @@ return {
     {
         "williamboman/mason-lspconfig.nvim",
         config = function()
+            -- No rust_analyzer here
             require("mason-lspconfig").setup({
                 ensure_installed = { "pyright" },
                 automatic_installation = true,
@@ -325,24 +271,8 @@ return {
         config = function()
             local lsp = require("lsp-zero").preset("recommended")
 
-            lsp.configure("rust_analyzer", {
-                settings = {
-                    ["rust-analyzer"] = {
-                        cargo = {
-                            allFeatures = true,
-                        },
-                        -- Enable procedural macros
-                        procMacro = {
-                            enable = true,
-                        },
-                        -- If you also want to run Clippy on save:
-                        checkOnSave = {
-                            command = "clippy",
-                        },
-                    },
-                },
-            })
-
+            -- NOTE: No 'rust_analyzer' configuration
+            -- lsp.configure("rust_analyzer", { ... }) is removed
 
             lsp.on_attach(function(client, bufnr)
                 local opts = { noremap = true, silent = true, buffer = bufnr }
@@ -352,7 +282,6 @@ return {
                 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
                 vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
                 vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, opts)
-                -- etc...
             end)
 
             lsp.setup()
@@ -413,10 +342,7 @@ return {
             })
         end,
     },
-
-    -- Icons / UI improvements for completion
     { "onsails/lspkind-nvim" },
-    -- LSP UI enhancements (lspsaga)
     { "glepnir/lspsaga.nvim" },
 
     -- ─────────────────────────────────────────────────────────────────────────────
@@ -431,26 +357,17 @@ return {
                     dotfiles = false,
                     custom = { ".DS_Store", "thumbs.db" },
                 },
-                git = {
-                    enable = true,
-                    ignore = false,
-                },
-                renderer = {
-                    highlight_opened_files = "all",
-                },
-                view = {
-                    width = 30,
-                },
+                git = { enable = true, ignore = false },
+                renderer = { highlight_opened_files = "all" },
+                view = { width = 30 },
             })
 
-            -- Auto-open on startup
             vim.api.nvim_create_autocmd("VimEnter", {
                 callback = function()
                     require("nvim-tree.api").tree.open()
                 end,
             })
 
-            -- Toggle with <leader>ft
             vim.keymap.set("n", "<leader>ft", "<cmd>NvimTreeToggle<CR>", {
                 silent = true,
                 noremap = true,
@@ -462,7 +379,6 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- GIT / DIFF / TROUBLE
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- (Removed duplicates for diffview & fugitive here)
     {
         "folke/trouble.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -627,11 +543,7 @@ return {
     {
         "folke/lazydev.nvim",
         ft = "lua",
-        opts = {
-            library = {
-                -- Example: { path = "luvit-meta/library", words = { "vim%.uv" } },
-            },
-        },
+        opts = {},
     },
     {
         "Bilal2453/luvit-meta",
@@ -646,18 +558,6 @@ return {
                 group_index = 0,
             })
         end,
-    },
-    {
-        "lukas-reineke/indent-blankline.nvim",
-        enabled = false,
-        event = { "BufReadPost", "BufNewFile" },
-        version = "2.1.0",
-        opts = {
-            char = "┊",
-            filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-            show_trailing_blankline_indent = false,
-            show_current_context = false,
-        },
     },
     {
         "editorconfig/editorconfig-vim",
@@ -686,7 +586,6 @@ return {
                 leap.opts[k] = v
             end
             leap.add_default_mappings(true)
-            -- Optional: remove 'x' and 'X' if you prefer
             vim.keymap.del({ "x", "o" }, "x")
             vim.keymap.del({ "x", "o" }, "X")
         end,
@@ -697,19 +596,18 @@ return {
         version = "*",
         dependencies = {
             "SmiteshP/nvim-navic",
-            "nvim-tree/nvim-web-devicons", -- optional icons
+            "nvim-tree/nvim-web-devicons",
         },
         opts = {},
         config = function()
             require("barbecue").setup({
-                create_autocmd = false, -- manually control updates
+                create_autocmd = false,
             })
             vim.api.nvim_create_autocmd({
                 "WinScrolled",
                 "BufWinEnter",
                 "CursorHold",
                 "InsertLeave",
-                -- "BufModifiedSet",
             }, {
                 group = vim.api.nvim_create_augroup("barbecue.updater", {}),
                 callback = function()
@@ -762,6 +660,8 @@ return {
     {
         "echasnovski/mini.nvim",
         config = function()
+            vim.g.miniindentscope_disable = true
+
             require("mini.ai").setup({ n_lines = 500 })
             require("mini.surround").setup()
             require("mini.pairs").setup()
@@ -770,7 +670,6 @@ return {
             statusline.setup({
                 use_icons = vim.g.have_nerd_font,
             })
-            ---@diagnostic disable-next-line: duplicate-set-field
             statusline.section_location = function()
                 return "%2l:%-2v"
             end
@@ -784,7 +683,6 @@ return {
     },
     {
         "fladson/vim-kitty",
-        -- Additional UI library
         "MunifTanjim/nui.nvim",
     },
     {
@@ -824,58 +722,44 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUST TOOLS & CRATES
     -- ─────────────────────────────────────────────────────────────────────────────
-    {
-        "simrat39/rust-tools.nvim",
-        config = function()
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
-            local rt = require("rust-tools")
-
-            rt.setup({
-                tools = {
-                    hover_actions = {
-                        auto_focus = true,
-                        border = "rounded",
-                    },
-                    inlay_hints = {
-                        auto = true,
-                        show_parameter_hints = true,
-                        parameter_hints_prefix = "<- ",
-                        other_hints_prefix = "-> ",
-                    },
-                    runnables = {
-                        use_telescope = true,
-                    },
-                },
-                -- Comment out the entire `server` block so lsp-zero can take care of rust_analyzer
-                -- server = {
-                --   on_attach = function(_, bufnr)
-                --     vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-                --     vim.keymap.set("n", "<Leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
-                --     vim.keymap.set("n", "<Leader>rr", rt.runnables.runnables, { buffer = bufnr })
-                --   end,
-                --   capabilities = capabilities,
-                --   settings = {
-                --     ["rust-analyzer"] = {
-                --       cargo = {
-                --         allFeatures = true,
-                --       },
-                --       checkOnSave = {
-                --         command = "clippy",
-                --       },
-                --       completion = {
-                --         autoimport = { enable = true },
-                --       },
-                --       lens = {
-                --         enable = true,
-                --       },
-                --     },
-                --   },
-                -- },
-            })
-        end,
-    },
-
-
+    --{
+    --    "simrat39/rust-tools.nvim",
+    --    config = function()
+    --        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+    --        local rt = require("rust-tools")
+    --        rt.setup({
+    --            tools = {
+    --                hover_actions = { auto_focus = true, border = "rounded" },
+    --                inlay_hints = {
+    --                    auto = true,
+    --                    show_parameter_hints = true,
+    --                    parameter_hints_prefix = "<- ",
+    --                    other_hints_prefix = "-> ",
+    --                },
+    --                runnables = { use_telescope = true },
+    --            },
+    --            -- Comment out the entire `server` block so it won't attach rust-analyzer
+    --            -- server = {
+    --            --   on_attach = function(_, bufnr)
+    --            --     vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+    --            --     ...
+    --            --   end,
+    --            --   capabilities = capabilities,
+    --            --   settings = {
+    --            --     ["rust-analyzer"] = {
+    --            --       cargo = {
+    --            --         allFeatures = true,
+    --            --       },
+    --            --       checkOnSave = {
+    --            --         command = "clippy",
+    --            --       },
+    --            --       ...
+    --            --     },
+    --            --   },
+    --            -- },
+    --        })
+    --    end,
+    --},
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },
@@ -904,10 +788,7 @@ return {
                 completion = {
                     insert_closing_quote = true,
                 },
-                null_ls = {
-                    enabled = false,
-                    name = "crates.nvim",
-                },
+                null_ls = { enabled = false, name = "crates.nvim" },
             })
         end,
     },
@@ -918,8 +799,6 @@ return {
     { "kosayoda/nvim-lightbulb" },
     { "mfussenegger/nvim-lint" },
     { "mhartington/formatter.nvim" },
-
-    -- Lightbulb on CursorHold
     {
         "kosayoda/nvim-lightbulb",
         config = function()
@@ -955,7 +834,6 @@ return {
             vim.g.mkdp_filetypes = { "markdown" }
         end,
         build = function()
-            -- This is the Lua-friendly approach recommended by the plugin
             vim.fn["mkdp#util#install"]()
         end,
     },
@@ -965,3 +843,4 @@ return {
     { "junegunn/goyo.vim" },
 
 }
+

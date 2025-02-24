@@ -77,7 +77,7 @@ end
 -------------------------------------------------------------------------------
 -- LSP-ZERO SETUP
 -------------------------------------------------------------------------------
--- 1) Load lsp-zero with the "recommended" preset (which configures many defaults)
+-- 1) Load lsp-zero with the "recommended" preset
 local lsp = require('lsp-zero').preset('recommended')
 
 -- 2) Ensure certain servers are installed via mason-lspconfig
@@ -90,10 +90,11 @@ require('mason-lspconfig').setup({
         'lua_ls',
         'marksman',
         'pyright',
-        'rust_analyzer',
         'sqlls',
         'taplo',
         'yamlls',
+        -- ADD RUST HERE
+        'rust_analyzer',
     },
     automatic_installation = false,
 })
@@ -124,24 +125,27 @@ lsp.on_attach(function(client, bufnr)
     end
 end)
 
--- 4) Optional: Fine-tune specific servers
---    (For example, Rust Analyzer advanced config)
-lsp.configure('rust_analyzer', {
+-- 4) Optional: Fine-tune Rust Analyzer advanced config
+lsp.configure("rust_analyzer", {
     settings = {
         ["rust-analyzer"] = {
             cargo = { allFeatures = true },
             procMacro = { enable = true },
             checkOnSave = { command = "clippy" },
+
+            diagnostics = {
+                -- This is the important part:
+                disabled = { "unresolved-proc-macro", "macro-error" },
+            },
         },
     },
 })
-
--- 5) For Lua, you can add extra workspace settings, etc.
+-- 5) Configure Lua separately (optional)
 lsp.configure('lua_ls', {
     settings = {
         Lua = {
             diagnostics = {
-                globals = { 'vim' }, -- Recognize the `vim` global
+                globals = { 'vim' }, -- Recognize `vim` global
             },
             workspace = {
                 library = vim.api.nvim_get_runtime_file("", true),
@@ -184,4 +188,3 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 -------------------------------------------------------------------------------
 print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
-

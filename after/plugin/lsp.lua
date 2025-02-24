@@ -76,19 +76,19 @@ lsp.on_attach(function(client, bufnr)
 end)
 
 
--- Tell rust-analyzer to enable proc macros and build all features
-lsp.configure('rust_analyzer', {
-    settings = {
-        ['rust-analyzer'] = {
-            cargo = {
-                allFeatures = true,
-            },
-            procMacro = {
-                enable = true
-            },
-        }
-    }
-})
+---- Tell rust-analyzer to enable proc macros and build all features
+--lsp.configure('rust_analyzer', {
+--    settings = {
+--        ['rust-analyzer'] = {
+--            cargo = {
+--                allFeatures = true,
+--            },
+--            procMacro = {
+--                enable = true
+--            },
+--        }
+--    }
+--})
 
 -- Initialize the lsp setup
 lsp.setup()
