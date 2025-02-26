@@ -235,6 +235,51 @@ return {
     { "hrsh7th/cmp-nvim-lsp-signature-help" },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- Themes
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        "sainnhe/everforest",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.g.everforest_background = "medium" -- Options: soft, medium, hard
+            vim.cmd("colorscheme everforest")
+        end
+    },
+    {
+        "folke/tokyonight.nvim",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.cmd("colorscheme tokyonight-moon") -- Options: tokyonight-night, tokyonight-storm, tokyonight-moon, tokyonight-day
+        end
+    },
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            require("catppuccin").setup({
+                flavour = "mocha", -- Options: latte, frappe, macchiato, mocha
+            })
+            vim.cmd("colorscheme catppuccin")
+        end
+    },
+    {
+        "shaunsingh/nord.nvim",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.cmd("colorscheme nord")
+        end
+    },
+
+
+
+
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- LSP CONFIG / MASON / LSP-ZERO
     -- ─────────────────────────────────────────────────────────────────────────────
     { "neovim/nvim-lspconfig" },
@@ -843,4 +888,3 @@ return {
     { "junegunn/goyo.vim" },
 
 }
-
