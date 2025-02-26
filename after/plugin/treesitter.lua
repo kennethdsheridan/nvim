@@ -41,7 +41,7 @@ require('nvim-treesitter.configs').setup({
     -- 6) An optional function that can disable Treesitter for certain conditions,
     --    e.g. extremely large files. This keeps Neovim responsive.
     disable = function(_, buf)
-      local max_filesize = 1024 * 1024 -- 100 KB
+      local max_filesize = 2 * 1024 * 1024 -- 100 KB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then
         -- Return true to disable Treesitter for this file

@@ -107,13 +107,17 @@ vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
 
--- Keybinding to open Telescope to find files
-vim.keymap.set('n', '<leader>ff', function() require('telescope.builtin').find_files() end,
-    { desc = 'Open Telescope to find files' })
+local telescope = require('telescope.builtin')
 
--- Keybinding to open Telescope to search for strings within files
-vim.keymap.set('n', '<leader>fg', function() require('telescope.builtin').live_grep() end,
-    { desc = 'Open Telescope to grep for strings' })
+-- Keybinding to open Telescope to find files (from project root)
+vim.keymap.set('n', '<leader>ff', function()
+    telescope.find_files({ cwd = vim.fn.getcwd() })
+end, { desc = 'Open Telescope to find files from project root' })
+
+-- Keybinding to open Telescope to search for strings (from project root)
+vim.keymap.set('n', '<leader>fg', function()
+    telescope.live_grep({ cwd = vim.fn.getcwd() })
+end, { desc = 'Open Telescope to grep for strings from project root' })
 
 -- Additional keybindings for project navigation and visual mode adjustments
 
