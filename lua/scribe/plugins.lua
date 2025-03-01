@@ -50,18 +50,39 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- Monorepo
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        "imNel/monorepo.nvim",
+        dependencies = { "nvim-telescope/telescope.nvim" },
+        -- No cmd = { ... }, so it loads right away (or you can do event = "VeryLazy" if you like)
+        config = function()
+            require("monorepo").setup({
+                silent = false,
+                autoload_telescope = true,
+                data_path = vim.fn.stdpath("data") .. "/monorepo.json",
+            })
+        end,
+    },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
+    -- Rust Owl
+    -- ─────────────────────────────────────────────────────────────────────────────
+    { "cordx56/rustowl",   dependencies = { "neovim/nvim-lspconfig" } },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- NeoGit
     -- ─────────────────────────────────────────────────────────────────────────────
     {
         "NeogitOrg/neogit",
         dependencies = {
-            "nvim-lua/plenary.nvim", -- required
+            "nvim-lua/plenary.nvim",  -- required
             "sindrets/diffview.nvim", -- optional - Diff integration
 
             -- Only one of these is needed.
             "nvim-telescope/telescope.nvim", -- optional
-            "ibhagwan/fzf-lua",      -- optional
-            "echasnovski/mini.pick", -- optional
+            "ibhagwan/fzf-lua",              -- optional
+            "echasnovski/mini.pick",         -- optional
         },
         config = true
     },
@@ -69,14 +90,14 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUSTACEANVIM (Commented Out)
     -- ─────────────────────────────────────────────────────────────────────────────
-    -- {
-    --     "mrcjkb/rustaceanvim",
-    --     version = "^5",
-    --     ft = { "rust" },
-    --     config = function()
-    --         -- ...
-    --     end,
-    -- },
+    {
+        "mrcjkb/rustaceanvim",
+        version = "^5",
+        ft = { "rust" },
+        config = function()
+            -- ...
+        end,
+    },
 
     -- ─────────────────────────────────────────────────────────────────────────────
     -- Project management
@@ -278,7 +299,7 @@ return {
         priority = 1000,
         config = function()
             require("catppuccin").setup({
-                flavour = "mocha", -- Options: latte, frappe, macchiato, mocha
+                flavour = "frappe", -- Options: latte, frappe, macchiato, mocha
             })
             vim.cmd("colorscheme catppuccin")
         end
@@ -424,11 +445,11 @@ return {
                 view = { width = 30 },
             })
 
-            vim.api.nvim_create_autocmd("VimEnter", {
-                callback = function()
-                    require("nvim-tree.api").tree.open()
-                end,
-            })
+            --vim.api.nvim_create_autocmd("VimEnter", {
+            --    callback = function()
+            --        require("nvim-tree.api").tree.open()
+            --    end,
+            --})
 
             vim.keymap.set("n", "<leader>ft", "<cmd>NvimTreeToggle<CR>", {
                 silent = true,
@@ -454,7 +475,6 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     {
         "nvim-telescope/telescope.nvim",
-        tag = "0.1.6",
         dependencies = { "nvim-lua/plenary.nvim" },
     },
 
@@ -685,7 +705,7 @@ return {
     },
     {
         "danymat/neogen",
-        enabled = false,
+        enabled = true,
         dependencies = {
             "nvim-treesitter/nvim-treesitter",
             "L3MON4D3/LuaSnip",
@@ -784,44 +804,42 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUST TOOLS & CRATES
     -- ─────────────────────────────────────────────────────────────────────────────
-    --{
-    --    "simrat39/rust-tools.nvim",
-    --    config = function()
-    --        local capabilities = require("cmp_nvim_lsp").default_capabilities()
-    --        local rt = require("rust-tools")
-    --        rt.setup({
-    --            tools = {
-    --                hover_actions = { auto_focus = true, border = "rounded" },
-    --                inlay_hints = {
-    --                    auto = true,
-    --                    show_parameter_hints = true,
-    --                    parameter_hints_prefix = "<- ",
-    --                    other_hints_prefix = "-> ",
-    --                },
-    --                runnables = { use_telescope = true },
-    --            },
-    --            -- Comment out the entire `server` block so it won't attach rust-analyzer
-    --            -- server = {
-    --            --   on_attach = function(_, bufnr)
-    --            --     vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-    --            --     ...
-    --            --   end,
-    --            --   capabilities = capabilities,
-    --            --   settings = {
-    --            --     ["rust-analyzer"] = {
-    --            --       cargo = {
-    --            --         allFeatures = true,
-    --            --       },
-    --            --       checkOnSave = {
-    --            --         command = "clippy",
-    --            --       },
-    --            --       ...
-    --            --     },
-    --            --   },
-    --            -- },
-    --        })
-    --    end,
-    --},
+    {
+        "simrat39/rust-tools.nvim",
+        config = function()
+            local capabilities = require("cmp_nvim_lsp").default_capabilities()
+            local rt = require("rust-tools")
+            rt.setup({
+                tools = {
+                    hover_actions = { auto_focus = true, border = "rounded" },
+                    inlay_hints = {
+                        auto = true,
+                        show_parameter_hints = true,
+                        parameter_hints_prefix = "<- ",
+                        other_hints_prefix = "-> ",
+                    },
+                    runnables = { use_telescope = true },
+                },
+                -- Comment out the entire `server` block so it won't attach rust-analyzer
+                server = {
+                    on_attach = function(_, bufnr)
+                        vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+                    end,
+                    capabilities = capabilities,
+                    settings = {
+                        ["rust-analyzer"] = {
+                            cargo = {
+                                allFeatures = true,
+                            },
+                            checkOnSave = {
+                                command = "clippy",
+                            },
+                        },
+                    },
+                },
+            })
+        end,
+    },
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },

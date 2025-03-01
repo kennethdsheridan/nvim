@@ -5,13 +5,31 @@ local lsp = require('lsp-zero').preset('recommended')
 require('mason').setup()
 require('mason-lspconfig').setup({
     ensure_installed = {
+        -- Web dev
+        'tsserver',
         'eslint',
-        'lua_ls',
-        'rust_analyzer',
-    },
-    automatic_installation = true, -- Optional, automatically install LSP servers
-})
+        'html',
+        'cssls',
+        'tailwindcss',
 
+        -- Languages
+        'lua_ls',        -- Lua
+        'pyright',       -- Python
+        'rust_analyzer', -- Rust
+        'gopls',         -- Go
+        'clangd',        -- C/C++
+        'bashls',        -- Bash
+
+        -- Config files
+        'jsonls',
+        'yamlls',
+
+        -- Others
+        'dockerls',
+        'marksman', -- Markdown
+    },
+    automatic_installation = true,
+})
 -- Require necessary modules
 local cmp = require('cmp')         -- Completion engine
 local lspkind = require('lspkind') -- Adds icons to completion items
