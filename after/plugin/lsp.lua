@@ -55,26 +55,31 @@ cmp.setup({
 
     -- Formatting block for custom icons and source display
     formatting = {
+        -- Specify which fields are shown and in what order
+        fields = { "kind", "abbr", "menu" },
+
         format = function(entry, vim_item)
             -- Use default lspkind icons, with a fallback to empty if none exists
             vim_item.kind = lspkind.presets.default[vim_item.kind] or ""
 
-            -- Add Rust-specific icon 🦀 for rust_analyzer LSP items (e.g., Rust modules)
+            -- Add Rust-specific icon for rust_analyzer LSP items
             if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module' and entry.completion_item.label:find("::") then
-                vim_item.kind = '🦀' -- Rust crab emoji for Rust modules
+                vim_item.kind = '🦀'
             end
 
-            -- For other sources, keep menu display simple and clean
+            -- For other sources, keep menu display simple
             vim_item.menu = ({
-                buffer = "[Buffer]",
+                buffer   = "[Buffer]",
                 nvim_lsp = "[LSP]",
-                path = "[Path]",
-                luasnip = "[Snippet]",
+                path     = "[Path]",
+                luasnip  = "[Snippet]",
             })[entry.source.name] or ""
 
             return vim_item
         end,
     },
+
+
 }) -- This was missing its closing parenthesis
 
 -- Configure LSP client on attachment to buffer
