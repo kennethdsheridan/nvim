@@ -85,23 +85,23 @@ return {
         },
     },
 
-    -- C Language Documentation
-    {
-        "Freed-Wu/cppman.nvim",
-        ft = { "c", "cpp" },
-        cmd = "Cppman",
-        config = function()
-            require("cppman").setup()
-
-            -- Keymaps for C documentation
-            vim.api.nvim_create_autocmd("FileType", {
-                pattern = { "c", "cpp" },
-                callback = function()
-                    vim.keymap.set("n", "<leader>cm", "<cmd>Cppman<cr>", { buffer = true, desc = "Open C/C++ Manual" })
-                end,
-            })
-        end,
-    },
+    --    -- C Language Documentation
+    --    {
+    --        "Freed-Wu/cppman.nvim",
+    --        ft = { "c", "cpp" },
+    --        cmd = "Cppman",
+    --        config = function()
+    --            require("cppman").setup()
+    --
+    --            -- Keymaps for C documentation
+    --            vim.api.nvim_create_autocmd("FileType", {
+    --                pattern = { "c", "cpp" },
+    --                callback = function()
+    --                    vim.keymap.set("n", "<leader>cm", "<cmd>Cppman<cr>", { buffer = true, desc = "Open C/C++ Manual" })
+    --                end,
+    --            })
+    --        end,
+    --    },
 
     -- Bash Documentation
     {
