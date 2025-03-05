@@ -20,6 +20,15 @@ vim.keymap.set("n", "<F12>", require("dap").step_out)
 vim.keymap.set("n", "<Leader>b", require("dap").toggle_breakpoint)
 vim.keymap.set("n", "<Leader>dt", require("dap").terminate)
 
+-- Split horizontally with a terminal session on top
+vim.keymap.set("n", "<leader>tt", function()
+    -- "10sp" means "horizontal split 10 lines tall"
+    -- "aboveleft" ensures it appears above the current window
+    -- Then open the built-in terminal
+    vim.cmd("aboveleft 10split | terminal")
+end, { desc = "Open terminal (top horizontal split)" })
+
+
 
 
 -- Rustacean vim mapping

@@ -28,7 +28,7 @@ end
 M.tabnine = function()
     return {
         max_lines = 1,
-        max_num_results = 5,
+        max_num_results = 1,
         sort = true,
         run_on_every_keystroke = true,
         show_prediction_strength = true
