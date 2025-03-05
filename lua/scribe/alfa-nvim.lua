@@ -1,111 +1,58 @@
-return {
-    "goolord/alpha-nvim",
-    enabled = true,
-    event = "VimEnter",
-    lazy = true,
-    opts = function()
-        local dashboard = require("alpha.themes.dashboard")
-        local logo = [[
-в–€в–€в–€в•—   в–€в–€в•—в–€в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в•—   в–€в–€в•—в–€в–€в•—в–€в–€в–€в•—   в–€в–€в–€в•—
-в–€в–€в–€в–€в•—  в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ђв•ђв•ќв–€в–€в•”в•ђв•ђв•ђв–€в–€в•—в–€в–€в•‘   в–€в–€в•‘в–€в–€в•‘в–€в–€в–€в–€в•— в–€в–€в–€в–€в•‘
-в–€в–€в•”в–€в–€в•— в–€в–€в•‘в–€в–€в–€в–€в–€в•—  в–€в–€в•‘   в–€в–€в•‘в–€в–€в•‘   в–€в–€в•‘в–€в–€в•‘в–€в–€в•”в–€в–€в–€в–€в•”в–€в–€в•‘
-в–€в–€в•‘в•љв–€в–€в•—в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ќ  в–€в–€в•‘   в–€в–€в•‘в•љв–€в–€в•— в–€в–€в•”в•ќв–€в–€в•‘в–€в–€в•‘в•љв–€в–€в•”в•ќв–€в–€в•‘
-в–€в–€в•‘ в•љв–€в–€в–€в–€в•‘в–€в–€в–€в–€в–€в–€в–€в•—в•љв–€в–€в–€в–€в–€в–€в•”в•ќ в•љв–€в–€в–€в–€в•”в•ќ в–€в–€в•‘в–€в–€в•‘ в•љв•ђв•ќ в–€в–€в•‘
-в•љв•ђв•ќ  в•љв•ђв•ђв•ђв•ќв•љв•ђв•ђв•ђв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќ   в•љв•ђв•ђв•ђв•ќ  в•љв•ђв•ќв•љв•ђв•ќ     в•љв•ђв•ќ
-    ]]
-
-        local notEmacs = [[
-
-в–€в–€в–€в•—   в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в–€в–€в•—    в–€в–€в–€в–€в–€в–€в–€в•—в–€в–€в–€в•—   в–€в–€в–€в•— в–€в–€в–€в–€в–€в•—  в–€в–€в–€в–€в–€в–€в•—в–€в–€в–€в–€в–€в–€в–€в•—
-в–€в–€в–€в–€в•—  в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ђв–€в–€в•—в•љв•ђв•ђв–€в–€в•”в•ђв•ђв•ќ    в–€в–€в•”в•ђв•ђв•ђв•ђв•ќв–€в–€в–€в–€в•— в–€в–€в–€в–€в•‘в–€в–€в•”в•ђв•ђв–€в–€в•—в–€в–€в•”в•ђв•ђв•ђв•ђв•ќв–€в–€в•”в•ђв•ђв•ђв•ђв•ќ
-в–€в–€в•”в–€в–€в•— в–€в–€в•‘в–€в–€в•‘   в–€в–€в•‘   в–€в–€в•‘       в–€в–€в–€в–€в–€в•—  в–€в–€в•”в–€в–€в–€в–€в•”в–€в–€в•‘в–€в–€в–€в–€в–€в–€в–€в•‘в–€в–€в•‘     в–€в–€в–€в–€в–€в–€в–€в•—
-в–€в–€в•‘в•љв–€в–€в•—в–€в–€в•‘в–€в–€в•‘   в–€в–€в•‘   в–€в–€в•‘       в–€в–€в•”в•ђв•ђв•ќ  в–€в–€в•‘в•љв–€в–€в•”в•ќв–€в–€в•‘в–€в–€в•”в•ђв•ђв–€в–€в•‘в–€в–€в•‘     в•љв•ђв•ђв•ђв•ђв–€в–€в•‘
-в–€в–€в•‘ в•љв–€в–€в–€в–€в•‘в•љв–€в–€в–€в–€в–€в–€в•”в•ќ   в–€в–€в•‘       в–€в–€в–€в–€в–€в–€в–€в•—в–€в–€в•‘ в•љв•ђв•ќ в–€в–€в•‘в–€в–€в•‘  в–€в–€в•‘в•љв–€в–€в–€в–€в–€в–€в•—в–€в–€в–€в–€в–€в–€в–€в•‘
-в•љв•ђв•ќ  в•љв•ђв•ђв•ђв•ќ в•љв•ђв•ђв
-•ђв•ђв•ђв•ќ    в•љв•ђв•ќ       в•љв•ђв•ђв•ђв•ђв•ђв•ђв•ќв•љв•ђв•ќ     в•љв•ђв•ќв•љв•ђв•ќ  в•љв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќв•љв•ђв•ђв•ђв•ђв•ђв•ђв•ќ
-
-]]
-
-        local notVscode = [[
-
-в–€в–€в–€в•—   в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в–€в–€в•—    в–€в–€в•—   в–€в–€в•—в–€в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в•— в–€в–€в–€в–€в–€в–€в–€в•—
-в–€в–€в–€в–€в•—  в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ђв–€в–€в•—в•љв•ђв•ђв–€в–€в•”в•ђв•ђв•ќ    в–€в–€в•‘   в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ђв•ђв•ќв–€в–€в•”в•ђв•ђв•ђв•ђв•ќв–€в–€в•”в•ђв•ђв•ђв–€в–€в•—в–€в–€в•”в•ђв•ђв–€в–€в•—в–€в–€в•”в•ђв•ђв•ђв•ђв•ќ
-в–€в–€в•”в–€в–€в•— в–€в–€в•‘в–€в–€в•‘   в–€в–€в•‘   в–€в–€в•‘       в–€в–€в•‘   в–€в–€в•‘в–€в–€в–€в–€в–€в–€в–€в•—в–€в–€в•‘     в–€в–€в•‘   в–€в–€в•‘в–€в–€в•‘  в–€в–€в•‘в–€в–€в–€в–€в–€в•—
-в–€в–€в•‘в•љв–€в–€в•—в–€в–€в•‘в–€в–€в•‘   в–€в–€в•‘   в–€в–€в•‘       в•љв–€в–€в•— в–€в–€в•”в•ќв•љв•ђв•ђв•ђв•ђв–€в–€в•‘в–€в–€в•‘     в–€в–€в•‘   в–€в–€в•‘в–€в–€в•‘  в–€в–€в•‘в–€в–€в•”в•ђв•ђв•ќ
-в–€в–€в•‘ в•љв–€в–€в–€в–€в•‘в•љв–€в–€в–€в–€в–€в–€в•”в•ќ   в–€в–€в•‘        в•љв–€в–€в–€в–€в•”в•ќ в–€в–€в–€в–€в–€в–€в–€в•‘в•љв–€в–€в–€в–€в–€в–€в•—в•љв–€в–€в–€в–€в–€в–€в•”в•ќв–€в–€в–€в–€в–€в–€в•”в•ќв–€в–€в–€в–€в–€в–€в–€в•—
-в•љв•ђв•ќ  в•љв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќ    в•љв•ђв•ќ         в•љв•ђв•ђв•ђв•ќ  в•љв•ђв•ђв•ђв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ќ в•љв•ђв•ђв•ђв•ђв•ђв•ђв•ќ
-
-    ]]
-        dashboard.section.header.val = vim.split(logo, "\n")
-        dashboard.section.buttons.val = {
-            dashboard.button("f", "пЂ‚ " .. " Find file", ":Telescope find_files <CR>"),
-            -- dashboard.button("n", "п…› " .. " New file", ":ene <BAR> startinsert <CR>"),
-            -- dashboard.button("r", "пѓ… " .. " Recent files", ":Telescope oldfiles <CR>"),
-            -- dashboard.button("g", "пЂў " .. " Find text", ":Telescope live_grep <CR>"),
-            dashboard.button("s", "пЂ® " .. "Restore Session", '<cmd>lua require("persistence").load()<cr>'),
-            -- dashboard.button("c", "пђЈ " .. " Config", ":e ~/.config/nvim/ <CR>"),
-            -- dashboard.button("l", "у°’І " .. " Lazy", ":Lazy<CR>"),
-            dashboard.button("q", "пђ¦ " .. " Quit", ":qa<CR>"),
-        }
-        for _, button in ipairs(dashboard.section.buttons.val) do
-            button.opts.hl = "AlphaButtons"
-            button.opts.hl_shortcut = "AlphaShortcut"
-        end
-        dashboard.section.header.opts.hl = "AlphaHeader"
-        dashboard.section.buttons.opts.hl = "AlphaButtons"
-        dashboard.section.footer.opts.hl = "AlphaFooter"
-        dashboard.opts.layout[1].val = 8
-        return dashboard
-    end,
-    config = function(_, dashboard)
-        -- close Lazy and re-open when the dashboard is ready
-        if vim.o.filetype == "lazy" then
-            vim.cmd.close()
-            vim.api.nvim_create_autocmd("User", {
-                pattern = "AlphaReady",
-                callback = function()
-                    require("lazy").show()
-                end,
-            })
-        end
-
-        require("alpha").setup(dashboard.opts)
-
-        vim.api.nvim_create_autocmd("User", {
-            pattern = "LazyVimStarted",
-            callback = function()
-                local stats = require("lazy").stats()
-                local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-                dashboard.section.footer.val = "вљЎ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
-                pcall(vim.cmd.AlphaRedraw)
-            end,
-        })
-    end,
-}
-
 local M = {}
 
 M.opts = function()
     local dashboard = require("alpha.themes.dashboard")
     local logo = [[
+вввв   ввввввввввв ввввввв ввв   вввввввввв   вввв
+ввввв  ввввввввввввввввввввввв   ввввввввввв ввввв
+вввввв ввввввввв  ввв   вввввв   ввввввввввввввввв
+вввввввввввввввв  ввв   ввввввв вввввввввввввввввв
+ввв ввввввввввввввввввввввв ввввввв вввввв ввв ввв
+ввв  ввввввввввввв ввввввв   ввввв  вввввв     ввв
+    ]]
 
+    local notEmacs = [[
 
+вввв   ввв ввввввв ввввввввв    вввввввввввв   вввв вввввв  ввввввввввввввв
+ввввв  ввввввввввввввввввввв    ввввввввввввв ввввввввввввввввввввввввввввв
+вввввв вввввв   ввв   ввв       вввввв  вввввввввввввввввввввв     вввввввв
+ввввввввввввв   ввв   ввв       вввввв  вввввввввввввввввввввв     вввввввв
+ввв ввввввввввввввв   ввв       ввввввввввв ввв вввввв  ввввввввввввввввввв
+ввв  ввввв вввв
+ввв    ввв       ввввввввввв     вввввв  ввв ввввввввввввввв
 
-                       їїїї   їїїїїїїїїїї їїїїїїї їїї   їїїїїїїїїї   їїїї
-                       їїїїї  їїїїїїїїїїїїїїїїїїїїїїї   їїїїїїїїїїї їїїїї
-                       їїїїїї їїїїїїїїї  їїї   їїїїїї   їїїїїїїїїїїїїїїїї
-                       їїїїїїїїїїїїїїїї  їїї   їїїїїїї їїїїїїїїїїїїїїїїїї
-                       їїї їїїїїїїїїїїїїїїїїїїїїїї їїїїїїї їїїїїї їїї їїї
-                       їїї  їїїїїїїїїїїїї їїїїїїї   їїїїї  їїїїїї     їїї
-                           ]]
+]]
 
+    local notVscode = [[
+
+вввв   ввв ввввввв ввввввввв    ввв   ввввввввввв ввввввв ввввввв ввввввв вввввввв
+ввввв  ввввввввввввввввввввв    ввв   вввввввввввввввввввввввввввввввввввввввввввв
+вввввв вввввв   ввв   ввв       ввв   вввввввввввввв     ввв   вввввв  ввввввввв
+ввввввввввввв   ввв   ввв       вввв ввввввввввввввв     ввв   вввввв  ввввввввв
+ввв ввввввввввввввв   ввв        ввввввв ввввввввввввввввввввввввввввввввввввввввв
+ввв  ввввв ввввввв    ввв         ввввв  вввввввв ввввввв ввввввв ввввввв вввввввв
+
+    ]]
+
+    -- Choose which logo to display
     dashboard.section.header.val = vim.split(logo, "\n")
+
     dashboard.section.buttons.val = {
-        dashboard.button("f", "Find file", ":Telescope find_files <CR>"),
-        dashboard.button("s", "Restore Session", ":SessionRestore <CR>"),
-        dashboard.button("d", "Documentation", ":Telescope command_palette <CR>"),
-        dashboard.button("q", "Quit", ":qa<CR>"),
+        dashboard.button("f", "п " .. " Find file", ":Telescope find_files <CR>"),
+        -- dashboard.button("n", "п " .. " New file", ":ene <BAR> startinsert <CR>"),
+        -- dashboard.button("r", "п " .. " Recent files", ":Telescope oldfiles <CR>"),
+        -- dashboard.button("g", "пў " .. " Find text", ":Telescope live_grep <CR>"),
+        dashboard.button("s", "п® " .. "Restore Session", '<cmd>lua require("persistence").load()<cr>'),
+        -- dashboard.button("c", "пЈ " .. " Config", ":e ~/.config/nvim/ <CR>"),
+        -- dashboard.button("l", "у°І " .. " Lazy", ":Lazy<CR>"),
+        dashboard.button("d", "п " .. " Documentation", ":Telescope command_palette <CR>"),
+        dashboard.button("q", "п¦ " .. " Quit", ":qa<CR>"),
     }
+
+    for _, button in ipairs(dashboard.section.buttons.val) do
+        button.opts.hl = "AlphaButtons"
+        button.opts.hl_shortcut = "AlphaShortcut"
+    end
 
     -- Add documentation section
     local docs_section = {
@@ -118,6 +65,10 @@ M.opts = function()
         },
         position = "center",
     }
+
+    dashboard.section.header.opts.hl = "AlphaHeader"
+    dashboard.section.buttons.opts.hl = "AlphaButtons"
+    dashboard.section.footer.opts.hl = "AlphaFooter"
 
     dashboard.config.layout = {
         { type = "padding", val = 2 },
@@ -152,10 +103,18 @@ M.config = function(_, dashboard)
         callback = function()
             local stats = require("lazy").stats()
             local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-            dashboard.section.footer.val = "ї Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
+            dashboard.section.footer.val = "вЎ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
             pcall(vim.cmd.AlphaRedraw)
         end,
     })
 end
 
-return M
+return {
+    "goolord/alpha-nvim",
+    enabled = true,
+    event = "VimEnter",
+    lazy = true,
+    opts = M.opts,
+    config = M.config,
+}
+
