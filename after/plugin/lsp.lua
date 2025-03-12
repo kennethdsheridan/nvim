@@ -28,7 +28,7 @@ require('mason-lspconfig').setup({
         'dockerls',
         'marksman', -- Markdown
     },
-    automatic_installation = true,
+    automatic_installation = false,
 })
 -- Require necessary modules
 local cmp = require('cmp')         -- Completion engine

@@ -182,9 +182,12 @@ return {
             local codelldb = mason_registry.get_package("codelldb")
             local extension_path = codelldb:get_install_path() .. "/extension/"
             local codelldb_path = extension_path .. "adapter/codelldb"
-            local liblldb_path = extension_path .. "lldb/lib/liblldb.so" -- Linux
-            -- local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- macOS
-            -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll" -- Windows
+            -- Linux
+            -- local liblldb_path = extension_path .. "lldb/lib/liblldb.so"
+            -- macOS:
+            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
+            -- Windows:
+            -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll"
 
             dap.adapters.rt_lldb = {
                 type = "server",
@@ -195,7 +198,50 @@ return {
                 },
             }
 
+            -- Add required fields: 'current_frame' in icons, and 'indent' in render
             dapui.setup({
+                icons = {
+                    expanded = "▾",
+                    collapsed = "▸",
+                    current_frame = "▶", -- <-- Required
+                },
+                mappings = {
+                    expand = { "<CR>", "<2-LeftMouse>" },
+                    open = "o",
+                    remove = "d",
+                    edit = "e",
+                    repl = "r",
+                    toggle = "t",
+                },
+                element_mappings = {},
+                expand_lines = true,
+                force_buffers = false,
+                floating = {
+                    max_height = 0.9,
+                    max_width = 0.5,
+                    border = "single",
+                    mappings = {
+                        close = { "q", "<Esc>" },
+                    },
+                },
+                controls = {
+                    enabled = true,
+                    element = "repl",
+                    icons = {
+                        pause = "",
+                        play = "",
+                        step_into = "",
+                        step_over = "",
+                        step_out = "",
+                        step_back = "",
+                        run_last = "",
+                        terminate = "",
+                    },
+                },
+                render = {
+                    max_type_length = nil,
+                    indent = 1, -- <-- Required
+                },
                 layouts = {
                     {
                         elements = {
@@ -218,6 +264,7 @@ return {
                 },
             })
 
+            -- Rust-specific debug configurations
             dap.configurations.rust = {
                 {
                     name = "Debug Rust",
@@ -265,6 +312,7 @@ return {
                 },
             }
 
+            -- Automatically open/close DAP UI
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
@@ -287,8 +335,9 @@ return {
         lazy = false,
         priority = 1000,
         config = function()
-            vim.g.everforest_background = "medium" -- Options: soft, medium, hard
+            vim.g.everforest_background = "hard" -- Options: soft, medium, hard
             vim.cmd("colorscheme everforest")
+            -- light Theme
         end
     },
     {
@@ -306,7 +355,7 @@ return {
         priority = 1000,
         config = function()
             require("catppuccin").setup({
-                flavour = "frappe", -- Options: latte, frappe, macchiato, mocha
+                flavour = "latte", -- Options: latte, frappe, macchiato, mocha
             })
             vim.cmd("colorscheme catppuccin")
         end
@@ -319,6 +368,16 @@ return {
             vim.cmd("colorscheme nord")
         end
     },
+
+    {
+        "savq/melange",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            vim.cmd("colorscheme melange")
+        end
+    },
+
 
 
 
@@ -361,11 +420,12 @@ return {
         config = function()
             local lsp = require("lsp-zero").preset("recommended")
 
-            -- NOTE: No 'rust_analyzer' configuration
-            -- lsp.configure("rust_analyzer", { ... }) is removed
+            -- If you decide to add Rust-specific configuration later,
+            -- you can re-introduce lsp.configure("rust_analyzer", { ... })
 
-            lsp.on_attach(function(client, bufnr)
+            lsp.on_attach(function(_, bufnr) -- Replace `client` with `_` since we don't use it
                 local opts = { noremap = true, silent = true, buffer = bufnr }
+
                 vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
                 vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
                 vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
@@ -473,7 +533,82 @@ return {
         "folke/trouble.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("trouble").setup({})
+            require("trouble").setup({
+                -- Basic appearance/position
+                position = "bottom",
+                height = 10,
+                width = 50,                     -- if position = "left" or "right"
+                icons = true,
+                mode = "workspace_diagnostics", -- or "document_diagnostics", "quickfix", etc.
+                fold_open = "",
+                fold_closed = "",
+                group = true,
+                padding = true,
+
+                -- Previously “action_keys”; now must be under `keys`
+                keys = {
+                    close = "q",
+                    cancel = "<esc>",
+                    refresh = "r",
+                    jump = { "<cr>", "<tab>" },
+                    open_split = { "<c-x>" },
+                    open_vsplit = { "<c-v>" },
+                    open_tab = { "<c-t>" },
+                    jump_close = { "o" },
+                    toggle_mode = "m",
+                    toggle_preview = "P",
+                    hover = "K",
+                    preview = "p",
+                    close_folds = { "zM", "zm" },
+                    open_folds = { "zR", "zr" },
+                    toggle_fold = { "zA", "za" },
+                    previous = "k",
+                    next = "j",
+                },
+
+                -- Required to avoid type-check warnings
+                debug = false,
+                auto_open = false,
+                auto_close = false,
+                auto_preview = true,
+                auto_refresh = true,
+                auto_jump = { "lsp_definitions" },
+                focus = false,
+                restore = false,
+                follow = false,
+                indent_guides = true,
+                max_items = nil,
+                multiline = true,
+                pinned = true,
+                warn_no_results = true,
+                open_folds = false,
+
+                -- Newly required fields:
+                open_no_results = false, -- Don’t auto-open Trouble if no results
+                preview = true,          -- Enable preview of diagnostics
+                throttle = 50,           -- Debounce in ms for updates
+                modes = {
+                    -- Minimal sub-tables for each mode you might use
+                    workspace_diagnostics = {},
+                    document_diagnostics = {},
+                    quickfix = {},
+                    lsp_references = {},
+                    loclist = {},
+                },
+                win = {
+                    -- You can define window options (like transparency) here
+                    -- e.g. blend = 0, winhighlight = "Normal:Normal,FloatBorder:FloatBorder"
+                },
+
+                signs = {
+                    error = "",
+                    warning = "",
+                    hint = "",
+                    information = "",
+                    other = "",
+                },
+                use_diagnostic_signs = false,
+            })
         end,
     },
 
@@ -498,6 +633,53 @@ return {
         },
         config = function()
             require("noice").setup({
+                -- Required fields
+                cmdline = {
+                    enabled = true,
+                },
+                messages = {
+                    enabled = true,
+                },
+                popupmenu = {
+                    enabled = true,
+                },
+                redirect = {
+                    enabled = false,
+                },
+                commands = {
+                    enabled = true,
+                },
+                notify = {
+                    enabled = true,
+                    view = "notify",
+                },
+                markdown = {
+                    hover = { enabled = true },
+                    view = "popup", -- or "cmdline", etc.
+                },
+                health = {
+                    checker = true,
+                },
+                throttle = 1000, -- Throttling (ms) for Noice updates
+
+                -- Optional, but needed to avoid warnings if you want custom views
+                views = {
+                    -- Example: customize the cmdline or popupmenu
+                    cmdline = {
+                        position = { row = -1, col = "50%" },
+                        size = { height = 1 },
+                    },
+                    popupmenu = {
+                        relative = "editor",
+                        position = { row = 10, col = "50%" },
+                        size = { width = 60, height = 10 },
+                    },
+                },
+                routes = {
+                    -- Add filtering or routing rules here
+                },
+
+                -- Your LSP overrides
                 lsp = {
                     override = {
                         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
@@ -505,6 +687,8 @@ return {
                         ["cmp.entry.get_documentation"] = true,
                     },
                 },
+
+                -- Presets (your existing settings are fine here)
                 presets = {
                     bottom_search = true,
                     command_palette = true,
@@ -512,6 +696,22 @@ return {
                     inc_rename = false,
                     lsp_doc_border = true,
                 },
+
+                -- Additional required fields
+                status = {
+                    enabled = true,
+                    view = "mini", -- or "cmdline", etc.
+                },
+                format = {
+                    enabled = true,
+                },
+                debug = false,
+                log = {
+                    enabled = false,
+                    level = 2,
+                    file = vim.fn.stdpath("data") .. "/noice.log",
+                },
+                log_max_size = 1024 * 1024, -- 1MB
             })
         end,
     },
@@ -697,6 +897,7 @@ return {
             vim.keymap.del({ "x", "o" }, "X")
         end,
     },
+
     {
         "utilyre/barbecue.nvim",
         name = "barbecue",
@@ -708,21 +909,98 @@ return {
         opts = {},
         config = function()
             require("barbecue").setup({
-                create_autocmd = false,
-            })
-            vim.api.nvim_create_autocmd({
-                "WinScrolled",
-                "BufWinEnter",
-                "CursorHold",
-                "InsertLeave",
-            }, {
-                group = vim.api.nvim_create_augroup("barbecue.updater", {}),
-                callback = function()
-                    require("barbecue.ui").update()
+                -- Required keys:
+                attach_navic = true,
+                include_buftypes = { "" },
+                exclude_filetypes = {
+                    "gitcommit",
+                    "toggleterm",
+                    "DressingSelect",
+                    "dashboard",
+                    "cmp_menu",
+                    "cmp_docs",
+                    "noice",
+                    "",
+                },
+                modifiers = {
+                    dirname = ":~:.",
+                    basename = "",
+                },
+                show_dirname = true,
+                show_basename = true,
+                -- Called to get the modified flag (●) if the buffer is modified
+                modified = function(bufnr)
+                    return vim.bo[bufnr].modified and "●" or ""
                 end,
+                show_modified = false,
+                show_navic = true,
+                lead_custom_section = function() return "" end,
+                custom_section = function() return "" end,
+                theme = "auto", -- or "catppuccin", "onedark", "tokyonight", etc.
+                kinds = {
+                    Array = "",
+                    Boolean = "",
+                    Class = "",
+                    Color = "",
+                    Constant = "",
+                    Constructor = "",
+                    Enum = "",
+                    EnumMember = "",
+                    Event = "",
+                    Field = "",
+                    File = "",
+                    Folder = "",
+                    Function = "",
+                    Interface = "",
+                    Key = "",
+                    Keyword = "",
+                    Method = "",
+                    Module = "",
+                    Namespace = "",
+                    Null = "",
+                    Number = "",
+                    Object = "",
+                    Operator = "",
+                    Package = "",
+                    Property = "",
+                    Reference = "",
+                    Snippet = "",
+                    String = "",
+                    Struct = "",
+                    Text = "",
+                    TypeParameter = "",
+                    Unit = "",
+                    Value = "",
+                    Variable = "",
+                },
+
+                -- Your existing key:
+                create_autocmd = false,
+                -- Newly required
+                context_follow_icon_color = false,
+                symbols = {
+                    separator = "  ",
+                    modified = "●",
+                    ellipsis = "…",
+                },
+
+
             })
+
+            -- Optionally auto-update barbecue on certain events
+            vim.api.nvim_create_autocmd(
+                { "WinScrolled", "BufWinEnter", "CursorHold", "InsertLeave" },
+                {
+                    group = vim.api.nvim_create_augroup("barbecue.updater", {}),
+                    callback = function()
+                        require("barbecue.ui").update()
+                    end,
+                }
+            )
         end,
     },
+
+
     {
         "folke/persistence.nvim",
         event = "BufReadPre",
@@ -792,14 +1070,19 @@ return {
         "fladson/vim-kitty",
         "MunifTanjim/nui.nvim",
     },
+
     {
         "rcarriga/nvim-notify",
         config = function()
             require("notify").setup({
+                -- Your current setting
                 background_colour = "#000000",
+                -- Required field to avoid the type-check warning:
+                merge_duplicates = false,
             })
         end,
     },
+
     {
         "nvchad/showkeys",
         cmd = "ShowkeysToggle",
