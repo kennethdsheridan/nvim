@@ -331,15 +331,37 @@ return {
     -- Themes
     -- ─────────────────────────────────────────────────────────────────────────────
     {
+        "NLKNguyen/papercolor-theme",
+        lazy = false,
+        priority = 1000,
+        config = function()
+            -- Tell Neovim we're using a light background
+            vim.o.background = "light"
+
+            -- Then set the PaperColor theme
+            vim.cmd("colorscheme PaperColor")
+        end,
+    },
+    {
         "sainnhe/everforest",
         lazy = false,
         priority = 1000,
         config = function()
-            vim.g.everforest_background = "hard" -- Options: soft, medium, hard
+            -- Make sure we support 24-bit colors
+            vim.opt.termguicolors = true
+
+            -- Tell Neovim we want a light background
+            vim.o.background = "light" -- or: vim.cmd("set background=light")
+
+            -- Optional: set contrast level ('soft', 'medium', or 'hard')
+            vim.g.everforest_background = "soft"
+
+            -- Finally, load the colorscheme
             vim.cmd("colorscheme everforest")
-            -- light Theme
         end
     },
+
+
     {
         "folke/tokyonight.nvim",
         lazy = false,
