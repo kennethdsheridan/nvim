@@ -1,64 +1,93 @@
-require('noice').setup({
-    -- Configuration for routes
-    routes = {
-        {
-            filter = {
-                event = "msg_show",
-                kind = ""
-            },
-            opts = {
-                skip = true
-            }
-        },
-        -- Additional route filters can be added here
+require("noice").setup({
+    messages = {
+        enabled = true, -- Enable messages (recommended)
     },
+    popupmenu = {
+        enabled = true, -- Enable popupmenu
+    },
+    redirect = {
+        enabled = false, -- Disable redirection unless needed
+    },
+    commands = {
+        enabled = true, -- Enable commands support
+    },
+    lsp = {
+        progress = { enabled = true },
+        override = {
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
+        },
+    },
+    markdown = {
+        hover = { enabled = true },
+        view = "popup",
+    },
+    health = {
+        checker = true, -- Enable health checks
+    },
+    presets = {
+        bottom_search = true,
+        command_palette = true,
+        long_message_to_split = true,
+        inc_rename = false, -- Disable incremental rename unless needed
+    },
+    throttle = 1000,        -- Adjust throttle rate
+    status = {
+        enabled = true,
+        view = "mini",
+    },
+    format = {
+        enabled = true,
+    },
+    debug = false,       -- Disable debug mode
+    log = {
+        enabled = false, -- Disable logging
+        level = 2,
+        file = vim.fn.stdpath("data") .. "/noice.log",
+    },
+    log_max_size = 10000, -- Adjust max log size if needed
 
-    -- Configuration for views
+    -- ✅ Add missing required fields
+    cmdline = {
+        enabled = true,
+    },
+    notify = {
+        enabled = true, -- Enable nvim-notify for notifications
+        view = "notify",
+    },
     views = {
         cmdline = {
             position = {
-                row = -1,    -- Use a negative value for bottom position
+                row = -1,    -- Bottom position
                 col = "50%", -- Center horizontally
             },
             size = {
-                height = 1, -- Adjust height as needed
+                height = 1,
             },
         },
         popupmenu = {
             relative = "editor",
             position = {
-                row = "10%", -- Adjust vertical position as needed
+                row = 10,
                 col = "50%", -- Center horizontally
             },
             size = {
-                width = 60,  -- Set width to fit your preference
-                height = 10, -- Set height for the popup menu
+                width = 60,
+                height = 10,
             },
         },
-        -- Add more custom view configurations here if needed
     },
-
-    -- Configuration for cmdline
-    cmdline = {
-        icons = {
-            ["/"] = {
-                icon = "",
-                hl_group = "DiagnosticWarn",
-                firstc = false
+    routes = {
+        {
+            filter = {
+                event = "msg_show",
+                kind = "",
             },
-            [":"] = {
-                icon = "",
-                hl_group = "DiagnosticInfo",
-                firstc = false
+            opts = {
+                skip = true,
             },
-            -- Add more cmdline icons as needed
         },
-    },
-
-    -- Configuration for notify
-    notify = {
-        enabled = true, -- Use nvim-notify for notifications
-        view = "notify",
     },
 })
 
