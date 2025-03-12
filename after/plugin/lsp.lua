@@ -1,8 +1,21 @@
+-- Make sure this file is the single source of truth for language servers
+-- (i.e., you do NOT call "require('lspconfig').rust_analyzer.setup({})"
+-- or any other server setups anywhere else).
+
 -- Load the lsp-zero library with the 'recommended' preset
 local lsp = require('lsp-zero').preset('recommended')
 
+-- Improve completion quality of life
+-- (Set recommended completeopt for a better completion menu experience)
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
+-- If you edit Neovim config in Lua, uncomment the next line for better Lua completions:
+-- lsp.nvim_workspace()
+
 -- Mason setup for installing and managing LSP servers
 require('mason').setup()
+
+-- Let mason-lspconfig ensure the following servers are installed
 require('mason-lspconfig').setup({
     ensure_installed = {
         -- Web dev
@@ -13,12 +26,12 @@ require('mason-lspconfig').setup({
         'tailwindcss',
 
         -- Languages
-        'lua_ls',        -- Lua
-        'pyright',       -- Python
+        'lua_ls',    -- Lua
+        'pyright',   -- Python
         'rust_analyzer', -- Rust
-        'gopls',         -- Go
-        'clangd',        -- C/C++
-        'bashls',        -- Bash
+        'gopls',     -- Go
+        'clangd',    -- C/C++
+        'bashls',    -- Bash
 
         -- Config files
         'jsonls',
@@ -28,23 +41,24 @@ require('mason-lspconfig').setup({
         'dockerls',
         'marksman', -- Markdown
     },
+    -- `automatic_installation = true` will auto-install any server you configure in lsp-zero,
+    -- which can be nice. Disable if you prefer full manual control.
     automatic_installation = false,
 })
--- Require necessary modules
-local cmp = require('cmp')         -- Completion engine
-local lspkind = require('lspkind') -- Adds icons to completion items
 
--- Configure completion behavior and mappings
+-- Set up nvim-cmp for autocompletion
+local cmp = require('cmp')
+local lspkind = require('lspkind')
+
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-    ['<C-p>']     = cmp.mapping.select_prev_item(cmp_select), -- Select previous item
-    ['<C-n>']     = cmp.mapping.select_next_item(cmp_select), -- Select next item
-    ['<C-y>']     = cmp.mapping.confirm({ select = true }),   -- Confirm selection
-    ['<C-Space>'] = cmp.mapping.complete(),                   -- Trigger completion
-    ['<Tab>']     = cmp.mapping.confirm({ select = true }),   -- Confirm selection with Tab
+    ['<C-p>']     = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>']     = cmp.mapping.select_next_item(cmp_select),
+    ['<C-y>']     = cmp.mapping.confirm({ select = true }),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<Tab>']     = cmp.mapping.confirm({ select = true }),
 })
 
--- Adjust the completion sources and their priorities
 cmp.setup({
     mapping = cmp_mappings,
     sources = {
@@ -52,22 +66,18 @@ cmp.setup({
         { name = 'buffer',   priority = 500 },
         { name = 'path',     priority = 300 },
     },
-
-    -- Formatting block for custom icons and source display
     formatting = {
-        -- Specify which fields are shown and in what order
         fields = { "kind", "abbr", "menu" },
-
         format = function(entry, vim_item)
-            -- Use default lspkind icons, with a fallback to empty if none exists
+            -- Use lspkind icons
             vim_item.kind = lspkind.presets.default[vim_item.kind] or ""
 
-            -- Add Rust-specific icon for rust_analyzer LSP items
-            if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module' and entry.completion_item.label:find("::") then
+            -- Special rust icon for Rust modules
+            if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module'
+                and entry.completion_item.label:find("::") then
                 vim_item.kind = '🦀'
             end
 
-            -- For other sources, keep menu display simple
             vim_item.menu = ({
                 buffer   = "[Buffer]",
                 nvim_lsp = "[LSP]",
@@ -78,40 +88,37 @@ cmp.setup({
             return vim_item
         end,
     },
+})
 
-
-}) -- This was missing its closing parenthesis
-
--- Configure LSP client on attachment to buffer
+-- Configure on_attach behavior: LSP keymaps, etc.
 lsp.on_attach(function(client, bufnr)
-    -- Set up key mappings for LSP functions
     local opts = { buffer = bufnr, remap = false }
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)                -- Go to definition
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)                      -- Hover for info
-    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts) -- Workspace symbols
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)     -- Open diagnostics
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)              -- Next diagnostic
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)              -- Previous diagnostic
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)      -- Code action
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)       -- References
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)           -- Rename symbol
-    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)         -- Signature help
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
+    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
+    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
+    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
 end)
 
+-- Additional config for Rust, e.g. enabling proc macros and all features
+lsp.configure('rust_analyzer', {
+    settings = {
+        ['rust-analyzer'] = {
+            cargo = {
+                allFeatures = true,
+            },
+            procMacro = {
+                enable = true
+            },
+        }
+    }
+})
 
----- Tell rust-analyzer to enable proc macros and build all features
---lsp.configure('rust_analyzer', {
---    settings = {
---        ['rust-analyzer'] = {
---            cargo = {
---                allFeatures = true,
---            },
---            procMacro = {
---                enable = true
---            },
---        }
---    }
---})
-
--- Initialize the lsp setup
+-- Finally set everything up
 lsp.setup()
+

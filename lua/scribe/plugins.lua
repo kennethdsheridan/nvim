@@ -1204,6 +1204,23 @@ return {
     },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- Aerial VIM
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        "stevearc/aerial.nvim",
+        config = function()
+            require("aerial").setup({
+                -- Example: automatically open aerial when entering a buffer
+                on_attach = function(bufnr)
+                    -- Jump keys
+                    vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+                    vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr })
+                end,
+            })
+        end
+    },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- ADDITIONAL LSP / FORMAT / LINT
     -- ─────────────────────────────────────────────────────────────────────────────
     { "kosayoda/nvim-lightbulb" },
