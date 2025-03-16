@@ -1,52 +1,36 @@
 -- Make sure this file is the single source of truth for language servers
--- (i.e., you do NOT call "require('lspconfig').rust_analyzer.setup({})"
--- or any other server setups anywhere else).
+-- (i.e., do NOT call "require('lspconfig').rust_analyzer.setup({})" elsewhere).
 
--- Load the lsp-zero library with the 'recommended' preset
+-- 1. Load the lsp-zero library with the 'recommended' preset
 local lsp = require('lsp-zero').preset('recommended')
 
--- Improve completion quality of life
--- (Set recommended completeopt for a better completion menu experience)
+-- 2. Improve completion quality of life
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
--- If you edit Neovim config in Lua, uncomment the next line for better Lua completions:
--- lsp.nvim_workspace()
-
--- Mason setup for installing and managing LSP servers
+-- 3. Mason setup for installing and managing LSP servers
 require('mason').setup()
-
--- Let mason-lspconfig ensure the following servers are installed
 require('mason-lspconfig').setup({
     ensure_installed = {
-        -- Web dev
         'tsserver',
         'eslint',
         'html',
         'cssls',
         'tailwindcss',
-
-        -- Languages
-        'lua_ls',    -- Lua
-        'pyright',   -- Python
-        'rust_analyzer', -- Rust
-        'gopls',     -- Go
-        'clangd',    -- C/C++
-        'bashls',    -- Bash
-
-        -- Config files
+        'lua_ls',
+        'pyright',
+        'rust_analyzer',
+        'gopls',
+        'clangd',
+        'bashls',
         'jsonls',
         'yamlls',
-
-        -- Others
         'dockerls',
-        'marksman', -- Markdown
+        'marksman',
     },
-    -- `automatic_installation = true` will auto-install any server you configure in lsp-zero,
-    -- which can be nice. Disable if you prefer full manual control.
     automatic_installation = false,
 })
 
--- Set up nvim-cmp for autocompletion
+-- 4. Set up nvim-cmp for autocompletion
 local cmp = require('cmp')
 local lspkind = require('lspkind')
 
@@ -67,14 +51,18 @@ cmp.setup({
         { name = 'path',     priority = 300 },
     },
     formatting = {
+        -- ▼ Add the expandable_indicator to avoid typecheck warnings.
+        expandable_indicator = false,
         fields = { "kind", "abbr", "menu" },
         format = function(entry, vim_item)
             -- Use lspkind icons
             vim_item.kind = lspkind.presets.default[vim_item.kind] or ""
 
             -- Special rust icon for Rust modules
-            if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module'
-                and entry.completion_item.label:find("::") then
+            if entry.source.name == 'nvim_lsp'
+                and vim_item.kind == 'Module'
+                and entry.completion_item.label:find("::")
+            then
                 vim_item.kind = '🦀'
             end
 
@@ -90,8 +78,9 @@ cmp.setup({
     },
 })
 
--- Configure on_attach behavior: LSP keymaps, etc.
-lsp.on_attach(function(client, bufnr)
+-- 5. Configure on_attach behavior: LSP keymaps, etc.
+-- If we’re not using the “client” parameter, remove it or rename to `_`.
+lsp.on_attach(function(_, bufnr)
     local opts = { buffer = bufnr, remap = false }
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
@@ -105,7 +94,7 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
 end)
 
--- Additional config for Rust, e.g. enabling proc macros and all features
+-- 6. Additional config for Rust, e.g. enabling proc macros and all features
 lsp.configure('rust_analyzer', {
     settings = {
         ['rust-analyzer'] = {
@@ -119,6 +108,6 @@ lsp.configure('rust_analyzer', {
     }
 })
 
--- Finally set everything up
+-- 7. Finally set everything up
 lsp.setup()
 
