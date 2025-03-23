@@ -71,6 +71,75 @@ return {
     { "cordx56/rustowl",   dependencies = { "neovim/nvim-lspconfig" } },
 
     -- ─────────────────────────────────────────────────────────────────────────────
+    -- Augment Code completion
+    -- ─────────────────────────────────────────────────────────────────────────────
+    {
+        "augmentcode/augment.vim",
+        dependencies = {
+            "nvim-telescope/telescope.nvim",
+            "nvim-lua/plenary.nvim",
+        },
+        config = function()
+            -- Workspace configuration
+            local home = vim.fn.expand("$HOME")
+            if vim.fn.isdirectory(home) == 1 then
+                vim.g.augment_workspace_folders = { home }
+            end
+
+            -- Run commands configuration
+            vim.g.augment_run_commands = {
+                rust = "cargo run",
+                python = "python3 %",
+                sh = "bash %",
+                typescript = "ts-node %",
+                javascript = "node %",
+                go = "go run %",
+                lua = "lua %",
+                cpp = "g++ % -o %:r && ./%:r",
+                c = "gcc % -o %:r && ./%:r",
+            }
+
+            -- Telescope integration
+            local function setup_telescope_integration()
+                local ok, telescope = pcall(require, "telescope.builtin")
+                if not ok then
+                    vim.notify("Telescope not available for Augment integration", vim.log.levels.WARN)
+                    return
+                end
+
+                vim.api.nvim_create_user_command("AugmentTelescope", function()
+                    telescope.find_files({
+                        prompt_title = "Augment Project Files",
+                        cwd = vim.fn.getcwd(),
+                        hidden = true,
+                        follow = true,
+                    })
+                end, {})
+            end
+
+            -- Keymaps configuration
+            local function setup_keymaps()
+                local opts = { silent = true, noremap = true }
+
+                -- Chat operations
+                vim.keymap.set("n", "<leader>ac", "<cmd>Augment chat<CR>",
+                    vim.tbl_extend("force", opts, { desc = "Augment: Enter Chat Mode" }))
+
+                vim.keymap.set("n", "<leader>an", "<cmd>Augment new-chat<CR>",
+                    vim.tbl_extend("force", opts, { desc = "Augment: Create New Chat" }))
+
+                vim.keymap.set("n", "<leader>at", "<cmd>Augment chat-toggle<CR>",
+                    vim.tbl_extend("force", opts, { desc = "Augment: Toggle chat window" }))
+            end
+
+            -- Initialize all components
+            setup_telescope_integration()
+            setup_keymaps()
+        end,
+        event = "VeryLazy",
+    },
+
+    -- ─────────────────────────────────────────────────────────────────────────────
     -- Documentation
     -- ─────────────────────────────────────────────────────────────────────────────
     require("scribe.documentation"),
@@ -179,31 +248,93 @@ return {
             local dapui = require("dapui")
             local mason_registry = require("mason-registry")
 
+            -- 1. Get codelldb paths from Mason
             local codelldb = mason_registry.get_package("codelldb")
             local extension_path = codelldb:get_install_path() .. "/extension/"
             local codelldb_path = extension_path .. "adapter/codelldb"
-            -- Linux
-            -- local liblldb_path = extension_path .. "lldb/lib/liblldb.so"
-            -- macOS:
-            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib"
-            -- Windows:
-            -- local liblldb_path = extension_path .. "lldb\\bin\\liblldb.dll"
+            local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- Adjust if needed
 
+            -- 2. Define the rt_lldb adapter for Rust (via codelldb)
             dap.adapters.rt_lldb = {
                 type = "server",
                 port = "${port}",
                 executable = {
                     command = codelldb_path,
-                    args = { "--port", "${port}" },
+                    -- Pass `--liblldb` so codelldb knows where to find lldb.dylib
+                    args = { "--liblldb", liblldb_path, "--port", "${port}" },
+                },
+                env = {
+                    -- This can help certain TTY-launch issues on macOS
+                    LLDB_LAUNCH_FLAG_LAUNCH_IN_TTY = "YES",
                 },
             }
 
-            -- Add required fields: 'current_frame' in icons, and 'indent' in render
+            -- Helper: automatically build/pick the first bin target from cargo metadata
+            local function pick_first_bin_target()
+                -- 1) Fetch metadata
+                local output = vim.fn.systemlist("cargo metadata --format-version 1 --no-deps")
+                if vim.v.shell_error ~= 0 then
+                    error("Error running 'cargo metadata':\n" .. table.concat(output, "\n"))
+                end
+                local metadata = vim.fn.json_decode(table.concat(output, "\n"))
+
+                -- 2) Grab the first package
+                local pkg = metadata.packages[1]
+                if not pkg then
+                    error("No packages found in 'cargo metadata'.")
+                end
+
+                -- 3) Collect all bin targets
+                local bin_targets = {}
+                for _, target in ipairs(pkg.targets or {}) do
+                    if vim.tbl_contains(target.kind, "bin") then
+                        table.insert(bin_targets, target.name)
+                    end
+                end
+                if #bin_targets == 0 then
+                    error("No bin targets found in package '" .. pkg.name .. "'.")
+                end
+
+                -- 4) Build the *first* bin target
+                local bin_name = bin_targets[1]
+                local build_cmd = "cargo build --bin " .. bin_name
+                local build_result = vim.fn.systemlist(build_cmd)
+                if vim.v.shell_error ~= 0 then
+                    error("Error building " .. bin_name .. ":\n" .. table.concat(build_result, "\n"))
+                end
+
+                -- 5) Return the resulting path
+                local exe_path = "target/debug/" .. bin_name
+                if vim.fn.executable(exe_path) == 0 then
+                    error("Could not find debug executable at " .. exe_path)
+                end
+                return exe_path
+            end
+
+            -- Helper: build & locate the test executable
+            local function get_test_executable()
+                -- Build tests (without running them)
+                vim.fn.system("cargo test --no-run")
+
+                local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
+                local metadata = vim.fn.json_decode(metadata_json)
+                local target_name = metadata.packages[1].targets[1].name
+
+                -- Find the test artifact. This assumes a single test target.
+                local pattern = "target/debug/deps/" .. target_name .. "-*"
+                local test_files = vim.fn.glob(pattern, 1, 1)
+                if #test_files == 0 then
+                    error("Test executable not found after running cargo test --no-run")
+                end
+                return test_files[1]
+            end
+
+            -- 3. Set up nvim-dap-ui
             dapui.setup({
                 icons = {
                     expanded = "▾",
                     collapsed = "▸",
-                    current_frame = "▶", -- <-- Required
+                    current_frame = "▶", -- Required by nvim-dap-ui v3
                 },
                 mappings = {
                     expand = { "<CR>", "<2-LeftMouse>" },
@@ -240,7 +371,7 @@ return {
                 },
                 render = {
                     max_type_length = nil,
-                    indent = 1, -- <-- Required
+                    indent = 1, -- Required by nvim-dap-ui v3
                 },
                 layouts = {
                     {
@@ -264,55 +395,29 @@ return {
                 },
             })
 
-            -- Rust-specific debug configurations
+            -- 4. Rust-specific configurations (no prompts for program or args)
             dap.configurations.rust = {
                 {
-                    name = "Debug Rust",
-                    type = "rt_lldb",
+                    name = "Debug Rust (auto bin)",
+                    type = "rt_lldb", -- Uses our `rt_lldb` adapter defined above
                     request = "launch",
-                    program = function()
-                        local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
-                        local metadata = vim.fn.json_decode(metadata_json)
-                        local target_name = metadata.packages[1].targets[1].name
-                        local cargo_path = "target/debug/" .. target_name
-
-                        if vim.fn.executable(cargo_path) == 1 then
-                            return cargo_path
-                        end
-                        return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
-                    end,
+                    program = pick_first_bin_target,
                     cwd = "${workspaceFolder}",
                     stopOnEntry = false,
-                    args = function()
-                        local args_string = vim.fn.input("Arguments: ")
-                        return vim.fn.split(args_string, " ", true)
-                    end,
+                    args = {},
                 },
                 {
                     name = "Debug Rust Tests",
                     type = "rt_lldb",
                     request = "launch",
-                    program = function()
-                        local metadata_json = vim.fn.system("cargo metadata --format-version 1 --no-deps")
-                        local metadata = vim.fn.json_decode(metadata_json)
-                        local target_name = metadata.packages[1].targets[1].name
-
-                        return vim.fn.input(
-                            "Path to test executable: ",
-                            vim.fn.getcwd() .. "/target/debug/" .. target_name .. "-",
-                            "file"
-                        )
-                    end,
+                    program = get_test_executable,
                     cwd = "${workspaceFolder}",
                     stopOnEntry = false,
-                    args = function()
-                        local args_string = vim.fn.input("Arguments: ")
-                        return vim.fn.split(args_string, " ", true)
-                    end,
+                    args = {},
                 },
             }
 
-            -- Automatically open/close DAP UI
+            -- 5. Auto-open/close the DAP UI
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 dapui.open()
             end
@@ -467,6 +572,7 @@ return {
     {
         "codota/tabnine-nvim",
         build = "./dl_binaries.sh",
+        event = "InsertEnter",
     },
     {
         "hrsh7th/nvim-cmp",
@@ -525,6 +631,10 @@ return {
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("nvim-tree").setup({
+                hijack_netrw = false, -- or true if you want Nvim-Tree to replace netrw, but be aware of its side effects
+                hijack_directories = {
+                    enable = false,
+                },
                 filters = {
                     dotfiles = false,
                     custom = { ".DS_Store", "thumbs.db" },
@@ -1134,42 +1244,42 @@ return {
     -- ─────────────────────────────────────────────────────────────────────────────
     -- RUST TOOLS & CRATES
     -- ─────────────────────────────────────────────────────────────────────────────
-    {
-        "simrat39/rust-tools.nvim",
-        config = function()
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
-            local rt = require("rust-tools")
-            rt.setup({
-                tools = {
-                    hover_actions = { auto_focus = true, border = "rounded" },
-                    inlay_hints = {
-                        auto = true,
-                        show_parameter_hints = true,
-                        parameter_hints_prefix = "<- ",
-                        other_hints_prefix = "-> ",
-                    },
-                    runnables = { use_telescope = true },
-                },
-                -- Comment out the entire `server` block so it won't attach rust-analyzer
-                server = {
-                    on_attach = function(_, bufnr)
-                        vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-                    end,
-                    capabilities = capabilities,
-                    settings = {
-                        ["rust-analyzer"] = {
-                            cargo = {
-                                allFeatures = true,
-                            },
-                            checkOnSave = {
-                                command = "clippy",
-                            },
-                        },
-                    },
-                },
-            })
-        end,
-    },
+    --     {
+    --         "simrat39/rust-tools.nvim",
+    --         config = function()
+    --             local capabilities = require("cmp_nvim_lsp").default_capabilities()
+    --             local rt = require("rust-tools")
+    --             rt.setup({
+    --                 tools = {
+    --                     hover_actions = { auto_focus = true, border = "rounded" },
+    --                     inlay_hints = {
+    --                         auto = true,
+    --                         show_parameter_hints = true,
+    --                         parameter_hints_prefix = "<- ",
+    --                         other_hints_prefix = "-> ",
+    --                     },
+    --                     runnables = { use_telescope = true },
+    --                 },
+    --                 -- Comment out the entire `server` block so it won't attach rust-analyzer
+    --                 server = {
+    --                     on_attach = function(_, bufnr)
+    --                         vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+    --                     end,
+    --                     capabilities = capabilities,
+    --                     settings = {
+    --                         ["rust-analyzer"] = {
+    --                             cargo = {
+    --                                 allFeatures = true,
+    --                             },
+    --                             checkOnSave = {
+    --                                 command = "clippy",
+    --                             },
+    --                         },
+    --                     },
+    --                 },
+    --             })
+    --         end,
+    --     },
     {
         "saecki/crates.nvim",
         event = { "BufRead Cargo.toml" },

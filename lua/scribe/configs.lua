@@ -15,7 +15,7 @@ M.cmp = function()
             end,
         },
         sources = {
-            { name = "cmp_tabnine" },
+            -- { name = "cmp_tabnine" },
             { name = "luasnip" },
             { name = "nvim_lsp" },
             { name = "buffer" },
