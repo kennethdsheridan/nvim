@@ -34,13 +34,14 @@ require("lazy").setup("scribe.plugins")
 print("Hello, from Scribe, starting configuration and requirement imports")
 
 -------------------------------------------------------------------------------
--- IMPORT REMAPS AND SETTINGS
+-- IMPORT REMAPS AND SETTINGS (but skip scribe.configs for now)
 -------------------------------------------------------------------------------
 require("scribe.remap")
 require("scribe.set")
 require("scribe.rust")
 require("scribe.markdown")
-require("scribe.configs")
+-- Skip scribe.configs temporarily to isolate the LSP setup issue
+-- require("scribe.configs")
 
 -------------------------------------------------------------------------------
 -- OPTIONAL: AUTOCMD / COLOR SETUP
@@ -60,50 +61,21 @@ end, { desc = "Dismiss all notifications" })
 vim.o.clipboard = "unnamedplus"
 
 -------------------------------------------------------------------------------
--- MASON SETUP (FOR LSP + DAP INSTALLATION)
+-- MASON SETUP (SIMPLE APPROACH)
 -------------------------------------------------------------------------------
--- Make sure 'mason' is set up *before* we configure 'mason-lspconfig'
+-- First, set up mason
 require('mason').setup()
 
--- DAP tools (optional)
-local mason_nvim_dap_ok, mason_nvim_dap = pcall(require, "mason-nvim-dap")
-if mason_nvim_dap_ok then
-    mason_nvim_dap.setup({
-        ensure_installed = { "codelldb" }, -- for Rust debugging
-        automatic_installation = true,
-    })
-end
-
 -------------------------------------------------------------------------------
--- LSP-ZERO SETUP
+-- MANUAL LSP CONFIGURATION
 -------------------------------------------------------------------------------
--- 1) Load lsp-zero with the "recommended" preset
-local lsp = require('lsp-zero').preset('recommended')
+local lspconfig = require('lspconfig')
 
--- 2) Ensure certain servers are installed via mason-lspconfig
-require('mason-lspconfig').setup({
-    ensure_installed = {
-        'bashls',
-        'dockerls',
-        'gopls',
-        'jsonls',
-        'lua_ls',
-        'marksman',
-        'pyright',
-        'sqlls',
-        'taplo',
-        'yamlls',
-        -- ADD RUST HERE
-        'rust_analyzer',
-    },
-    automatic_installation = false,
-})
-
--- 3) Customize what happens when an LSP server attaches to a buffer
-lsp.on_attach(function(client, bufnr)
+-- Default on_attach function
+local on_attach = function(client, bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr }
 
-    -- Some typical LSP keybinds
+    -- LSP keybinds
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
@@ -113,39 +85,45 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
 
-    -- Format on save
-    if client.server_capabilities.documentFormattingProvider then
+    -- Format on save (only if supported)
+    if client.supports_method('textDocument/formatting') then
         vim.api.nvim_create_autocmd("BufWritePre", {
-            group = vim.api.nvim_create_augroup("LspFormatting", { clear = true }),
+            group = vim.api.nvim_create_augroup("LspFormatting", {}),
             buffer = bufnr,
             callback = function()
-                vim.lsp.buf.format({ async = false })
+                vim.lsp.buf.format({ bufnr = bufnr })
             end,
         })
     end
-end)
+end
 
--- 4) Optional: Fine-tune Rust Analyzer advanced config
-lsp.configure("rust_analyzer", {
-    settings = {
-        ["rust-analyzer"] = {
-            cargo = { allFeatures = true },
-            procMacro = { enable = true },
-            checkOnSave = { command = "clippy" },
+-- Basic servers
+local servers = {
+    'bashls',
+    'dockerls',
+    'gopls',
+    'jsonls',
+    'marksman',
+    'pyright',
+    'sqlls',
+    'taplo',
+    'yamlls',
+}
 
-            diagnostics = {
-                -- This is the important part:
-                disabled = { "unresolved-proc-macro", "macro-error" },
-            },
-        },
-    },
-})
--- 5) Configure Lua separately (optional)
-lsp.configure('lua_ls', {
+-- Set up basic servers
+for _, server in ipairs(servers) do
+    lspconfig[server].setup({
+        on_attach = on_attach,
+    })
+end
+
+-- Special config for lua_ls
+lspconfig.lua_ls.setup({
+    on_attach = on_attach,
     settings = {
         Lua = {
             diagnostics = {
-                globals = { 'vim' }, -- Recognize `vim` global
+                globals = { 'vim' },
             },
             workspace = {
                 library = vim.api.nvim_get_runtime_file("", true),
@@ -156,22 +134,74 @@ lsp.configure('lua_ls', {
     },
 })
 
--- 6) Finally, initialize lsp-zero, which will set up all servers
-lsp.setup()
+-- Special config for rust_analyzer
+lspconfig.rust_analyzer.setup({
+    on_attach = on_attach,
+    settings = {
+        ["rust-analyzer"] = {
+            cargo = { allFeatures = true },
+            procMacro = { enable = true },
+            checkOnSave = { command = "clippy" },
+            diagnostics = {
+                disabled = { "unresolved-proc-macro", "macro-error" },
+            },
+        },
+    },
+})
 
 -------------------------------------------------------------------------------
--- TABNINE CONFIGURATION (IF USED)
+-- DAP SETUP (SIMPLIFIED)
 -------------------------------------------------------------------------------
-require('tabnine').setup({
-    disable_auto_comment = true,
-    accept_keymap = "<Tab>",
-    dismiss_keymap = "<C-]>",
-    debounce_ms = 800,
-    suggestion_color = { gui = "#808080", cterm = 244 },
-    exclude_filetypes = { "TelescopePrompt", "NvimTree" },
-    log_file_path = nil,
-    ignore_certificate_errors = false,
-})
+-- Only set up DAP if the plugin is properly loaded
+local dap_ok, dap = pcall(require, 'dap')
+if dap_ok then
+    -- Basic DAP configuration for Rust
+    dap.adapters.lldb = {
+        type = 'executable',
+        command = '/usr/bin/lldb-vscode', -- Adjust path as needed
+        name = 'lldb'
+    }
+
+    dap.configurations.rust = {
+        {
+            name = 'Launch',
+            type = 'lldb',
+            request = 'launch',
+            program = function()
+                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+            end,
+            cwd = '${workspaceFolder}',
+            stopOnEntry = false,
+            args = {},
+        },
+    }
+end
+
+-- Mason-nvim-dap setup (optional)
+local mason_nvim_dap_ok, mason_nvim_dap = pcall(require, "mason-nvim-dap")
+if mason_nvim_dap_ok then
+    mason_nvim_dap.setup({
+        ensure_installed = { "codelldb" },
+        automatic_installation = false,
+    })
+end
+
+-------------------------------------------------------------------------------
+-- TABNINE CONFIGURATION
+-------------------------------------------------------------------------------
+local tabnine_ok, tabnine = pcall(require, 'tabnine')
+if tabnine_ok then
+    tabnine.setup({
+        disable_auto_comment = true,
+        accept_keymap = "<Tab>",
+        dismiss_keymap = "<C-]>",
+        debounce_ms = 800,
+        suggestion_color = { gui = "#808080", cterm = 244 },
+        exclude_filetypes = { "TelescopePrompt", "NvimTree" },
+        log_file_path = nil,
+        ignore_certificate_errors = false,
+    })
+end
 
 -------------------------------------------------------------------------------
 -- FILETYPE OVERRIDES (HUJSON -> jsonc)
