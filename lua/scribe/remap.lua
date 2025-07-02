@@ -40,6 +40,25 @@ vim.keymap.set("n", "<Leader>dt", function()
     vim.cmd('RustLsp testables')
 end, { desc = "Debugger testables" })
 
+-- Toggle autocomplete
+vim.g.completion_active = true
+vim.keymap.set('n', '<leader>tc', function()
+    vim.g.completion_active = not vim.g.completion_active
+    
+    local cmp = require('cmp')
+    
+    if vim.g.completion_active then
+        -- Re-enable completions (without Tab)
+        cmp.setup({ enabled = true })
+        print("Autocomplete: enabled")
+    else
+        -- Disable nvim-cmp
+        cmp.setup({ enabled = false })
+        print("Autocomplete: disabled")
+    end
+end, { desc = "Toggle autocomplete" })
+
+
 -- Visual mode adjustments
 -- Move selected block of text up and down
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")

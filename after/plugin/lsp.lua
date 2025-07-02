@@ -105,9 +105,10 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
     ['<C-n>']     = cmp.mapping.select_next_item(cmp_select),
     ['<C-y>']     = cmp.mapping.confirm({ select = true }),
     ['<C-Space>'] = cmp.mapping.complete(),
-    ['<Tab>']     = cmp.mapping.confirm({ select = true }),
+    -- ['<Tab>']     = cmp.mapping.confirm({ select = true }),  -- DISABLED TAB COMPLETION
 })
 cmp.setup({
+    enabled = true,  -- RE-ENABLED AUTOCOMPLETE (Tab still disabled)
     mapping = cmp_mappings,
     sources = {
         { name = 'nvim_lsp', priority = 750 },

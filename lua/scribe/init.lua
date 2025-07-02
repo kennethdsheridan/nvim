@@ -193,7 +193,8 @@ local tabnine_ok, tabnine = pcall(require, 'tabnine')
 if tabnine_ok then
     tabnine.setup({
         disable_auto_comment = true,
-        accept_keymap = "<Tab>",
+        -- accept_keymap = "<Tab>",  -- DISABLED TAB ACCEPTANCE
+        accept_keymap = nil,  -- Disable Tabnine completely
         dismiss_keymap = "<C-]>",
         debounce_ms = 800,
         suggestion_color = { gui = "#808080", cterm = 244 },
@@ -218,3 +219,16 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 -------------------------------------------------------------------------------
 print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
+
+-------------------------------------------------------------------------------
+-- DISABLE TAB COMPLETION AFTER EVERYTHING LOADS
+-------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        vim.schedule(function()
+            -- Force disable Tab completion
+            vim.keymap.set('i', '<Tab>', '\t', { noremap = true, silent = true })
+            print("Tab completion forcefully disabled")
+        end)
+    end,
+})
