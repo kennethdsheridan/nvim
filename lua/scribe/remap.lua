@@ -48,15 +48,20 @@ vim.keymap.set('n', '<leader>tc', function()
     local cmp = require('cmp')
     
     if vim.g.completion_active then
-        -- Re-enable completions (without Tab)
-        cmp.setup({ enabled = true })
-        print("Autocomplete: enabled")
+        -- Enable automatic completion
+        cmp.setup({ 
+            enabled = true,
+            completion = { 
+                autocomplete = { cmp.TriggerEvent.TextChanged }
+            }
+        })
+        print("Auto completion: enabled")
     else
-        -- Disable nvim-cmp
+        -- Disable nvim-cmp completely
         cmp.setup({ enabled = false })
-        print("Autocomplete: disabled")
+        print("Completion: disabled")
     end
-end, { desc = "Toggle autocomplete" })
+end, { desc = "Toggle completion" })
 
 
 -- Visual mode adjustments

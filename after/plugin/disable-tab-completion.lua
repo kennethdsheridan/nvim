@@ -24,3 +24,5 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 
 -- Disable immediately for current session
 disable_tab()
+
+-- Note: Removed autocmd that was closing completion menu

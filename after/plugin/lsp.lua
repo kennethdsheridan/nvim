@@ -108,13 +108,17 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
     -- ['<Tab>']     = cmp.mapping.confirm({ select = true }),  -- DISABLED TAB COMPLETION
 })
 cmp.setup({
-    enabled = true,  -- RE-ENABLED AUTOCOMPLETE (Tab still disabled)
+    enabled = true,
+    completion = {
+        autocomplete = { cmp.TriggerEvent.TextChanged },
+        completeopt = 'menu,menuone,noselect',
+    },
     mapping = cmp_mappings,
-    sources = {
+    sources = cmp.config.sources({
         { name = 'nvim_lsp', priority = 750 },
         { name = 'buffer',   priority = 500 },
         { name = 'path',     priority = 300 },
-    },
+    }),
     formatting = {
         -- ▼ Add the expandable_indicator to avoid typecheck warnings.
         expandable_indicator = false,

@@ -73,6 +73,8 @@ return {
     -- �����������������������������������������������������������������������������
     -- Augment Code completion
     -- �����������������������������������������������������������������������������
+    -- DISABLED - Augment completion cannot be properly disabled
+    --[[
     {
         "augmentcode/augment.vim",
         dependencies = {
@@ -83,6 +85,8 @@ return {
             -- Disable Augment autocomplete but keep chat
             vim.g.augment_autocomplete_enabled = false
             vim.g.augment_disable_keymaps = true
+            vim.g.augment_enable_inline_completion = false
+            vim.g.augment_trigger_on_context_change = false
             
             -- Workspace configuration
             local home = vim.fn.expand("$HOME")
@@ -143,6 +147,7 @@ return {
         end,
         event = "VeryLazy",
     },
+    --]]
 
     -- �����������������������������������������������������������������������������
     -- Documentation
