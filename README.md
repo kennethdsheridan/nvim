@@ -5,7 +5,7 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 ## Features
 
 - **LSP Support**: Full language server protocol integration for multiple languages
-- **AI Integration**: Augment AI for chat-based coding assistance
+- **Markdown Preview**: Multiple preview options (browser and native webview)
 - **Completion**: nvim-cmp with LSP sources (Tab completion disabled)
 - **Git Integration**: Fugitive, Gitsigns, and Diffview
 - **File Navigation**: Telescope fuzzy finder and Harpoon
@@ -21,10 +21,10 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 - `<C-y>` - Accept completion
 - `<C-Space>` - Trigger completion
 
-### AI Assistant (Augment)
-- `<leader>ac` - Open Augment chat
-- `<leader>an` - New Augment chat
-- `<leader>at` - Toggle chat window
+### Markdown Preview
+- `<leader>mp` - Toggle Markdown Preview (browser-based)
+- `<leader>pk` - Open Peek preview (native webview)
+- `<leader>pc` - Close Peek preview
 
 ### File Navigation
 - `<leader>pf` - Find files

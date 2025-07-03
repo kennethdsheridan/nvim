@@ -6,7 +6,7 @@ This file contains important information for Claude AI when working with this Ne
 
 ### Current Setup
 - **nvim-cmp**: Enabled for LSP completions
-- **Augment**: Enabled for AI chat features
+- **Markdown Preview**: Two options available (markdown-preview.nvim and peek.nvim)
 - **Tab key**: Disabled for completion acceptance (inserts literal tabs)
 
 ### Key Bindings
@@ -19,14 +19,15 @@ This file contains important information for Claude AI when working with this Ne
 - `after/plugin/disable-tab-completion.lua` - Forces Tab to insert literal tabs
 - `lua/scribe/remap.lua` - Contains toggle function for autocomplete
 - `after/plugin/lsp.lua` - Main nvim-cmp configuration
-- `lua/scribe/plugins.lua` - Plugin configurations including Augment
+- `lua/scribe/plugins.lua` - Plugin configurations including peek.nvim
+- `lua/scribe/markdown.lua` - Additional markdown plugin configurations
 
-### Augment Chat Commands
-- `<leader>ac` - Enter Augment chat mode
-- `<leader>an` - Create new Augment chat
-- `<leader>at` - Toggle Augment chat window
+### Markdown Preview Commands
+- `<leader>mp` - Toggle Markdown Preview (browser-based)
+- `<leader>pk` - Open Peek preview (native webview)
+- `<leader>pc` - Close Peek preview
 
 ## Notes for Future Changes
 - Tab completion is intentionally disabled via multiple mechanisms
 - The toggle function modifies nvim-cmp's enabled state
-- Augment autocomplete is disabled but chat features remain active
+- Peek.nvim provides native webview markdown preview with auto-reload

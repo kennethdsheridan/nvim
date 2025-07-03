@@ -134,6 +134,28 @@ vim.keymap.set(
 vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.dotfiles/nvim/.config/nvim/lua/theprimeagen/packer.lua<CR>")
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
 
+-- Markdown Preview
+vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", { desc = "Toggle Markdown Preview" })
+
+-- Peek Preview (safe loading)
+vim.keymap.set("n", "<leader>pk", function() 
+    local ok, peek = pcall(require, "peek")
+    if ok then
+        peek.open()
+    else
+        print("Peek.nvim not available - restart Neovim after plugin installation")
+    end
+end, { desc = "Peek Open" })
+
+vim.keymap.set("n", "<leader>pc", function() 
+    local ok, peek = pcall(require, "peek")
+    if ok then
+        peek.close()
+    else
+        print("Peek.nvim not available")
+    end
+end, { desc = "Peek Close" })
+
 -- Reload Vim configuration
 vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")

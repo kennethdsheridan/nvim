@@ -1437,6 +1437,25 @@ return {
         end,
     },
     { "preservim/vim-markdown" },
+
+    {
+        "toppair/peek.nvim",
+        event = { "VeryLazy" },
+        build = "deno task --quiet build:fast",
+        config = function()
+            require("peek").setup({
+                auto_load = true,         -- automatically load preview when entering markdown buffer
+                close_on_bdelete = true,  -- close preview window on buffer delete
+                syntax = true,            -- enable syntax highlighting
+                theme = 'dark',           -- 'dark' or 'light'
+                update_on_change = true,
+                app = 'webview',          -- use native macOS webview
+                filetype = { 'markdown' }, -- list of filetypes to recognize as markdown
+                throttle_at = 200000,     -- start throttling when file exceeds this amount of bytes
+                throttle_time = 'auto',   -- minimum time between updates
+            })
+        end,
+    },
     { "dhruvasagar/vim-table-mode" },
     { "junegunn/limelight.vim" },
     { "junegunn/goyo.vim" },
