@@ -1451,5 +1451,73 @@ return {
     { "junegunn/limelight.vim" },
     { "junegunn/goyo.vim" },
 
+    -- �����������������������������������������������������������������������������
+    -- RENDER MARKDOWN
+    -- �����������������������������������������������������������������������������
+    {
+        'MeanderingProgrammer/render-markdown.nvim',
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+        ---@module 'render-markdown'
+        ---@type render.md.UserConfig
+        opts = {},
+        ft = { "markdown" },
+        config = function()
+            require('render-markdown').setup({
+                -- Enable for markdown files
+                enabled = true,
+                -- File types to enable for
+                file_types = { 'markdown' },
+                -- Render style
+                render_modes = { 'n', 'c' },
+                -- Enable anti-conceal
+                anti_conceal = {
+                    enabled = true,
+                },
+                -- Configure heading styles
+                heading = {
+                    enabled = true,
+                    sign = true,
+                    position = 'overlay',
+                    icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+                    signs = { '󰫎 ' },
+                    width = 'full',
+                    left_pad = 0,
+                    right_pad = 0,
+                    min_width = 0,
+                    border = false,
+                    border_virtual = false,
+                    above = '',
+                    below = '',
+                },
+                -- Configure code block rendering
+                code = {
+                    enabled = true,
+                    sign = true,
+                    style = 'full',
+                    position = 'left',
+                    language_pad = 0,
+                    disable_background = { 'diff' },
+                    width = 'full',
+                    left_pad = 0,
+                    right_pad = 0,
+                    min_width = 0,
+                    border = 'thin',
+                    above = '',
+                    below = '',
+                    highlight = 'RenderMarkdownCode',
+                    highlight_inline = 'RenderMarkdownCodeInline',
+                },
+                -- Configure list rendering
+                bullet = {
+                    enabled = true,
+                    icons = { '●', '○', '◆', '◇' },
+                    left_pad = 0,
+                    right_pad = 0,
+                    highlight = 'RenderMarkdownBullet',
+                },
+            })
+        end,
+    },
+
 }
 
