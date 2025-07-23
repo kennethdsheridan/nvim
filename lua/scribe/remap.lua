@@ -12,6 +12,16 @@ vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, { desc = "Go to im
 vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, { desc = "Show documentation hover" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 
+-- Octo.nvim GitHub PR Review
+vim.keymap.set("n", "<leader>opl", "<cmd>Octo pr list<CR>", { desc = "List PRs" })
+vim.keymap.set("n", "<leader>opv", "<cmd>Octo pr view<CR>", { desc = "View current PR" })
+vim.keymap.set("n", "<leader>opc", "<cmd>Octo pr checkout<CR>", { desc = "Checkout PR" })
+vim.keymap.set("n", "<leader>opr", "<cmd>Octo review start<CR>", { desc = "Start PR review" })
+vim.keymap.set("n", "<leader>ops", "<cmd>Octo review submit<CR>", { desc = "Submit PR review" })
+vim.keymap.set("n", "<leader>opa", "<cmd>Octo review comments<CR>", { desc = "View review comments" })
+vim.keymap.set("n", "<leader>opd", "<cmd>Octo pr diff<CR>", { desc = "View PR diff" })
+vim.keymap.set("n", "<leader>opm", "<cmd>Octo pr merge<CR>", { desc = "Merge PR" })
+
 -- NVIM DapBreakpoint
 vim.keymap.set("n", "<F5>", require("dap").continue)
 vim.keymap.set("n", "<F10>", require("dap").step_over)

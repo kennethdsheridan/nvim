@@ -48,6 +48,26 @@ return {
             require("diffview").setup({})
         end,
     },
+    
+    -- �����������������������������������������������������������������������������
+    -- GitHub PR Review with Octo.nvim
+    -- �����������������������������������������������������������������������������
+    {
+        "pwntester/octo.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim",
+            "nvim-tree/nvim-web-devicons",
+        },
+        config = function()
+            require("octo").setup({
+                enable_builtin = true,
+                default_to_projects_v2 = true,
+                default_merge_method = "commit",
+                picker = "telescope",
+            })
+        end,
+    },
 
     -- �����������������������������������������������������������������������������
     -- Monorepo
