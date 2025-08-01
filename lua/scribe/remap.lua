@@ -12,6 +12,122 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 -- vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show documentation hover" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 
+-- Open Rust documentation for symbol under cursor
+vim.keymap.set("n", "<leader>ro", function()
+    local word = vim.fn.expand("<cword>")
+    if not word or word == "" then
+        print("No symbol under cursor")
+        return
+    end
+    
+    -- Rust keywords and std library items that should go to std docs
+    local std_items = {
+        -- Keywords
+        "fn", "let", "mut", "const", "static", "if", "else", "match", "loop", "while", "for", "break", "continue",
+        "return", "struct", "enum", "impl", "trait", "mod", "pub", "use", "extern", "crate", "self", "Self",
+        "super", "async", "await", "move", "ref", "where", "type", "unsafe", "dyn", "macro_rules",
+        
+        -- Primitive types
+        "i8", "i16", "i32", "i64", "i128", "isize", "u8", "u16", "u32", "u64", "u128", "usize",
+        "f32", "f64", "bool", "char", "str", "slice", "array",
+        
+        -- Core std types
+        "Vec", "HashMap", "HashSet", "BTreeMap", "BTreeSet", "VecDeque", "LinkedList", "BinaryHeap",
+        "String", "Option", "Result", "Box", "Rc", "Arc", "Weak", "RefCell", "Cell", "UnsafeCell",
+        "Cow", "Mutex", "RwLock", "Condvar", "Barrier", "Once", "OnceCell", "LazyLock",
+        
+        -- Std modules from your code
+        "std", "borrow", "io", "os", "fd", "sync", "fs", "process", "thread", "time", "env", "path",
+        "collections", "ffi", "mem", "ptr", "slice", "str", "fmt", "error", "result", "option",
+        "convert", "ops", "cmp", "hash", "iter", "marker", "clone", "default", "any",
+        
+        -- IO types
+        "File", "Read", "Write", "Seek", "BufRead", "BufReader", "BufWriter", "Cursor", "Stdin", "Stdout", "Stderr",
+        "SeekFrom", "ErrorKind", "UnixStream", "TcpStream", "UdpSocket", "UnixListener", "TcpListener",
+        
+        -- Time types  
+        "Duration", "Instant", "SystemTime", "UNIX_EPOCH",
+        
+        -- Threading types
+        "JoinHandle", "ThreadId", "Builder", "LocalKey", "AccessError",
+        
+        -- Path types
+        "Path", "PathBuf", "Component", "Components", "Ancestors", "StripPrefixError",
+        
+        -- OS types
+        "AsFd", "AsRawFd", "BorrowedFd", "OwnedFd", "RawFd",
+        
+        -- Traits
+        "Debug", "Display", "Clone", "Copy", "PartialEq", "Eq", "PartialOrd", "Ord", "Hash",
+        "Iterator", "IntoIterator", "Extend", "FromIterator", "Collect", "ExactSizeIterator", "DoubleEndedIterator",
+        "Default", "Drop", "Deref", "DerefMut", "Index", "IndexMut", "Add", "Sub", "Mul", "Div", "Rem",
+        "AsRef", "AsMut", "From", "Into", "TryFrom", "TryInto", "ToString", "FromStr", "Send", "Sync",
+        "Sized", "Unpin", "Future", "IntoFuture", "Stream", "Fn", "FnMut", "FnOnce",
+        
+        -- Error types
+        "Error", "ErrorKind", "ParseIntError", "ParseFloatError", "ParseBoolError", "Utf8Error",
+        
+        -- Process types
+        "Command", "Child", "ChildStdin", "ChildStdout", "ChildStderr", "ExitStatus", "ExitCode", "Stdio",
+        
+        -- Async types (std)
+        "Waker", "Context", "Poll", "Pin", "Ready", "Pending",
+        
+        -- Commonly used macros
+        "println", "print", "eprintln", "eprint", "dbg", "panic", "assert", "assert_eq", "assert_ne",
+        "debug_assert", "debug_assert_eq", "debug_assert_ne", "todo", "unimplemented", "unreachable",
+        "vec", "format", "include", "include_str", "include_bytes", "env", "option_env", "concat",
+        "stringify", "file", "line", "column", "module_path"
+    }
+    
+    local url
+    local is_std_item = false
+    
+    -- Check if it's a std library item or keyword
+    for _, item in ipairs(std_items) do
+        if word == item then
+            is_std_item = true
+            break
+        end
+    end
+    
+    if is_std_item then
+        -- For std items, go to the Rust standard library docs
+        url = "https://doc.rust-lang.org/std/?search=" .. word
+        print("Opening Rust std docs for: " .. word)
+    else
+        -- For other items, assume it's a crate and go to docs.rs
+        url = "https://docs.rs/" .. word
+        print("Opening docs.rs for: " .. word)
+    end
+    
+    -- Try multiple methods to open browser on macOS
+    local success = false
+    
+    -- Method 1: Try vim.ui.open (newer Neovim versions)
+    if vim.ui.open then
+        success = pcall(vim.ui.open, url)
+    end
+    
+    -- Method 2: Try open command with full path
+    if not success then
+        local result = vim.fn.system("/usr/bin/open " .. vim.fn.shellescape(url))
+        success = vim.v.shell_error == 0
+    end
+    
+    -- Method 3: Try with explicit background execution
+    if not success then
+        vim.fn.jobstart({"/usr/bin/open", url}, {detach = true})
+        success = true
+    end
+    
+    if not success then
+        print("Failed to open browser. URL copied to clipboard:")
+        vim.fn.setreg("+", url)
+        print(url)
+    end
+end, { desc = "Open Rust documentation for symbol under cursor" })
+
 -- Octo.nvim GitHub PR Review
 vim.keymap.set("n", "<leader>opl", "<cmd>Octo pr list<CR>", { desc = "List PRs" })
 vim.keymap.set("n", "<leader>opv", "<cmd>Octo pr view<CR>", { desc = "View current PR" })

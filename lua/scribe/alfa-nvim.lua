@@ -5,9 +5,9 @@ M.opts = function()
     local logo = [[
                                                 
         ╭─────────────────────────────╮        
-        │          NeoVim             │        
-        │  Powered Editor for         │        
-        │     Professionals           │        
+        │           NeoVim            │        
+        │     Powered Editor for      │        
+        │       Professionals         │        
         ╰─────────────────────────────╯        
                        🦀                      
                                                 
@@ -60,10 +60,13 @@ M.opts = function()
     local docs_section = {
         type = "group",
         val = {
-            { type = "text",    val = "Documentation",                                                opts = { hl = "SpecialComment", position = "center" } },
+            { type = "text",    val = "🔧 Essential Keybindings",                                        opts = { hl = "SpecialComment", position = "center" } },
             { type = "padding", val = 1 },
-            { type = "text",    val = "Rust: <leader>rd | TypeScript/JS: <leader>ng | C: <leader>cm", opts = { hl = "Comment", position = "center" } },
-            { type = "text",    val = "Bash: <leader>bd | Lua: <leader>ld | All: <leader>dd",         opts = { hl = "Comment", position = "center" } },
+            { type = "text",    val = "Git: <leader>gs (status) | <leader>gp (preview) | <leader>gt (blame)", opts = { hl = "Comment", position = "center" } },
+            { type = "text",    val = "Octo: <leader>opl (PRs) | <leader>opr (review) | <leader>opc (checkout)", opts = { hl = "Comment", position = "center" } },
+            { type = "text",    val = "Files: <leader>pf (find) | <C-p> (git files) | <leader>/ (grep)", opts = { hl = "Comment", position = "center" } },
+            { type = "text",    val = "Harpoon: <leader>a (add) | <C-e> (menu) | <C-h/t/n/s> (nav)",   opts = { hl = "Comment", position = "center" } },
+            { type = "text",    val = "Debug: <F5> (run) | <Leader>b (breakpoint) | <leader>tt (trouble)", opts = { hl = "Comment", position = "center" } },
         },
         position = "center",
     }
@@ -73,13 +76,13 @@ M.opts = function()
     dashboard.section.footer.opts.hl = "AlphaFooter"
 
     dashboard.config.layout = {
-        { type = "padding", val = 2 },
+        { type = "padding", val = 4 },
         dashboard.section.header,
-        { type = "padding", val = 2 },
+        { type = "padding", val = 3 },
         dashboard.section.buttons,
-        { type = "padding", val = 1 },
+        { type = "padding", val = 2 },
         docs_section,
-        { type = "padding", val = 1 },
+        { type = "padding", val = 2 },
         dashboard.section.footer,
     }
 
