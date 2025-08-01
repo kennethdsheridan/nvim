@@ -27,6 +27,24 @@ This file contains important information for Claude AI when working with this Ne
 - `<leader>pk` - Open Peek preview (native webview)
 - `<leader>pc` - Close Peek preview
 
+### Rust Configuration
+- **Enhanced rust-analyzer**: Comprehensive configuration with workspace detection
+- **Inlay hints**: Type annotations and parameter hints enabled
+- **Clippy integration**: Advanced linting with pedantic and nursery rules
+- **Code lens**: References, implementations, and debug/run buttons
+
+### Rust Keybindings
+- `<leader>rr` - Run runnables (via rust-analyzer)
+- `<leader>rd` - Debug runnables
+- `<leader>re` - Expand macro
+- `<leader>rc` - Open Cargo.toml
+- `<leader>rp` - Go to parent module
+- `<leader>rj` - Join lines
+- `<leader>rh` - Hover actions
+- `<leader>rH` - Hover range
+- `<leader>rm` - Move item down
+- `<leader>rM` - Move item up
+
 ## Notes for Future Changes
 - Tab completion is intentionally disabled via multiple mechanisms
 - The toggle function modifies nvim-cmp's enabled state

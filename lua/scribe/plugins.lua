@@ -48,6 +48,80 @@ return {
             require("diffview").setup({})
         end,
     },
+
+    -- �����������������������������������������������������������������������������
+    -- Database Tools
+    -- �����������������������������������������������������������������������������
+    {
+        "tpope/vim-dadbod",
+    },
+    {
+        "kristijanhusak/vim-dadbod-ui",
+        dependencies = {
+            "tpope/vim-dadbod",
+            "kristijanhusak/vim-dadbod-completion",
+        },
+        config = function()
+            vim.g.db_ui_use_nerd_fonts = 1
+            vim.g.db_ui_show_database_icon = 1
+            vim.g.db_ui_force_echo_notifications = 1
+            vim.g.db_ui_win_position = 'left'
+            vim.g.db_ui_winwidth = 40
+            vim.g.db_ui_default_query = 'SELECT * FROM "{table}" LIMIT 10;'
+            
+            -- Auto-completion for SQL
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = { "sql", "mysql", "plsql" },
+                callback = function()
+                    local ok, cmp = pcall(require, 'cmp')
+                    if ok then
+                        cmp.setup.buffer({
+                            sources = {
+                                { name = 'vim-dadbod-completion' },
+                                { name = 'buffer' },
+                            },
+                        })
+                    end
+                end,
+            })
+        end,
+        keys = {
+            { "<leader>db", "<cmd>DBUIToggle<CR>", desc = "Toggle Database UI" },
+            { "<leader>df", "<cmd>DBUIFindBuffer<CR>", desc = "Find Database Buffer" },
+            { "<leader>dr", "<cmd>DBUIRenameBuffer<CR>", desc = "Rename Database Buffer" },
+            { "<leader>dq", "<cmd>DBUILastQueryInfo<CR>", desc = "Last Query Info" },
+        },
+    },
+    {
+        "kristijanhusak/vim-dadbod-completion",
+        dependencies = "tpope/vim-dadbod",
+        ft = { "sql", "mysql", "plsql" },
+    },
+
+    -- �����������������������������������������������������������������������������
+    -- Git Worktree Management
+    -- �����������������������������������������������������������������������������
+    {
+        "ThePrimeagen/git-worktree.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim",
+        },
+        config = function()
+            require("git-worktree").setup({
+                change_directory_command = "cd",
+                update_on_change = true,
+                update_on_change_command = "e .",
+                clearjumps_on_change = true,
+                autopush = false,
+            })
+            -- Extension loaded in telescope config to avoid conflicts
+        end,
+        keys = {
+            { "<leader>gw", "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>", desc = "Switch worktree" },
+            { "<leader>gW", "<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>", desc = "Create worktree" },
+        },
+    },
     
     -- �����������������������������������������������������������������������������
     -- GitHub PR Review with Octo.nvim
@@ -88,7 +162,8 @@ return {
     -- �����������������������������������������������������������������������������
     -- Rust Owl
     -- �����������������������������������������������������������������������������
-    { "cordx56/rustowl",   dependencies = { "neovim/nvim-lspconfig" } },
+    { "cordx56/rustowl",   dependencies = { "neovim/nvim-lspconfig" }, enabled = false },
+    { "mrcjkb/rustaceanvim", enabled = false },  -- Disable rustaceanvim temporarily
 
     -- �����������������������������������������������������������������������������
     -- Augment Code completion
@@ -204,7 +279,7 @@ return {
                 detection_methods = { "pattern" },
                 patterns = {
                     ".git",
-                    "Cargo.toml",
+                    -- "Cargo.toml",  -- Disabled: conflicts with rust-analyzer workspace detection
                     "go.mod",
                     "package.json",
                     "tsconfig.json",
@@ -213,9 +288,7 @@ return {
                 },
                 silent_chdir = false,
             }
-            pcall(function()
-                require("telescope").load_extension("projects")
-            end)
+            -- Extension loaded in telescope config to avoid conflicts
         end,
     },
 

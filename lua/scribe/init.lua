@@ -23,6 +23,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+
 -------------------------------------------------------------------------------
 -- SET UP LAZY.NVIM WITH OUR PLUGIN SPECS
 -------------------------------------------------------------------------------
@@ -105,16 +106,19 @@ local servers = {
     'jsonls',
     'marksman',
     'pyright',
+    'rust_analyzer',  -- Add rust_analyzer back
     'sqlls',
     'taplo',
     'yamlls',
 }
 
--- Set up basic servers
+-- Set up basic servers (rust_analyzer is configured in after/plugin/lsp.lua)
 for _, server in ipairs(servers) do
-    lspconfig[server].setup({
-        on_attach = on_attach,
-    })
+    if server ~= 'rust_analyzer' then
+        lspconfig[server].setup({
+            on_attach = on_attach,
+        })
+    end
 end
 
 -- Special config for lua_ls
@@ -134,20 +138,6 @@ lspconfig.lua_ls.setup({
     },
 })
 
--- Special config for rust_analyzer
-lspconfig.rust_analyzer.setup({
-    on_attach = on_attach,
-    settings = {
-        ["rust-analyzer"] = {
-            cargo = { allFeatures = true },
-            procMacro = { enable = true },
-            checkOnSave = { command = "clippy" },
-            diagnostics = {
-                disabled = { "unresolved-proc-macro", "macro-error" },
-            },
-        },
-    },
-})
 
 -------------------------------------------------------------------------------
 -- DAP SETUP (SIMPLIFIED)
@@ -213,6 +203,25 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
         vim.bo.filetype = "jsonc"
     end
 })
+
+-------------------------------------------------------------------------------
+-- RUST-SPECIFIC COMMANDS
+-------------------------------------------------------------------------------
+vim.api.nvim_create_user_command('CargoTest', function()
+    vim.cmd('!cargo test')
+end, { desc = 'Run cargo test' })
+
+vim.api.nvim_create_user_command('CargoRun', function()
+    vim.cmd('!cargo run')
+end, { desc = 'Run cargo run' })
+
+vim.api.nvim_create_user_command('CargoCheck', function()
+    vim.cmd('!cargo check')
+end, { desc = 'Run cargo check' })
+
+vim.api.nvim_create_user_command('CargoClippy', function()
+    vim.cmd('!cargo clippy')
+end, { desc = 'Run cargo clippy' })
 
 -------------------------------------------------------------------------------
 -- FINAL DEBUG PRINT

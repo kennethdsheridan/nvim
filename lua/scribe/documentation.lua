@@ -108,22 +108,8 @@ return {
         "LinArcX/telescope-command-palette.nvim",
         dependencies = { "nvim-telescope/telescope.nvim" },
         config = function()
-            require("telescope").load_extension("command_palette")
-
-            -- Add bash documentation commands
-            require("telescope").setup({
-                extensions = {
-                    command_palette = {
-                        {
-                            "Bash Documentation",
-                            { "Man Page",        ":Man bash" },
-                            { "Bash Builtins",   ":Man bash-builtins" },
-                            { "Bash Parameters", ":term tldr bash" },
-                        },
-                    },
-                },
-            })
-
+            -- Extension loaded in telescope config to avoid conflicts
+            
             -- Keymaps for bash documentation
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "sh", "bash" },

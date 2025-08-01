@@ -4,12 +4,12 @@ vim.g.mapleader = " "
 -- Project navigation
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
--- GOTO declaration and documentation navigation
--- Go to reference (LSP go to definition/reference)
-vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, { desc = "Go to reference" })
-vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
-vim.keymap.set("n", "<leader>K", vim.lsp.buf.hover, { desc = "Show documentation hover" })
+-- GOTO declaration and documentation navigation (using standard LSP keys)
+-- These will be handled by the LSP on_attach function instead
+-- vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+-- vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
+-- vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
+-- vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show documentation hover" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 
 -- Octo.nvim GitHub PR Review
@@ -33,22 +33,82 @@ vim.keymap.set("n", "<Leader>b", require("dap").toggle_breakpoint)
 vim.keymap.set("n", "<Leader>dt", require("dap").terminate)
 
 -- Split horizontally with a terminal session on top
-vim.keymap.set("n", "<leader>tt", function()
+vim.keymap.set("n", "<leader>tm", function()
     -- "10sp" means "horizontal split 10 lines tall"
     -- "aboveleft" ensures it appears above the current window
     -- Then open the built-in terminal
     vim.cmd("aboveleft 10split | terminal")
 end, { desc = "Open terminal (top horizontal split)" })
 
+-- Trouble.nvim keymaps
+vim.keymap.set("n", "<leader>tt", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Trouble: Toggle diagnostics" })
+vim.keymap.set("n", "<leader>tT", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Trouble: Buffer diagnostics" })
+vim.keymap.set("n", "<leader>ts", "<cmd>Trouble symbols toggle focus=false<cr>", { desc = "Trouble: Symbols" })
+vim.keymap.set("n", "<leader>tl", "<cmd>Trouble lsp toggle focus=false win.position=right<cr>", { desc = "Trouble: LSP Definitions / references / ..." })
+vim.keymap.set("n", "<leader>tL", "<cmd>Trouble loclist toggle<cr>", { desc = "Trouble: Location List" })
+vim.keymap.set("n", "<leader>tQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Trouble: Quickfix List" })
+
+-- Git worktree commands (manual since telescope extension has issues)
+vim.keymap.set("n", "<leader>gw", function()
+    -- Create a new buffer to show worktree list
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+    
+    -- Get worktree list
+    local handle = io.popen('git worktree list')
+    local result = handle:read('*a')
+    handle:close()
+    
+    -- Split result into lines and set buffer content
+    local lines = {}
+    for line in result:gmatch("[^\r\n]+") do
+        table.insert(lines, line)
+    end
+    
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    vim.api.nvim_buf_set_name(buf, "Git Worktrees")
+    
+    -- Open in a split
+    vim.cmd("split")
+    vim.api.nvim_win_set_buf(0, buf)
+    vim.api.nvim_win_set_height(0, math.min(#lines + 2, 10))
+    
+    -- Make it read-only
+    vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+end, { desc = "List git worktrees" })
+
+vim.keymap.set("n", "<leader>gW", function()
+    -- Prompt for branch name and path for new worktree
+    local branch = vim.fn.input("Branch name: ")
+    if branch ~= "" then
+        local path = vim.fn.input("Worktree path: ", "../sfcompute-" .. branch)
+        if path ~= "" then
+            vim.cmd("!git worktree add " .. path .. " " .. branch)
+        end
+    end
+end, { desc = "Create new git worktree" })
+
+vim.keymap.set("n", "<leader>gc", function()
+    -- Change to different worktree directory
+    local path = vim.fn.input("Worktree path: ", "../")
+    if path ~= "" and vim.fn.isdirectory(path) == 1 then
+        vim.cmd("cd " .. path)
+        print("Changed to: " .. path)
+    else
+        print("Invalid directory: " .. path)
+    end
+end, { desc = "Change to worktree directory" })
+
 -- Projects keymap (Telescope Projects extension)
 vim.keymap.set('n', '<leader>pp', function()
     require('telescope').extensions.projects.projects {}
 end, {})
 
--- Rustacean vim mapping
+-- Rust test mapping
 vim.keymap.set("n", "<Leader>dt", function()
-    vim.cmd('RustLsp testables')
-end, { desc = "Debugger testables" })
+    vim.cmd('!cargo test')
+end, { desc = "Run Rust tests" })
 
 -- Toggle autocomplete
 vim.g.completion_active = true
@@ -106,8 +166,7 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 -- Delete without yanking
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
--- Code Actions
-vim.api.nvim_set_keymap('n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true })
+-- Code Actions (handled in LSP on_attach)
 
 -- Miscellaneous
 -- Cancel action in insert mode
@@ -116,8 +175,7 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 vim.keymap.set("n", "Q", "<nop>")
 -- Open tmux sessionizer
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
--- Format buffer using LSP
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+-- Format buffer using LSP (handled in LSP on_attach)
 
 -- Navigation between diagnostics and locations
 -- Next and previous compiler errors
@@ -168,7 +226,7 @@ end, { desc = "Peek Close" })
 
 -- Reload Vim configuration
 vim.keymap.set("n", "<leader><leader>", function()
-    vim.cmd("so")
+    vim.cmd("source ~/.config/nvim/init.lua")
 end)
 
 --------------------------------------------------------------------------------
@@ -189,12 +247,10 @@ vim.keymap.set("n", "<leader>pb", telescope.buffers, { desc = "Telescope: Buffer
 vim.keymap.set("n", "<leader>po", telescope.oldfiles, { desc = "Telescope: Old Files" })
 vim.keymap.set("n", "<leader>ph", telescope.help_tags, { desc = "Telescope: Help Tags" })
 
--- 2) LSP-related pickers
--- NOTE: These conflict with your <leader>gr, <leader>gd, <leader>gi> if you want them
--- the same you can replace or rename them below:
-vim.keymap.set("n", "gr", telescope.lsp_references, { desc = "Telescope: LSP References" })
-vim.keymap.set("n", "gd", telescope.lsp_definitions, { desc = "Telescope: LSP Definitions" })
-vim.keymap.set("n", "gi", telescope.lsp_implementations, { desc = "Telescope: LSP Implementations" })
+-- 2) LSP-related pickers (using <leader> prefix to avoid conflicts)
+vim.keymap.set("n", "<leader>lr", telescope.lsp_references, { desc = "Telescope: LSP References" })
+vim.keymap.set("n", "<leader>ld", telescope.lsp_definitions, { desc = "Telescope: LSP Definitions" })
+vim.keymap.set("n", "<leader>li", telescope.lsp_implementations, { desc = "Telescope: LSP Implementations" })
 
 --------------------------------------------------------------------------------
 -- Example: Additional Telescope keybindings that search project root

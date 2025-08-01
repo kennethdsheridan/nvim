@@ -80,20 +80,249 @@ lspconfig.lua_ls.setup({
     },
 })
 
--- Special configuration for rust_analyzer
+-- Enhanced rust-analyzer configuration
 lspconfig.rust_analyzer.setup({
-    on_attach = lsp.on_attach,
+    on_attach = function(client, bufnr)
+        lsp.on_attach(client, bufnr)
+        
+        -- Enable inlay hints for Rust
+        if client.server_capabilities.inlayHintProvider then
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        end
+        
+        -- Rust-specific keybindings
+        local opts = { buffer = bufnr, remap = false }
+        vim.keymap.set("n", "<leader>rr", "<cmd>RustRunnables<cr>", opts)
+        vim.keymap.set("n", "<leader>rd", "<cmd>RustDebuggables<cr>", opts)
+        vim.keymap.set("n", "<leader>re", "<cmd>RustExpandMacro<cr>", opts)
+        vim.keymap.set("n", "<leader>rc", "<cmd>RustOpenCargo<cr>", opts)
+        vim.keymap.set("n", "<leader>rp", "<cmd>RustParentModule<cr>", opts)
+        vim.keymap.set("n", "<leader>rj", "<cmd>RustJoinLines<cr>", opts)
+        vim.keymap.set("n", "<leader>rh", "<cmd>RustHoverActions<cr>", opts)
+        vim.keymap.set("n", "<leader>rH", "<cmd>RustHoverRange<cr>", opts)
+        vim.keymap.set("n", "<leader>rm", "<cmd>RustMoveItemDown<cr>", opts)
+        vim.keymap.set("n", "<leader>rM", "<cmd>RustMoveItemUp<cr>", opts)
+    end,
     capabilities = lsp.get_capabilities(),
+    cmd = { "rust-analyzer" },
+    filetypes = { "rust" },
+    root_dir = function(fname)
+        local util = require('lspconfig.util')
+        -- Look for Cargo.toml in parent directories
+        local cargo_crate_root = util.root_pattern('Cargo.toml')(fname)
+        -- Look for rust-project.json for non-cargo projects
+        local rust_project_root = util.root_pattern('rust-project.json')(fname)
+        
+        -- Prioritize workspace root if we're in a workspace
+        if cargo_crate_root then
+            local cargo_toml = cargo_crate_root .. '/Cargo.toml'
+            local file = io.open(cargo_toml, 'r')
+            if file then
+                local content = file:read('*all')
+                file:close()
+                -- If this is a workspace member, try to find the workspace root
+                if not content:match('%[workspace%]') then
+                    local parent = vim.fn.fnamemodify(cargo_crate_root, ':h')
+                    while parent ~= '/' and parent ~= '' do
+                        local parent_cargo = parent .. '/Cargo.toml'
+                        local parent_file = io.open(parent_cargo, 'r')
+                        if parent_file then
+                            local parent_content = parent_file:read('*all')
+                            parent_file:close()
+                            if parent_content:match('%[workspace%]') then
+                                return parent
+                            end
+                        end
+                        parent = vim.fn.fnamemodify(parent, ':h')
+                    end
+                end
+            end
+            return cargo_crate_root
+        end
+        
+        return rust_project_root or util.find_git_ancestor(fname)
+    end,
     settings = {
-        ['rust-analyzer'] = {
+        ["rust-analyzer"] = {
+            -- Import settings
+            imports = {
+                granularity = {
+                    group = "module",
+                },
+                merge = {
+                    glob = true,
+                },
+                prefix = "self",
+            },
+            
+            -- Cargo settings
             cargo = {
+                buildScripts = {
+                    enable = true,
+                },
+                features = "all",
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
+                -- Target specific settings
+                target = nil, -- Will use the default target
+            },
+            
+            -- Check on save settings (using clippy)
+            checkOnSave = {
+                enable = true,
+                command = "clippy",
+                extraArgs = {
+                    "--",
+                    "-W", "clippy::pedantic",
+                    "-W", "clippy::nursery",
+                    "-W", "clippy::unwrap_used",
+                    "-W", "clippy::expect_used"
+                },
                 allFeatures = true,
             },
+            
+            -- Diagnostics settings
+            diagnostics = {
+                enable = true,
+                experimental = {
+                    enable = true,
+                },
+                disabled = {
+                    -- Disable specific diagnostics if needed
+                },
+                enableExperimental = true,
+                warningsAsHint = {
+                    -- Downgrade specific warnings to hints
+                },
+                warningsAsInfo = {
+                    -- Downgrade specific warnings to info
+                },
+            },
+            
+            -- Inlay hints configuration
+            inlayHints = {
+                bindingModeHints = {
+                    enable = false,
+                },
+                chainingHints = {
+                    enable = true,
+                },
+                closingBraceHints = {
+                    enable = true,
+                    minLines = 25,
+                },
+                closureReturnTypeHints = {
+                    enable = "never",
+                },
+                lifetimeElisionHints = {
+                    enable = "never",
+                    useParameterNames = false,
+                },
+                maxLength = 25,
+                parameterHints = {
+                    enable = true,
+                },
+                reborrowHints = {
+                    enable = "never",
+                },
+                renderColons = true,
+                typeHints = {
+                    enable = true,
+                    hideClosureInitialization = false,
+                    hideNamedConstructor = false,
+                },
+            },
+            
+            -- Lens settings (code lens)
+            lens = {
+                enable = true,
+                debug = true,
+                implementations = true,
+                references = true,
+                methodReferences = true,
+                enumVariantReferences = true,
+            },
+            
+            -- Proc macro settings
             procMacro = {
-                enable = true
+                enable = true,
+                attributes = {
+                    enable = true,
+                },
+                ignored = {
+                    -- List of proc macros to ignore
+                },
+            },
+            
+            -- Rust fmt settings
+            rustfmt = {
+                enableRangeFormatting = true,
+                extraArgs = {},
+                overrideCommand = nil,
+            },
+            
+            -- Workspace settings
+            workspace = {
+                symbol = {
+                    search = {
+                        kind = "all_symbols",
+                        limit = 128,
+                        scope = "workspace",
+                    },
+                },
+            },
+            
+            -- Completion settings
+            completion = {
+                addCallArgumentSnippets = true,
+                addCallParenthesis = true,
+                postfix = {
+                    enable = true,
+                },
+                autoimport = {
+                    enable = true,
+                },
+                autoself = {
+                    enable = true,
+                },
+            },
+            
+            -- Hover settings
+            hover = {
+                documentation = {
+                    enable = true,
+                    keywords = {
+                        enable = true,
+                    },
+                },
+                links = {
+                    enable = true,
+                },
+            },
+            
+            -- Join lines settings
+            joinLines = {
+                joinAssignments = true,
+                joinElseIf = true,
+                removeTrailingComma = true,
+                unwrapTrivialBlock = true,
+            },
+            
+            -- Highlighting settings
+            highlighting = {
+                strings = {
+                    enable = true,
+                },
+            },
+            
+            -- Files to watch
+            files = {
+                excludeDirs = {},
+                watcher = "client",
             },
         }
-    }
+    },
 })
 
 -- 4. Set up nvim-cmp for autocompletion
@@ -145,19 +374,29 @@ cmp.setup({
 })
 
 -- 5. Configure on_attach behavior: LSP keymaps, etc.
--- If we're not using the "client" parameter, remove it or rename to `_`.
+-- Using standard LSP keybindings that work consistently across all projects
 lsp.on_attach(function(_, bufnr)
     local opts = { buffer = bufnr, remap = false }
+    
+    -- Standard LSP navigation (these should work with Command+K, gd, gr)
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts) 
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
+    
+    -- Diagnostics
     vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_next, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+    
+    -- Code actions and refactoring
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    
+    -- Other useful LSP functions
+    vim.keymap.set("n", "<leader>ws", vim.lsp.buf.workspace_symbol, opts)
     vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
+    vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, opts)
 end)
 
 -- 6. Finally set everything up
