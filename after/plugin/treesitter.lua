@@ -18,6 +18,7 @@ require('nvim-treesitter.configs').setup({
     "html",
     "json",
     "jsonc", -- JSON with comments (VSCode-style)
+    "nix",   -- Nix language support
   },
 
   -- 2) If true, Parsers will be installed one-by-one and block Neovim until done.

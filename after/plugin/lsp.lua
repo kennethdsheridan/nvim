@@ -31,6 +31,7 @@ require('mason-lspconfig').setup({
         'yamlls',
         'dockerls',
         'marksman',
+        'nil_ls', -- Nix language server
     },
     automatic_installation = false, -- Still set to false for extra measure
 })
@@ -53,6 +54,7 @@ local default_servers = {
     'yamlls',
     'dockerls',
     'marksman',
+    'nil_ls',
 }
 
 for _, server in ipairs(default_servers) do

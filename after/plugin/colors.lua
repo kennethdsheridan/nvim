@@ -9,7 +9,7 @@ function ColorMyPencils(color)
     
     -- Custom highlight groups for a relaxed dark theme
     -- Dark background with light text
-    vim.api.nvim_set_hl(0, "Normal", { bg = "#2b2b2b", fg = "#d4d4d4" })
+    vim.api.nvim_set_hl(0, "Normal", { bg = "#323338", fg = "#d4d4d4" })
     vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#323232", fg = "#d4d4d4" })
     
     -- Light syntax highlighting for dark background
@@ -50,11 +50,11 @@ function ColorMyPencils(color)
     vim.api.nvim_set_hl(0, "@punctuation", { fg = "#abb2bf" })
     
     -- Line numbers and UI elements
-    vim.api.nvim_set_hl(0, "LineNr", { fg = "#5c6370", bg = "#2b2b2b" })
+    vim.api.nvim_set_hl(0, "LineNr", { fg = "#5c6370", bg = "#323338" })
     vim.api.nvim_set_hl(0, "CursorLine", { bg = "#363636" })
     vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#abb2bf", bg = "#363636", bold = true })
-    vim.api.nvim_set_hl(0, "SignColumn", { bg = "#2b2b2b" })
-    vim.api.nvim_set_hl(0, "VertSplit", { fg = "#3e4452", bg = "#2b2b2b" })
+    vim.api.nvim_set_hl(0, "SignColumn", { bg = "#323338" })
+    vim.api.nvim_set_hl(0, "VertSplit", { fg = "#3e4452", bg = "#323338" })
     
     -- Status line
     vim.api.nvim_set_hl(0, "StatusLine", { bg = "#3e4452", fg = "#abb2bf" })

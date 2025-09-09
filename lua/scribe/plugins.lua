@@ -1481,7 +1481,30 @@ return {
     -- �����������������������������������������������������������������������������
     { "kosayoda/nvim-lightbulb" },
     { "mfussenegger/nvim-lint" },
-    { "mhartington/formatter.nvim" },
+    {
+        "mhartington/formatter.nvim",
+        config = function()
+            require("formatter").setup({
+                logging = true,
+                log_level = vim.log.levels.WARN,
+                filetype = {
+                    nix = {
+                        require("formatter.filetypes.nix").nixpkgsfmt
+                    },
+                    ["*"] = {
+                        require("formatter.filetypes.any").remove_trailing_whitespace
+                    }
+                }
+            })
+            
+            vim.api.nvim_create_augroup("__formatter__", { clear = true })
+            vim.api.nvim_create_autocmd("BufWritePost", {
+                group = "__formatter__",
+                pattern = "*.nix",
+                command = ":FormatWrite",
+            })
+        end,
+    },
     {
         "kosayoda/nvim-lightbulb",
         config = function()
