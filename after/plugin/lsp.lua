@@ -104,6 +104,8 @@ lspconfig.rust_analyzer.setup({
         vim.keymap.set("n", "<leader>rH", "<cmd>RustHoverRange<cr>", opts)
         vim.keymap.set("n", "<leader>rm", "<cmd>RustMoveItemDown<cr>", opts)
         vim.keymap.set("n", "<leader>rM", "<cmd>RustMoveItemUp<cr>", opts)
+        
+        -- Rust documentation keymaps are set up via rust-docs module
     end,
     capabilities = lsp.get_capabilities(),
     cmd = { "rust-analyzer" },
