@@ -1,9 +1,25 @@
 function ColorMyPencils(color)
     color = color or "everforest"
-    
-    -- Set dark background
+
+    -- Handle catppuccin specially
+    if color == "catppuccin" or color:find("catppuccin") then
+        vim.o.background = "dark"
+        local flavour = color:match("catppuccin%-(%w+)") or "latte"
+        require("catppuccin").setup({ flavour = flavour })
+        vim.cmd.colorscheme("catppuccin")
+        return
+    end
+
+    -- Handle nord specially
+    if color == "nord" then
+        vim.o.background = "dark"
+        vim.cmd.colorscheme("nord")
+        return
+    end
+
+    -- Set dark background for other themes
     vim.o.background = "dark"
-    
+
     -- Apply colorscheme
     vim.cmd.colorscheme(color)
     
@@ -88,7 +104,11 @@ vim.api.nvim_create_user_command('Theme', function(opts)
 end, {
     nargs = '?',
     complete = function()
-        return { 'everforest', 'gruvbox', 'tokyonight-moon', 'catppuccin', 'nord' }
+        return {
+            'everforest', 'gruvbox', 'tokyonight-moon',
+            'catppuccin-latte', 'catppuccin-mocha', 'catppuccin-frappe', 'catppuccin-macchiato',
+            'nord'
+        }
     end,
     desc = 'Switch theme with custom highlights'
 })

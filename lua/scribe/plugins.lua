@@ -68,7 +68,7 @@ return {
             vim.g.db_ui_win_position = 'left'
             vim.g.db_ui_winwidth = 40
             vim.g.db_ui_default_query = 'SELECT * FROM "{table}" LIMIT 10;'
-            
+
             -- Auto-completion for SQL
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "sql", "mysql", "plsql" },
@@ -86,9 +86,9 @@ return {
             })
         end,
         keys = {
-            { "<leader>db", "<cmd>DBUIToggle<CR>", desc = "Toggle Database UI" },
-            { "<leader>df", "<cmd>DBUIFindBuffer<CR>", desc = "Find Database Buffer" },
-            { "<leader>dr", "<cmd>DBUIRenameBuffer<CR>", desc = "Rename Database Buffer" },
+            { "<leader>db", "<cmd>DBUIToggle<CR>",        desc = "Toggle Database UI" },
+            { "<leader>df", "<cmd>DBUIFindBuffer<CR>",    desc = "Find Database Buffer" },
+            { "<leader>dr", "<cmd>DBUIRenameBuffer<CR>",  desc = "Rename Database Buffer" },
             { "<leader>dq", "<cmd>DBUILastQueryInfo<CR>", desc = "Last Query Info" },
         },
     },
@@ -118,11 +118,11 @@ return {
             -- Extension loaded in telescope config to avoid conflicts
         end,
         keys = {
-            { "<leader>gw", "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>", desc = "Switch worktree" },
+            { "<leader>gw", "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>",       desc = "Switch worktree" },
             { "<leader>gW", "<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<CR>", desc = "Create worktree" },
         },
     },
-    
+
     -- �����������������������������������������������������������������������������
     -- GitHub PR Review with Octo.nvim
     -- �����������������������������������������������������������������������������
@@ -162,8 +162,8 @@ return {
     -- �����������������������������������������������������������������������������
     -- Rust Owl
     -- �����������������������������������������������������������������������������
-    { "cordx56/rustowl",   dependencies = { "neovim/nvim-lspconfig" }, enabled = false },
-    { "mrcjkb/rustaceanvim", enabled = false },  -- Disable rustaceanvim temporarily
+    { "cordx56/rustowl",     dependencies = { "neovim/nvim-lspconfig" }, enabled = false },
+    { "mrcjkb/rustaceanvim", enabled = false }, -- Disable rustaceanvim temporarily
 
     -- �����������������������������������������������������������������������������
     -- Augment Code completion
@@ -253,16 +253,27 @@ return {
             vim.opt.autoread = true
 
             -- Recommended/example keymaps
-            vim.keymap.set("n", "<leader>ot", function() require("opencode").toggle() end, { desc = "Toggle embedded opencode" })
-            vim.keymap.set("n", "<leader>oa", function() require("opencode").ask("@cursor: ") end, { desc = "Ask about this" })
-            vim.keymap.set("x", "<leader>oa", function() require("opencode").ask("@selection: ") end, { desc = "Ask about selection" })
-            vim.keymap.set("n", "<leader>o+", function() require("opencode").prompt("@buffer", { append = true }) end, { desc = "Add buffer to prompt" })
-            vim.keymap.set("x", "<leader>o+", function() require("opencode").prompt("@selection", { append = true }) end, { desc = "Add selection to prompt" })
-            vim.keymap.set("n", "<leader>oe", function() require("opencode").prompt("Explain @cursor and its context") end, { desc = "Explain this code" })
-            vim.keymap.set("n", "<leader>on", function() require("opencode").command("session_new") end, { desc = "New session" })
-            vim.keymap.set("n", "<S-C-u>",    function() require("opencode").command("messages_half_page_up") end, { desc = "Messages half page up" })
-            vim.keymap.set("n", "<S-C-d>",    function() require("opencode").command("messages_half_page_down") end, { desc = "Messages half page down" })
-            vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end, { desc = "Select prompt" })
+            vim.keymap.set("n", "<leader>ot", function() require("opencode").toggle() end,
+                { desc = "Toggle embedded opencode" })
+            vim.keymap.set("n", "<leader>oa", function() require("opencode").ask("@cursor: ") end,
+                { desc = "Ask about this" })
+            vim.keymap.set("x", "<leader>oa", function() require("opencode").ask("@selection: ") end,
+                { desc = "Ask about selection" })
+            vim.keymap.set("n", "<leader>o+", function() require("opencode").prompt("@buffer", { append = true }) end,
+                { desc = "Add buffer to prompt" })
+            vim.keymap.set("x", "<leader>o+", function() require("opencode").prompt("@selection", { append = true }) end,
+                { desc = "Add selection to prompt" })
+            vim.keymap.set("n", "<leader>oe",
+                function() require("opencode").prompt("Explain @cursor and its context") end,
+                { desc = "Explain this code" })
+            vim.keymap.set("n", "<leader>on", function() require("opencode").command("session_new") end,
+                { desc = "New session" })
+            vim.keymap.set("n", "<S-C-u>", function() require("opencode").command("messages_half_page_up") end,
+                { desc = "Messages half page up" })
+            vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("messages_half_page_down") end,
+                { desc = "Messages half page down" })
+            vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,
+                { desc = "Select prompt" })
         end,
     },
 
@@ -617,21 +628,18 @@ return {
     {
         "catppuccin/nvim",
         name = "catppuccin",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
             require("catppuccin").setup({
                 flavour = "latte", -- Options: latte, frappe, macchiato, mocha
             })
-            vim.cmd("colorscheme catppuccin")
         end
     },
     {
         "shaunsingh/nord.nvim",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
-            vim.cmd("colorscheme nord")
+            -- Colorscheme will be set by colors.lua
         end
     },
 
@@ -1530,7 +1538,7 @@ return {
                     }
                 }
             })
-            
+
             vim.api.nvim_create_augroup("__formatter__", { clear = true })
             vim.api.nvim_create_autocmd("BufWritePost", {
                 group = "__formatter__",
@@ -1585,21 +1593,34 @@ return {
         build = "deno task --quiet build:fast",
         config = function()
             require("peek").setup({
-                auto_load = true,         -- automatically load preview when entering markdown buffer
-                close_on_bdelete = true,  -- close preview window on buffer delete
-                syntax = true,            -- enable syntax highlighting
-                theme = 'dark',           -- 'dark' or 'light'
+                auto_load = true,          -- automatically load preview when entering markdown buffer
+                close_on_bdelete = true,   -- close preview window on buffer delete
+                syntax = true,             -- enable syntax highlighting
+                theme = 'dark',            -- 'dark' or 'light'
                 update_on_change = true,
-                app = 'webview',          -- use native macOS webview
+                app = 'webview',           -- use native macOS webview
                 filetype = { 'markdown' }, -- list of filetypes to recognize as markdown
-                throttle_at = 200000,     -- start throttling when file exceeds this amount of bytes
-                throttle_time = 'auto',   -- minimum time between updates
+                throttle_at = 200000,      -- start throttling when file exceeds this amount of bytes
+                throttle_time = 'auto',    -- minimum time between updates
             })
         end,
     },
     { "dhruvasagar/vim-table-mode" },
     { "junegunn/limelight.vim" },
     { "junegunn/goyo.vim" },
+
+    -- �����������������������������������������������������������������������������
+    -- OTTER NEOVIM
+    -- �����������������������������������������������������������������������������
+
+
+    {
+        'jmbuhr/otter.nvim',
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter',
+        },
+        opts = {},
+    },
 
     -- �����������������������������������������������������������������������������
     -- RENDER MARKDOWN
@@ -1670,4 +1691,3 @@ return {
     },
 
 }
-

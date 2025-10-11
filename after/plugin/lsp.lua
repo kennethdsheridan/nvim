@@ -1,5 +1,4 @@
 -- Make sure this file is the single source of truth for language servers
--- (i.e., do NOT call "require('lspconfig').rust_analyzer.setup({})" elsewhere).
 -- 1. Load the lsp-zero library with the 'recommended' preset
 local lsp = require('lsp-zero').preset('recommended')
 
@@ -36,36 +35,23 @@ require('mason-lspconfig').setup({
     automatic_installation = false, -- Still set to false for extra measure
 })
 
--- Manual LSP configuration (setup_handlers is not available in your version)
-local lspconfig = require('lspconfig')
-
--- Default configuration for most servers
-local default_servers = {
-    'ts_ls', -- UPDATED: was tsserver
-    'eslint',
-    'html',
-    'cssls',
-    'tailwindcss',
-    'pyright',
-    'gopls',
-    'clangd',
-    'bashls',
-    'jsonls',
-    'yamlls',
-    'dockerls',
-    'marksman',
-    'nil_ls',
+-- NEW: Use vim.lsp.config instead of deprecated lspconfig
+local servers = {
+    'ts_ls', 'eslint', 'html', 'cssls', 'tailwindcss', 'pyright',
+    'gopls', 'clangd', 'bashls', 'jsonls', 'yamlls', 'dockerls',
+    'marksman', 'nil_ls'
 }
 
-for _, server in ipairs(default_servers) do
-    lspconfig[server].setup({
+for _, server in ipairs(servers) do
+    vim.lsp.config(server, {
         on_attach = lsp.on_attach,
         capabilities = lsp.get_capabilities(),
     })
+    vim.lsp.enable(server)
 end
 
--- Special configuration for lua_ls
-lspconfig.lua_ls.setup({
+-- Special configuration for lua_ls using new API
+vim.lsp.config('lua_ls', {
     on_attach = lsp.on_attach,
     capabilities = lsp.get_capabilities(),
     settings = {
@@ -81,9 +67,10 @@ lspconfig.lua_ls.setup({
         },
     },
 })
+vim.lsp.enable('lua_ls')
 
--- Enhanced rust-analyzer configuration
-lspconfig.rust_analyzer.setup({
+-- Enhanced rust-analyzer configuration using new API
+vim.lsp.config('rust_analyzer', {
     on_attach = function(client, bufnr)
         lsp.on_attach(client, bufnr)
         
@@ -328,6 +315,7 @@ lspconfig.rust_analyzer.setup({
         }
     },
 })
+vim.lsp.enable('rust_analyzer')
 
 -- 4. Set up nvim-cmp for autocompletion
 local cmp = require('cmp')

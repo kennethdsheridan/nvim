@@ -112,17 +112,18 @@ local servers = {
     'yamlls',
 }
 
--- Set up basic servers (rust_analyzer is configured in after/plugin/lsp.lua)
+-- Set up basic servers using new vim.lsp.config API (rust_analyzer is configured in after/plugin/lsp.lua)
 for _, server in ipairs(servers) do
     if server ~= 'rust_analyzer' then
-        lspconfig[server].setup({
+        vim.lsp.config(server, {
             on_attach = on_attach,
         })
+        vim.lsp.enable(server)
     end
 end
 
--- Special config for lua_ls
-lspconfig.lua_ls.setup({
+-- Special config for lua_ls using new API
+vim.lsp.config('lua_ls', {
     on_attach = on_attach,
     settings = {
         Lua = {
@@ -137,6 +138,7 @@ lspconfig.lua_ls.setup({
         },
     },
 })
+vim.lsp.enable('lua_ls')
 
 
 -------------------------------------------------------------------------------
