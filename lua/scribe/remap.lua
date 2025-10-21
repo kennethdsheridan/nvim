@@ -380,6 +380,31 @@ vim.keymap.set('n', '<leader>fg', function()
 end, { desc = 'Live grep from project root' })
 
 --------------------------------------------------------------------------------
+-- OTTER LSP INTEGRATION
+--------------------------------------------------------------------------------
+-- Activate Otter for current buffer
+vim.keymap.set('n', '<leader>oa', function()
+    require('otter').activate()
+    print("Otter activated for current buffer")
+end, { desc = "Activate Otter LSP for embedded languages" })
+
+-- Deactivate Otter for current buffer
+vim.keymap.set('n', '<leader>od', function()
+    require('otter').deactivate()
+    print("Otter deactivated for current buffer")
+end, { desc = "Deactivate Otter LSP" })
+
+-- Show Otter status
+vim.keymap.set('n', '<leader>os', function()
+    local otter = require('otter')
+    if otter then
+        print("Otter is active")
+    else
+        print("Otter is not available")
+    end
+end, { desc = "Show Otter status" })
+
+--------------------------------------------------------------------------------
 -- DAP Icons Setup
 --------------------------------------------------------------------------------
 vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = '', linehl = '', numhl = '' })

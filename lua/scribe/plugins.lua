@@ -246,13 +246,16 @@ return {
         "NickvanDyke/opencode.nvim",
         config = function()
             vim.g.opencode_opts = {
-                -- Your configuration, if any — see lua/opencode/config.lua
+                auto_reload = true,
+                split_direction = "horizontal",
+                split_size = 0.3,
+                auto_open = false,
             }
 
             -- Required for vim.g.opencode_opts.auto_reload
             vim.opt.autoread = true
 
-            -- Recommended/example keymaps
+            -- Basic keymaps
             vim.keymap.set("n", "<leader>ot", function() require("opencode").toggle() end,
                 { desc = "Toggle embedded opencode" })
             vim.keymap.set("n", "<leader>oa", function() require("opencode").ask("@cursor: ") end,
@@ -274,6 +277,117 @@ return {
                 { desc = "Messages half page down" })
             vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,
                 { desc = "Select prompt" })
+
+            -- Enhanced context-aware keybindings
+            vim.keymap.set("n", "<leader>oP", function() 
+                require("opencode").prompt("@project", { append = true }) 
+            end, { desc = "Add project context" })
+
+            vim.keymap.set("n", "<leader>od", function() 
+                require("opencode").prompt("@diagnostics", { append = true }) 
+            end, { desc = "Add diagnostics context" })
+
+            vim.keymap.set("n", "<leader>og", function() 
+                require("opencode").prompt("@git", { append = true }) 
+            end, { desc = "Add git context" })
+
+            -- Quick code review and refactoring
+            vim.keymap.set("x", "<leader>or", function() 
+                require("opencode").ask("Review this code for potential issues: @selection") 
+            end, { desc = "Review selected code" })
+
+            vim.keymap.set("x", "<leader>oR", function() 
+                require("opencode").ask("Suggest refactoring improvements for: @selection") 
+            end, { desc = "Refactor selected code" })
+
+            -- LSP integration
+            vim.keymap.set("n", "<leader>ol", function()
+                require("opencode").prompt("Explain this LSP error: @cursor", { append = true })
+            end, { desc = "Explain LSP error" })
+
+            -- Workspace-aware prompts
+            vim.keymap.set("n", "<leader>ow", function()
+                local project_root = vim.fn.getcwd()
+                if pcall(require, "project_nvim") then
+                    project_root = require("project_nvim").get_project_root() or project_root
+                end
+                require("opencode").prompt(string.format("Working in project: %s. @buffer", project_root), { append = true })
+            end, { desc = "Add workspace context" })
+
+            -- Auto-commands for better workflow
+            vim.api.nvim_create_autocmd("FileChangedShellPost", {
+                callback = function()
+                    vim.notify("File updated by OpenCode", vim.log.levels.INFO)
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "OpenCodeSessionStart",
+                callback = function()
+                    vim.notify("OpenCode session started", vim.log.levels.INFO)
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "OpenCodeSessionEnd",
+                callback = function()
+                    vim.notify("OpenCode session ended", vim.log.levels.INFO)
+                end,
+            })
+
+            -- File type specific prompts
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "rust",
+                callback = function()
+                    vim.keymap.set("n", "<leader>orc", function()
+                        require("opencode").ask("Explain this Rust code and suggest improvements: @cursor")
+                    end, { desc = "Rust code explanation", buffer = true })
+                    
+                    vim.keymap.set("n", "<leader>ort", function()
+                        require("opencode").ask("Write comprehensive tests for this Rust code: @cursor")
+                    end, { desc = "Generate Rust tests", buffer = true })
+                    
+                    vim.keymap.set("n", "<leader>orp", function()
+                        require("opencode").ask("Optimize this Rust code for performance: @cursor")
+                    end, { desc = "Optimize Rust performance", buffer = true })
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "lua",
+                callback = function()
+                    vim.keymap.set("n", "<leader>olc", function()
+                        require("opencode").ask("Explain this Lua/Neovim config and suggest improvements: @cursor")
+                    end, { desc = "Lua config explanation", buffer = true })
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = { "javascript", "typescript" },
+                callback = function()
+                    vim.keymap.set("n", "<leader>ojc", function()
+                        require("opencode").ask("Explain this JavaScript/TypeScript code and suggest improvements: @cursor")
+                    end, { desc = "JS/TS code explanation", buffer = true })
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "go",
+                callback = function()
+                    vim.keymap.set("n", "<leader>ogc", function()
+                        require("opencode").ask("Explain this Go code and suggest improvements: @cursor")
+                    end, { desc = "Go code explanation", buffer = true })
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = "markdown",
+                callback = function()
+                    vim.keymap.set("n", "<leader>omc", function()
+                        require("opencode").ask("Help improve this markdown documentation: @buffer")
+                    end, { desc = "Improve markdown", buffer = true })
+                end,
+            })
         end,
     },
 
@@ -1619,7 +1733,39 @@ return {
         dependencies = {
             'nvim-treesitter/nvim-treesitter',
         },
-        opts = {},
+        opts = {
+            lsp = {
+                -- Enable LSP for embedded languages
+                hover = {
+                    border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+                },
+                -- Language-specific LSP configurations
+                diagnostic_update_events = { "BufWritePost", "InsertLeave", "TextChanged" },
+            },
+            buffers = {
+                -- Set to true to write to a temporary file and read from it instead of
+                -- redrawing the buffer
+                set_filetype = false,
+                -- Write to a temporary file and read from it instead of redrawing the buffer
+                write_to_disk = false,
+            },
+            strip_wrapping_quote_characters = { "'", '"', "`" },
+            -- Language specific highlighters
+            handle_leading_whitespace = true,
+        },
+        config = function(_, opts)
+            require('otter').setup(opts)
+
+            -- Activate otter for common languages
+            local otter_languages = {
+                'python', 'javascript', 'typescript', 'lua', 'rust', 'bash', 'sh',
+                'go', 'cpp', 'c', 'java', 'ruby', 'php', 'perl', 'r', 'sql'
+            }
+
+            for _, lang in ipairs(otter_languages) do
+                require('otter').activate({ lang })
+            end
+        end,
     },
 
     -- �����������������������������������������������������������������������������
