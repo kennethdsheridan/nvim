@@ -139,10 +139,13 @@ vim.keymap.set("n", "<leader>opd", "<cmd>Octo pr diff<CR>", { desc = "View PR di
 vim.keymap.set("n", "<leader>opm", "<cmd>Octo pr merge<CR>", { desc = "Merge PR" })
 
 -- NVIM DapBreakpoint
-vim.keymap.set("n", "<F5>", require("dap").continue)
-vim.keymap.set("n", "<F10>", require("dap").step_over)
-vim.keymap.set("n", "<F11>", require("dap").step_into)
-vim.keymap.set("n", "<F12>", require("dap").step_out)
+local dap_ok, dap = pcall(require, "dap")
+if dap_ok then
+    vim.keymap.set("n", "<F5>", dap.continue)
+    vim.keymap.set("n", "<F10>", dap.step_over)
+    vim.keymap.set("n", "<F11>", dap.step_into)
+    vim.keymap.set("n", "<F12>", dap.step_out)
+end
 vim.keymap.set("n", "<F9>", require("dap").step_back)
 vim.keymap.set("n", "<F8>", require("dap").restart)
 vim.keymap.set("n", "<Leader>b", require("dap").toggle_breakpoint)

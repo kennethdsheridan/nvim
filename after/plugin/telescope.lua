@@ -1,7 +1,18 @@
-local builtin = require('telescope.builtin')
+local telescope_ok, telescope = pcall(require, 'telescope')
+local builtin_ok, builtin = pcall(require, 'telescope.builtin')
+
+if not telescope_ok then
+    vim.notify("Telescope not available", vim.log.levels.WARN)
+    return
+end
+
+if not builtin_ok then
+    vim.notify("Telescope builtin not available", vim.log.levels.WARN)
+    return
+end
 
 -- Telescope setup with proper defaults to fix highlight issues
-require('telescope').setup({
+telescope.setup({
     defaults = {
         prompt_prefix = "> ",
         selection_caret = "> ",

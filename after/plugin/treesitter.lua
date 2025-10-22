@@ -1,6 +1,13 @@
 -- This is typically placed in your treesitter configuration file
 -- (e.g., ~/.config/nvim/lua/scribe/treesitter.lua)
-require('nvim-treesitter.configs').setup({
+local treesitter_ok, treesitter_configs = pcall(require, 'nvim-treesitter.configs')
+
+if not treesitter_ok then
+    vim.notify("nvim-treesitter not available", vim.log.levels.WARN)
+    return
+end
+
+treesitter_configs.setup({
 
   -- 1) The set of languages for which we want to install parsers.
   --    "all" is possible, but might install many unwanted parsers.

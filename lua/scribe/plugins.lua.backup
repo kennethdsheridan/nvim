@@ -780,6 +780,25 @@ return {
         build = ":MasonUpdate",
         -- Mason setup is handled in after/plugin/lsp.lua
     },
+    {
+        "williamboman/mason-lspconfig.nvim",
+        -- mason-lspconfig setup is handled in after/plugin/lsp.lua
+    },
+
+    -- �����������������������������������������������������������������������������
+    -- LSP Zero
+    -- �����������������������������������������������������������������������������
+    {
+        "VonHeikemen/lsp-zero.nvim",
+        branch = "v3.x",
+        dependencies = {
+            "neovim/nvim-lspconfig",
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig.nvim",
+            "L3MON4D3/LuaSnip",
+        },
+        -- lsp-zero configuration is handled in after/plugin/lsp.lua
+    },
 
     -- �����������������������������������������������������������������������������
     -- AUTOCOMPLETION (CMP) + TABNINE
