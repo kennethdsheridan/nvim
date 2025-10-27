@@ -178,27 +178,22 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -------------------------------------------------------------------------------
 -- PARCHMENT COLORSCHEME FUNCTION
 -------------------------------------------------------------------------------
+
 -------------------------------------------------------------------------------
--- GRUVBOX COLORSCHEME FUNCTION
+-- PARCHMENT COLORSCHEME FUNCTION
 -------------------------------------------------------------------------------
 function ColorMyPencils(color)
     color = color or "gruvbox"
     
     if color == "gruvbox" then
-        -- Setup Gruvbox with configuration
-        require("gruvbox").setup({
-            contrast = "medium", -- or "soft" for softer contrast
-            transparent_mode = false,
-            palette_overrides = {},
-            overrides = {},
-        })
-        vim.cmd.colorscheme("gruvbox")
-        print("Applied Gruvbox colorscheme - warm and retro coding vibes")
+        -- Load our custom parchment theme
+        require("gruvbox").setup({\n        contrast = "hard", -- or "soft" for softer contrast\n        transparent_mode = false,\n        palette_overrides = {},\n        overrides = {},\n    })\n        vim.cmd.colorscheme("gruvbox")
+        print("Applied Parchment colorscheme - like writing on aged manuscript paper")
     else
         vim.cmd.colorscheme(color)
     end
     
-    -- Optional: Keep backgrounds opaque
+    -- Optional: Keep backgrounds opaque for parchment effect
     -- Remove these lines if you want transparency
     -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
     -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })

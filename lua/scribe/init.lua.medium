@@ -187,7 +187,7 @@ function ColorMyPencils(color)
     if color == "gruvbox" then
         -- Setup Gruvbox with configuration
         require("gruvbox").setup({
-            contrast = "medium", -- or "soft" for softer contrast
+            contrast = "hard", -- or "soft" for softer contrast
             transparent_mode = false,
             palette_overrides = {},
             overrides = {},

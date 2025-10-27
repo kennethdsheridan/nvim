@@ -138,18 +138,49 @@ vim.keymap.set("n", "<leader>opa", "<cmd>Octo review comments<CR>", { desc = "Vi
 vim.keymap.set("n", "<leader>opd", "<cmd>Octo pr diff<CR>", { desc = "View PR diff" })
 vim.keymap.set("n", "<leader>opm", "<cmd>Octo pr merge<CR>", { desc = "Merge PR" })
 
--- NVIM DapBreakpoint
+-- DAP (Debug Adapter Protocol) keybindings
 local dap_ok, dap = pcall(require, "dap")
 if dap_ok then
-    vim.keymap.set("n", "<F5>", dap.continue)
-    vim.keymap.set("n", "<F10>", dap.step_over)
-    vim.keymap.set("n", "<F11>", dap.step_into)
-    vim.keymap.set("n", "<F12>", dap.step_out)
+    -- Function keys for stepping
+    vim.keymap.set("n", "<F5>", dap.continue, { desc = "DAP: Continue" })
+    vim.keymap.set("n", "<F10>", dap.step_over, { desc = "DAP: Step Over" })
+    vim.keymap.set("n", "<F11>", dap.step_into, { desc = "DAP: Step Into" })
+    vim.keymap.set("n", "<F12>", dap.step_out, { desc = "DAP: Step Out" })
+    vim.keymap.set("n", "<F9>", dap.step_back, { desc = "DAP: Step Back" })
+    vim.keymap.set("n", "<F8>", dap.restart, { desc = "DAP: Restart" })
+    
+    -- Leader key mappings (using <Leader> as per DAP documentation)
+    vim.keymap.set("n", "<Leader>b", dap.toggle_breakpoint, { desc = "DAP: Toggle Breakpoint" })
+    vim.keymap.set("n", "<Leader>B", function() 
+        dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) 
+    end, { desc = "DAP: Set Conditional Breakpoint" })
+    vim.keymap.set("n", "<Leader>lp", function() 
+        dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: ")) 
+    end, { desc = "DAP: Set Log Point" })
+    vim.keymap.set("n", "<Leader>dr", dap.repl.open, { desc = "DAP: Open REPL" })
+    vim.keymap.set("n", "<Leader>dl", dap.run_last, { desc = "DAP: Run Last" })
+    vim.keymap.set("n", "<Leader>dt", dap.terminate, { desc = "DAP: Terminate" })
+    vim.keymap.set("n", "<Leader>dc", dap.clear_breakpoints, { desc = "DAP: Clear All Breakpoints" })
+    vim.keymap.set("n", "<Leader>dp", dap.pause, { desc = "DAP: Pause" })
+    
+    -- Hover and evaluation
+    vim.keymap.set({"n", "v"}, "<Leader>dh", require("dap.ui.widgets").hover, { desc = "DAP: Hover" })
+    vim.keymap.set({"n", "v"}, "<Leader>dv", require("dap.ui.widgets").preview, { desc = "DAP: Preview" })
+    vim.keymap.set("n", "<Leader>df", function()
+        local widgets = require("dap.ui.widgets")
+        widgets.centered_float(widgets.frames)
+    end, { desc = "DAP: Frames" })
+    vim.keymap.set("n", "<Leader>ds", function()
+        local widgets = require("dap.ui.widgets")
+        widgets.centered_float(widgets.scopes)
+    end, { desc = "DAP: Scopes" })
+    
+    -- Alternative arrow key mappings (as suggested in docs)
+    vim.keymap.set("n", "<Down>", dap.step_over, { desc = "DAP: Step Over" })
+    vim.keymap.set("n", "<Right>", dap.step_into, { desc = "DAP: Step Into" })
+    vim.keymap.set("n", "<Left>", dap.step_out, { desc = "DAP: Step Out" })
+    vim.keymap.set("n", "<Up>", dap.restart_frame, { desc = "DAP: Restart Frame" })
 end
-vim.keymap.set("n", "<F9>", require("dap").step_back)
-vim.keymap.set("n", "<F8>", require("dap").restart)
-vim.keymap.set("n", "<Leader>b", require("dap").toggle_breakpoint)
-vim.keymap.set("n", "<Leader>dt", require("dap").terminate)
 
 -- Split horizontally with a terminal session on top
 vim.keymap.set("n", "<leader>tm", function()
@@ -300,9 +331,9 @@ vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 -- Next and previous compiler errors
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
--- Next and previous language server issues
-vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
-vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
+-- Next and previous language server issues (using different keys to avoid LSP conflicts)
+vim.keymap.set("n", "<leader>ln", "<cmd>lnext<CR>zz")
+vim.keymap.set("n", "<leader>lp", "<cmd>lprev<CR>zz")
 
 -- Search and replace
 -- Search and replace the word under cursor

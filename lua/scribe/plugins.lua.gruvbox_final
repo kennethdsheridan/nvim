@@ -136,7 +136,7 @@ return {
         config = function()
             require("octo").setup({
                 enable_builtin = true,
-                default_to_projects_v2 = false,
+                default_to_projects_v2 = true,
                 default_merge_method = "commit",
                 picker = "telescope",
             })
@@ -170,7 +170,6 @@ return {
     -- �����������������������������������������������������������������������������
     {
         "augmentcode/augment.vim",
-        enabled = false,
         dependencies = {
             "nvim-telescope/telescope.nvim",
             "nvim-lua/plenary.nvim",
@@ -509,15 +508,7 @@ return {
             -- FIXED: Add error handling for codelldb package
             local codelldb_ok, codelldb = pcall(mason_registry.get_package, "codelldb")
             if not codelldb_ok then
-                vim.notify("CodeLLDB not installed via Mason - skipping Rust debugging setup", vim.log.levels.INFO)
-                -- Still setup DAP UI without Rust debugging
-                dapui.setup({
-                    icons = {
-                        expanded = "▾",
-                        collapsed = "▸",
-                        current_frame = "▸",
-                    },
-                })
+                vim.notify("CodeLLDB not installed via Mason", vim.log.levels.WARN)
                 return
             end
 
@@ -1077,19 +1068,7 @@ return {
     -- COLORS & THEMES
     -- �����������������������������������������������������������������������������
     { "EdenEast/nightfox.nvim" },
-    {
-        "ellisonleao/gruvbox.nvim",
-        lazy = false,
-        priority = 1000,
-        config = function()
-            require("gruvbox").setup({
-                contrast = "medium",
-                transparent_mode = false,
-                palette_overrides = {},
-                overrides = {},
-            })
-        end,
-    },
+    {\n        "ellisonleao/gruvbox.nvim",\n        lazy = false,\n        priority = 1000,\n        config = function()\n            require("gruvbox").setup({\n                contrast = "hard",\n                transparent_mode = false,\n                palette_overrides = {},\n                overrides = {},\n            })\n        end,\n    },
     { "sainnhe/gruvbox-material" },
 
     -- �����������������������������������������������������������������������������
@@ -1758,24 +1737,14 @@ return {
         config = function(_, opts)
             require('otter').setup(opts)
 
-            -- Only activate otter for languages with available treesitter parsers
-            local function has_parser(lang)
-                local ok, _ = pcall(vim.treesitter.language.require_language, lang)
-                return ok
-            end
-
+            -- Activate otter for common languages
             local otter_languages = {
                 'python', 'javascript', 'typescript', 'lua', 'rust', 'bash', 'sh',
                 'go', 'cpp', 'c', 'java', 'ruby', 'php', 'perl', 'r', 'sql'
             }
 
             for _, lang in ipairs(otter_languages) do
-                if has_parser(lang) then
-                    local ok, err = pcall(require('otter').activate, { lang })
-                    if not ok then
-                        vim.notify("Failed to activate otter for " .. lang .. ": " .. err, vim.log.levels.DEBUG)
-                    end
-                end
+                require('otter').activate({ lang })
             end
         end,
     },
