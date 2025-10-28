@@ -710,20 +710,15 @@ return {
     -- �����������������������������������������������������������������������������
     {
         "NLKNguyen/papercolor-theme",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
             -- Tell Neovim we're using a light background
             vim.o.background = "light"
-
-            -- Then set the PaperColor theme
-            vim.cmd("colorscheme PaperColor")
         end,
     },
     {
         "sainnhe/everforest",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
             -- Make sure we support 24-bit colors
             vim.opt.termguicolors = true
@@ -733,19 +728,32 @@ return {
 
             -- Optional: set contrast level ('soft', 'medium', or 'hard')
             vim.g.everforest_background = "soft"
-
-            -- Finally, load the colorscheme
-            vim.cmd("colorscheme everforest")
         end
     },
 
-
     {
         "folke/tokyonight.nvim",
-        lazy = false,
-        priority = 1000,
+        lazy = true,
         config = function()
-            vim.cmd("colorscheme tokyonight-moon") -- Options: tokyonight-night, tokyonight-storm, tokyonight-moon, tokyonight-day
+            require("tokyonight").setup({
+                style = "storm", -- storm, moon, night, day
+                light_style = "day",
+                transparent = false,
+                terminal_colors = true,
+                styles = {
+                    comments = { italic = true },
+                    keywords = { italic = true },
+                    functions = {},
+                    variables = {},
+                    sidebars = "dark",
+                    floats = "dark",
+                },
+                sidebars = { "qf", "help" },
+                day_brightness = 0.3,
+                hide_inactive_statusline = false,
+                dim_inactive = false,
+                lualine_bold = false,
+            })
         end
     },
     {
@@ -754,7 +762,47 @@ return {
         lazy = true,
         config = function()
             require("catppuccin").setup({
-                flavour = "latte", -- Options: latte, frappe, macchiato, mocha
+                flavour = "auto", -- latte, frappe, macchiato, mocha
+                background = {
+                    light = "latte",
+                    dark = "mocha",
+                },
+                transparent_background = false,
+                show_end_of_buffer = false,
+                term_colors = false,
+                dim_inactive = {
+                    enabled = false,
+                    shade = "dark",
+                    percentage = 0.15,
+                },
+                no_italic = false,
+                no_bold = false,
+                no_underline = false,
+                styles = {
+                    comments = { "italic" },
+                    conditionals = { "italic" },
+                    loops = {},
+                    functions = {},
+                    keywords = {},
+                    strings = {},
+                    variables = {},
+                    numbers = {},
+                    booleans = {},
+                    properties = {},
+                    types = {},
+                    operators = {},
+                },
+                integrations = {
+                    cmp = true,
+                    gitsigns = true,
+                    nvimtree = true,
+                    treesitter = true,
+                    notify = false,
+                    mini = {
+                        enabled = true,
+                        indentscope_color = "",
+                    },
+                },
             })
         end
     },
@@ -768,10 +816,185 @@ return {
 
     {
         "savq/melange",
+        lazy = true,
+        config = function()
+            vim.cmd("colorscheme melange")
+        end
+    },
+
+    -- �����������������������������������������������������������������������������
+    -- RECOMMENDED DARK THEMES (More readable than Gruvbox)
+    -- �����������������������������������������������������������������������������
+    
+    -- Kanagawa - Beautiful dark theme inspired by famous painting
+    {
+        "rebelot/kanagawa.nvim",
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd("colorscheme melange")
+            require("kanagawa").setup({
+                compile = false,
+                undercurl = true,
+                commentStyle = { italic = true },
+                functionStyle = {},
+                keywordStyle = { italic = true },
+                statementStyle = { bold = true },
+                typeStyle = {},
+                transparent = false,
+                dimInactive = false,
+                terminalColors = true,
+                colors = {
+                    palette = {},
+                    theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+                },
+                theme = "wave", -- Load "wave" theme when 'background' option is not set
+                background = {
+                    dark = "wave", -- try "dragon" !
+                    light = "lotus"
+                },
+            })
+            vim.cmd("colorscheme kanagawa")
+        end
+    },
+
+    -- Onedark - Clean and readable
+    {
+        "navarasu/onedark.nvim",
+        lazy = true,
+        config = function()
+            require('onedark').setup {
+                style = 'dark', -- dark, darker, cool, deep, warm, warmer, light
+                transparent = false,
+                term_colors = true,
+                ending_tildes = false,
+                cmp_itemkind_reverse = false,
+                code_style = {
+                    comments = 'italic',
+                    keywords = 'none',
+                    functions = 'none',
+                    strings = 'none',
+                    variables = 'none'
+                },
+                diagnostics = {
+                    darker = true,
+                    undercurl = true,
+                    background = true,
+                },
+            }
+        end
+    },
+
+    -- Nightfox - Modern and clean
+    {
+        "EdenEast/nightfox.nvim",
+        lazy = true,
+        config = function()
+            require('nightfox').setup({
+                options = {
+                    compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+                    compile_file_suffix = "_compiled",
+                    transparent = false,
+                    terminal_colors = true,
+                    dim_inactive = false,
+                    module_default = true,
+                    styles = {
+                        comments = "italic",
+                        conditionals = "NONE",
+                        constants = "NONE",
+                        functions = "NONE",
+                        keywords = "NONE",
+                        numbers = "NONE",
+                        operators = "NONE",
+                        strings = "NONE",
+                        types = "NONE",
+                        variables = "NONE",
+                    },
+                    inverse = {
+                        match_paren = false,
+                        visual = false,
+                        search = false,
+                    },
+                }
+            })
+        end
+    },
+
+    -- Rose Pine - Elegant and easy on the eyes
+    {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        lazy = true,
+        config = function()
+            require('rose-pine').setup({
+                variant = 'auto', -- auto, main, moon, or dawn
+                dark_variant = 'main', -- main, moon, or dawn
+                dim_inactive_windows = false,
+                extend_background_behind_borders = true,
+                enable = {
+                    terminal = true,
+                    legacy_highlights = true,
+                    migrations = true,
+                },
+                styles = {
+                    bold = true,
+                    italic = true,
+                    transparency = false,
+                },
+            })
+        end
+    },
+
+    -- Sonokai - High contrast and readable
+    {
+        "sainnhe/sonokai",
+        lazy = true,
+        config = function()
+            vim.g.sonokai_style = 'default' -- default, atlantis, andromeda, shusia, maia, espresso
+            vim.g.sonokai_better_performance = 1
+            vim.g.sonokai_enable_italic = 1
+            vim.g.sonokai_diagnostic_text_highlight = 1
+            vim.g.sonokai_diagnostic_line_highlight = 1
+        end
+    },
+
+    -- Dracula - Classic and popular
+    {
+        "Mofiqul/dracula.nvim",
+        lazy = true,
+        config = function()
+            local dracula = require("dracula")
+            dracula.setup({
+                colors = {
+                    bg = "#282A36",
+                    fg = "#F8F8F2",
+                    selection = "#44475A",
+                    comment = "#6272A4",
+                    red = "#FF5555",
+                    orange = "#FFB86C",
+                    yellow = "#F1FA8C",
+                    green = "#50fa7b",
+                    purple = "#BD93F9",
+                    cyan = "#8BE9FD",
+                    pink = "#FF79C6",
+                    bright_red = "#FF6E6E",
+                    bright_green = "#69FF94",
+                    bright_yellow = "#FFFFA5",
+                    bright_blue = "#D6ACFF",
+                    bright_magenta = "#FF92DF",
+                    bright_cyan = "#A4FFFF",
+                    bright_white = "#FFFFFF",
+                    menu = "#21222C",
+                    visual = "#3E4452",
+                    gutter_fg = "#4B5263",
+                    nontext = "#3B4048",
+                    white = "#ABB2BF",
+                    black = "#191A21",
+                },
+                show_end_of_buffer = true,
+                transparent_bg = false,
+                lualine_bg_color = "#44475a",
+                italic_comment = true,
+            })
         end
     },
 
@@ -1551,10 +1774,11 @@ return {
     },
 
     -- �����������������������������������������������������������������������������
-    -- Aerial VIM
+    -- Aerial VIM (Code outline - disabled by default to avoid conflicts)
     -- �����������������������������������������������������������������������������
     {
         "stevearc/aerial.nvim",
+        enabled = false, -- Disabled to avoid keymap conflicts
         config = function()
             require("aerial").setup({
                 backends = { "lsp", "treesitter", "markdown", "man" },
@@ -1588,11 +1812,14 @@ return {
                 close_on_select = false,
                 center_on_jump = true,
                 on_attach = function(bufnr)
-                    vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-                    vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr })
-                    vim.keymap.set("n", "<leader>f", "<cmd>AerialToggle!<CR>", { buffer = bufnr })
-                    vim.keymap.set("n", "{", "<cmd>AerialPrevUp<CR>", { buffer = bufnr })
-                    vim.keymap.set("n", "}", "<cmd>AerialNextUp<CR>", { buffer = bufnr })
+                    -- Use non-conflicting keybindings for Aerial navigation
+                    vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Aerial: Previous symbol" })
+                    vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Aerial: Next symbol" })
+                    vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>", { buffer = bufnr, desc = "Aerial: Toggle outline" })
+                    
+                    -- Use leader-based keys instead of conflicting with { and }
+                    vim.keymap.set("n", "<leader>[", "<cmd>AerialPrevUp<CR>", { buffer = bufnr, desc = "Aerial: Previous level up" })
+                    vim.keymap.set("n", "<leader>]", "<cmd>AerialNextUp<CR>", { buffer = bufnr, desc = "Aerial: Next level up" })
 
                     vim.api.nvim_create_autocmd("QuitPre", {
                         buffer = bufnr,
@@ -1603,8 +1830,7 @@ return {
                         end,
                     })
 
-                    -- � REMOVE THIS TO DISABLE AUTO OPEN ON BUFFER ATTACH
-                    -- vim.cmd("AerialOpen")
+                    -- Don't auto-open Aerial to avoid conflicts
                 end,
                 filter_kind = {
                     "Class",
