@@ -4,7 +4,7 @@ local M = {}
 M.plugins = {
     user = require "om.plugins",
     override = {
-        ["hrsh7th/nvim-cmp"] = pluginConfs.cmp,
-        ["tzachar/cmp-tabnine"] = pluginConfs.tabnine
+        -- DISABLED: ["hrsh7th/nvim-cmp"] = pluginConfs.cmp,
+        -- DISABLED: ["tzachar/cmp-tabnine"] = pluginConfs.tabnine
     }
 }

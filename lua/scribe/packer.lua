@@ -392,6 +392,9 @@ return require("packer").startup(function(use)
 
     -- CMP Configuation for LSP suggestions
     local cmp = require("cmp")
+    -- DISABLED: Force disable nvim-cmp for native LSP only
+    cmp.setup({ enabled = false })
+    return
     cmp.setup({
         snippet = {
             expand = function(args)

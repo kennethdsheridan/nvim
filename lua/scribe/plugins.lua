@@ -1032,6 +1032,9 @@ return {
             local cmp = require("cmp")
             local luasnip = require("luasnip")
 
+    -- DISABLED: Force disable nvim-cmp for native LSP only
+    cmp.setup({ enabled = false })
+    return
             cmp.setup({
                 snippet = {
                     expand = function(args)

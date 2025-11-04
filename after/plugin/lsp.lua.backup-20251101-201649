@@ -50,11 +50,11 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { 'documentation', 'detail', 'additionalTextEdits' }
 }
 
--- DISABLED: -- Update capabilities with cmp if available
--- DISABLED: local cmp_ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
--- DISABLED: if cmp_ok then
--- DISABLED:     capabilities = cmp_lsp.default_capabilities()
--- DISABLED: end
+-- Update capabilities with cmp if available
+local cmp_ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
+if cmp_ok then
+    capabilities = cmp_lsp.default_capabilities(capabilities)
+end
 
 -- 4. Common on_attach function
 local function on_attach(client, bufnr)
@@ -180,43 +180,43 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Lua Language Server
--- DISABLED: vim.lsp.config('lua_ls', {
--- DISABLED:     cmd = { 'lua-language-server' },
--- DISABLED:     filetypes = { 'lua' },
--- DISABLED:     root_dir = function(fname)
--- DISABLED:         local function find_project_root(path)
--- DISABLED:             local patterns = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' }
--- DISABLED:             local current = path
--- DISABLED:             while current ~= '/' and current ~= '' do
--- DISABLED:                 for _, pattern in ipairs(patterns) do
--- DISABLED:                     if vim.fn.filereadable(current .. '/' .. pattern) == 1 or vim.fn.isdirectory(current .. '/' .. pattern) == 1 then
--- DISABLED:                         return current
--- DISABLED:                     end
--- DISABLED:                 end
--- DISABLED:                 current = vim.fn.fnamemodify(current, ':h')
--- DISABLED:             end
--- DISABLED:             return vim.fn.getcwd()
--- DISABLED:         end
--- DISABLED:         
--- DISABLED:         local dir = vim.fn.fnamemodify(fname, ':h')
--- DISABLED:         return find_project_root(dir)
--- DISABLED:     end,
--- DISABLED:     on_attach = on_attach,
--- DISABLED:     capabilities = capabilities,
--- DISABLED:     settings = {
--- DISABLED:         Lua = {
--- DISABLED:             diagnostics = { globals = { 'vim' } },
--- DISABLED:             workspace = {
--- DISABLED:                 library = vim.api.nvim_get_runtime_file("", true),
--- DISABLED:                 checkThirdParty = false,
--- DISABLED:             },
--- DISABLED:             telemetry = { enable = false },
--- DISABLED:         },
--- DISABLED:     },
--- DISABLED: })
+vim.lsp.config('lua_ls', {
+    cmd = { 'lua-language-server' },
+    filetypes = { 'lua' },
+    root_dir = function(fname)
+        local function find_project_root(path)
+            local patterns = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' }
+            local current = path
+            while current ~= '/' and current ~= '' do
+                for _, pattern in ipairs(patterns) do
+                    if vim.fn.filereadable(current .. '/' .. pattern) == 1 or vim.fn.isdirectory(current .. '/' .. pattern) == 1 then
+                        return current
+                    end
+                end
+                current = vim.fn.fnamemodify(current, ':h')
+            end
+            return vim.fn.getcwd()
+        end
+        
+        local dir = vim.fn.fnamemodify(fname, ':h')
+        return find_project_root(dir)
+    end,
+    on_attach = on_attach,
+    capabilities = capabilities,
+    settings = {
+        Lua = {
+            diagnostics = { globals = { 'vim' } },
+            workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+            },
+            telemetry = { enable = false },
+        },
+    },
+})
 
 -- Enable lua_ls
--- DISABLED: vim.lsp.enable('lua_ls')
+vim.lsp.enable('lua_ls')
 
 -- Helper function to start LSP servers for various languages
 local function setup_language_server(filetype, server_name, cmd, root_patterns, settings)
@@ -314,27 +314,16 @@ setup_language_server(
     }
 )
 
--- Nix (nixd - more advanced than nil)
+-- Nix (nil)
 setup_language_server(
     "nix",
-    "nixd",
-    { "nixd" },
+    "nil",
+    { "nil" },
     { "flake.nix", "default.nix", "shell.nix", ".git" },
     {
-        nixd = {
+        ["nil"] = {
             formatting = {
                 command = { "nixpkgs-fmt" },
-            },
-            nixpkgs = {
-                expr = "import <nixpkgs> { }",
-            },
-            options = {
-                nixos = {
-                    expr = "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.<hostname>.options",
-                },
-                home_manager = {
-                    expr = "(builtins.getFlake \"/etc/nixos\").homeConfigurations.<username>.options",
-                },
             },
         }
     }
@@ -635,7 +624,7 @@ vim.api.nvim_create_user_command('LspStatus', function()
         { "🐍 Python", "pyright-langserver", "python" },
         { "🐹 Go", "gopls", "go" },
         { "🐚 Bash", "bash-language-server", "bash/sh" },
-        { "❄️  Nix", "nixd", "nix" },
+        { "❄️  Nix", "nil", "nix" },
         { "📝 Markdown", "marksman", "markdown" },
         { "📄 Vim", "vim-language-server", "vim" },
         { "🟨 TypeScript/JS", "typescript-language-server", "typescript/javascript" },
@@ -660,60 +649,53 @@ vim.api.nvim_create_user_command('LspStatus', function()
     print("\n🔍 Check current buffer: :LspDebug")
 end, { desc = "Show language server support status" })
 
--- DISABLED: -- 7. Completion setup with nvim-cmp (Fixed version)
--- DISABLED: local cmp_ok, cmp = pcall(require, 'cmp')
--- DISABLED: local lspkind_ok, lspkind = pcall(require, 'lspkind')
--- DISABLED: 
--- DISABLED: if not cmp_ok then
--- DISABLED:     vim.notify("nvim-cmp not available", vim.log.levels.WARN)
--- DISABLED:     return
--- DISABLED: end
--- DISABLED: 
--- DISABLED: if not lspkind_ok then
--- DISABLED:     vim.notify("lspkind not available", vim.log.levels.WARN)
--- DISABLED:     -- Continue without lspkind
--- DISABLED: end
--- DISABLED: 
--- DISABLED: -- Simple, compatible cmp setup
--- DISABLED: cmp.setup({
--- DISABLED:     completion = {
--- DISABLED:         completeopt = 'menu,menuone,noselect',
--- DISABLED:     },
--- DISABLED:     mapping = {
--- DISABLED:         ['<C-p>'] = cmp.mapping.select_prev_item(),
--- DISABLED:         ['<C-n>'] = cmp.mapping.select_next_item(),
--- DISABLED:         ['<C-y>'] = cmp.mapping.confirm({ select = true }),
--- DISABLED:         ['<C-Space>'] = cmp.mapping.complete(),
--- DISABLED:         ['<C-u>'] = cmp.mapping.scroll_docs(-4),
--- DISABLED:         ['<C-d>'] = cmp.mapping.scroll_docs(4),
--- DISABLED:         ['<Esc>'] = cmp.mapping.abort(),
--- DISABLED:     },
--- DISABLED:     sources = {
--- DISABLED:         -- { name = 'nvim_lsp' }, -- DISABLED DUE TO BUFFER ERROR
--- DISABLED:         { name = 'buffer' },
--- DISABLED:         { name = 'path' },
--- DISABLED:     },
--- DISABLED:     formatting = lspkind_ok and {
--- DISABLED:         format = lspkind.cmp_format({
--- DISABLED:             mode = 'symbol_text',
--- DISABLED:             maxwidth = 50,
--- DISABLED:         })
--- DISABLED:     } or {},
--- DISABLED: })
+-- 7. Completion setup with nvim-cmp
+local cmp_ok, cmp = pcall(require, 'cmp')
+local lspkind_ok, lspkind = pcall(require, 'lspkind')
 
+if not cmp_ok then
+    vim.notify("nvim-cmp not available", vim.log.levels.WARN)
+    return
+end
 
--- Native LSP completion setup (no external plugins)
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+if not lspkind_ok then
+    vim.notify("lspkind not available", vim.log.levels.WARN)
+    return
+end
 
--- Enable native completion triggered by LSP
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-    
-    print('✅ Native LSP completion enabled for buffer ' .. ev.buf)
-  end,
+cmp.setup({
+    enabled = true,
+    completion = {
+        autocomplete = { cmp.TriggerEvent.TextChanged },
+        completeopt = 'menu,menuone,noselect',
+    },
+    mapping = cmp.mapping.preset.insert({
+        ['<C-p>'] = cmp.mapping.select_prev_item(),
+        ['<C-n>'] = cmp.mapping.select_next_item(),
+        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    }),
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp', priority = 750 },
+        { name = 'buffer', priority = 500 },
+        { name = 'path', priority = 300 },
+    }),
+    formatting = {
+        expandable_indicator = false,
+        fields = { "kind", "abbr", "menu" },
+        format = function(entry, vim_item)
+            vim_item.kind = lspkind.presets.default[vim_item.kind] or ""
+            if entry.source.name == 'nvim_lsp' and vim_item.kind == 'Module' and entry.completion_item.label:find("::") then
+                vim_item.kind = '🦀'
+            end
+            vim_item.menu = ({
+                buffer = "[Buffer]",
+                nvim_lsp = "[LSP]",
+                path = "[Path]",
+            })[entry.source.name] or ""
+            return vim_item
+        end,
+    },
 })
-
-print("🚀 Native LSP-only configuration loaded")

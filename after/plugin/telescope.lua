@@ -1,5 +1,6 @@
 local telescope_ok, telescope = pcall(require, 'telescope')
 local builtin_ok, builtin = pcall(require, 'telescope.builtin')
+local actions_ok, actions = pcall(require, 'telescope.actions')
 
 if not telescope_ok then
     vim.notify("Telescope not available", vim.log.levels.WARN)
@@ -8,6 +9,11 @@ end
 
 if not builtin_ok then
     vim.notify("Telescope builtin not available", vim.log.levels.WARN)
+    return
+end
+
+if not actions_ok then
+    vim.notify("Telescope actions not available", vim.log.levels.WARN)
     return
 end
 
@@ -43,6 +49,37 @@ telescope.setup({
         qflist_previewer = require('telescope.previewers').vim_buffer_qflist.new,
         -- Explicitly set highlight groups to prevent errors
         hl_result_eol = "",
+        -- Key mappings for full scrolling functionality
+        mappings = {
+            i = {
+                ["<C-n>"] = actions.move_selection_next,
+                ["<C-p>"] = actions.move_selection_previous,
+                ["<C-d>"] = actions.preview_scrolling_down,
+                ["<C-u>"] = actions.preview_scrolling_up,
+                ["<C-f>"] = actions.results_scrolling_down,
+                ["<C-b>"] = actions.results_scrolling_up,
+                ["<Down>"] = actions.move_selection_next,
+                ["<Up>"] = actions.move_selection_previous,
+                ["<PageDown>"] = actions.results_scrolling_down,
+                ["<PageUp>"] = actions.results_scrolling_up,
+                ["<Tab>"] = actions.move_selection_next,
+                ["<S-Tab>"] = actions.move_selection_previous,
+            },
+            n = {
+                ["j"] = actions.move_selection_next,
+                ["k"] = actions.move_selection_previous,
+                ["<C-d>"] = actions.preview_scrolling_down,
+                ["<C-u>"] = actions.preview_scrolling_up,
+                ["<C-f>"] = actions.results_scrolling_down,
+                ["<C-b>"] = actions.results_scrolling_up,
+                ["<Down>"] = actions.move_selection_next,
+                ["<Up>"] = actions.move_selection_previous,
+                ["<PageDown>"] = actions.results_scrolling_down,
+                ["<PageUp>"] = actions.results_scrolling_up,
+                ["gg"] = actions.move_to_top,
+                ["G"] = actions.move_to_bottom,
+            },
+        },
     },
     extensions = {
         -- Pre-configure extensions to avoid issues
