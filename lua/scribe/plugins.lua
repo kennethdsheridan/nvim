@@ -2077,4 +2077,102 @@ return {
         end,
     },
 
+    -- �����������������������������������������������������������������������������
+    -- SNACKS.NVIM - QoL Plugin Collection
+    -- �����������������������������������������������������������������������������
+    {
+        "folke/snacks.nvim",
+        priority = 1000,
+        lazy = false,
+        ---@type snacks.Config
+        opts = {
+            bigfile = { enabled = true },
+            dashboard = { enabled = false }, -- Keep your alpha dashboard
+            explorer = { enabled = true },
+            indent = { enabled = true },
+            input = { enabled = true },
+            picker = { enabled = true },
+            notifier = { enabled = false }, -- Keep your nvim-notify
+            quickfile = { enabled = true },
+            scope = { enabled = true },
+            scroll = { enabled = false }, -- Keep your neoscroll
+            statuscolumn = { enabled = true },
+            words = { enabled = true },
+            bufdelete = { enabled = false }, -- Keep your existing bufdelete
+            terminal = { enabled = true },
+            lazygit = { enabled = true },
+            zen = { enabled = true },
+            gitbrowse = { enabled = true },
+            rename = { enabled = true },
+            scratch = { enabled = true },
+            toggle = { enabled = true },
+        },
+        keys = {
+            -- File operations
+            { "<leader>fe", function() Snacks.explorer() end, desc = "File Explorer" },
+            { "<leader>.", function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
+            { "<leader>S", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
+            
+            -- Pickers (integrating with your existing telescope setup)
+            { "<leader>sf", function() Snacks.picker.files() end, desc = "Snacks: Find Files" },
+            { "<leader>sg", function() Snacks.picker.grep() end, desc = "Snacks: Live Grep" },
+            { "<leader>sb", function() Snacks.picker.buffers() end, desc = "Snacks: Buffers" },
+            { "<leader>sr", function() Snacks.picker.recent() end, desc = "Snacks: Recent Files" },
+            { "<leader>sh", function() Snacks.picker.help() end, desc = "Snacks: Help Pages" },
+            { "<leader>sk", function() Snacks.picker.keymaps() end, desc = "Snacks: Keymaps" },
+            { "<leader>sc", function() Snacks.picker.commands() end, desc = "Snacks: Commands" },
+            { "<leader>sd", function() Snacks.picker.diagnostics() end, desc = "Snacks: Diagnostics" },
+            
+            -- Git operations
+            { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
+            { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
+            { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
+            { "<leader>gB", function() Snacks.gitbrowse() end, desc = "Git Browse", mode = { "n", "v" } },
+            { "<leader>gg", function() Snacks.lazygit() end, desc = "Lazygit" },
+            
+            -- LSP
+            { "gd", function() Snacks.picker.lsp_definitions() end, desc = "Goto Definition" },
+            { "gr", function() Snacks.picker.lsp_references() end, desc = "References" },
+            { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
+            { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto Type Definition" },
+            { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
+            
+            -- Terminal and utilities
+            { "<c-/>", function() Snacks.terminal() end, desc = "Toggle Terminal" },
+            { "<c-_>", function() Snacks.terminal() end, desc = "which_key_ignore" },
+            { "<leader>z", function() Snacks.zen() end, desc = "Toggle Zen Mode" },
+            { "<leader>Z", function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
+            { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File" },
+            
+            -- Word navigation
+            { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Next Reference", mode = { "n", "t" } },
+            { "[[", function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Reference", mode = { "n", "t" } },
+        },
+        init = function()
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "VeryLazy",
+                callback = function()
+                    -- Setup debug globals
+                    _G.dd = function(...)
+                        Snacks.debug.inspect(...)
+                    end
+                    _G.bt = function()
+                        Snacks.debug.backtrace()
+                    end
+
+                    -- Create toggle mappings
+                    Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+                    Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+                    Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+                    Snacks.toggle.diagnostics():map("<leader>ud")
+                    Snacks.toggle.line_number():map("<leader>ul")
+                    Snacks.toggle.treesitter():map("<leader>uT")
+                    Snacks.toggle.inlay_hints():map("<leader>uh")
+                    Snacks.toggle.indent():map("<leader>ug")
+                    Snacks.toggle.dim():map("<leader>uD")
+                end,
+            })
+        end,
+    },
+
 }
