@@ -51,3 +51,74 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 - Dark chalkboard color theme
 - Custom status line with git integration
 - Automatic formatting on save for supported languages
+
+## Nix Flake Support
+
+This configuration is available as a Nix flake for easy installation on NixOS and other Nix-based systems.
+
+### Using the Flake
+
+#### On NixOS
+Add to your `flake.nix` inputs:
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    neovim-config.url = "github:kennethdsheridan/nvim";
+  };
+  
+  outputs = { self, nixpkgs, neovim-config }: {
+    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
+      # ... your config
+      modules = [
+        {
+          environment.systemPackages = [
+            neovim-config.packages.${system}.default
+          ];
+        }
+      ];
+    };
+  };
+}
+```
+
+#### Direct Usage
+```bash
+# Run Neovim with this config
+nix run github:kennethdsheridan/nvim
+
+# Enter development shell with all tools
+nix develop github:kennethdsheridan/nvim
+
+# Install locally
+nix profile install github:kennethdsheridan/nvim
+```
+
+#### Home Manager
+```nix
+{
+  inputs.neovim-config.url = "github:kennethdsheridan/nvim";
+  
+  # In your home.nix
+  home.packages = [
+    inputs.neovim-config.packages.${pkgs.system}.default
+  ];
+}
+```
+
+### Development Shell
+The flake provides a development shell with all necessary tools:
+- Language servers (lua-language-server, rust-analyzer, nil, nixd, etc.)
+- Formatters (stylua, nixpkgs-fmt, rustfmt, prettier, black)
+- Utilities (ripgrep, fd, fzf, lazygit)
+
+### Local Development
+```bash
+# Clone and enter development environment
+git clone https://github.com/kennethdsheridan/nvim ~/.config/nvim
+cd ~/.config/nvim
+nix develop
+
+# Or with direnv (if .envrc is present)
+direnv allow
+```
