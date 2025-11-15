@@ -1,0 +1,25 @@
+# Nix
+result
+result-*
+.direnv/
+
+# Lazy.nvim
+lazy-lock.json
+
+# Backup files
+*.backup*
+*.bak*
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
