@@ -1082,10 +1082,11 @@ return {
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("nvim-tree").setup({
-                hijack_netrw = false, -- or true if you want Nvim-Tree to replace netrw, but be aware of its side effects
+                hijack_netrw = true,
                 hijack_directories = {
                     enable = false,
                 },
+                disable_netrw = true,
                 filters = {
                     dotfiles = false,
                     custom = { ".DS_Store", "thumbs.db" },
@@ -2088,7 +2089,10 @@ return {
         opts = {
             bigfile = { enabled = true },
             dashboard = { enabled = false }, -- Keep your alpha dashboard
-            explorer = { enabled = true },
+            explorer = { 
+                enabled = true,
+                replace_netrw = false,
+            },
             indent = { enabled = true },
             input = { enabled = true },
             picker = { enabled = true },
