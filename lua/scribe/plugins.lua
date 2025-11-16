@@ -137,7 +137,7 @@ return {
             require("octo").setup({
                 enable_builtin = true,
                 default_to_projects_v2 = false,
-                default_merge_method = "commit",
+                default_merge_method = "squash",
                 picker = "telescope",
             })
         end,
@@ -1081,11 +1081,11 @@ return {
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("nvim-tree").setup({
-                hijack_netrw = true,
+                hijack_netrw = false,
                 hijack_directories = {
                     enable = false,
                 },
-                disable_netrw = true,
+                disable_netrw = false,
                 filters = {
                     dotfiles = false,
                     custom = { ".DS_Store", "thumbs.db" },
@@ -2089,8 +2089,7 @@ return {
             bigfile = { enabled = true },
             dashboard = { enabled = false }, -- Keep your alpha dashboard
             explorer = { 
-                enabled = true,
-                replace_netrw = false,
+                enabled = false,  -- Disabled to allow netrw for directory browsing
             },
             indent = { enabled = true },
             input = { enabled = true },

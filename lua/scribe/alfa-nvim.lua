@@ -102,6 +102,19 @@ M.config = function(_, dashboard)
     end
 
     require("alpha").setup(dashboard.config)
+    
+    -- Don't show alpha when opening a directory (let netrw handle it)
+    vim.api.nvim_create_autocmd("User", {
+        pattern = "AlphaReady",
+        callback = function()
+            local buf = vim.api.nvim_get_current_buf()
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            if vim.fn.isdirectory(bufname) == 1 then
+                vim.cmd("bd") -- Close alpha buffer
+                vim.cmd("edit " .. bufname) -- Open directory with netrw
+            end
+        end,
+    })
 
     vim.api.nvim_create_autocmd("User", {
         pattern = "LazyVimStarted",
