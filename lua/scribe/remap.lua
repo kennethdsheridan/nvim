@@ -402,6 +402,13 @@ vim.keymap.set("n", "<leader>lr", telescope.lsp_references, { desc = "Telescope:
 vim.keymap.set("n", "<leader>ld", telescope.lsp_definitions, { desc = "Telescope: LSP Definitions" })
 vim.keymap.set("n", "<leader>li", telescope.lsp_implementations, { desc = "Telescope: LSP Implementations" })
 
+-- Toggle inlay hints (type hints)
+vim.keymap.set("n", "<leader>ih", function()
+    local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = 0 })
+    vim.lsp.inlay_hint.enable(not enabled, { bufnr = 0 })
+    print("Inlay hints " .. (enabled and "disabled" or "enabled"))
+end, { desc = "Toggle inlay hints" })
+
 --------------------------------------------------------------------------------
 -- Example: Additional Telescope keybindings that search project root
 --------------------------------------------------------------------------------

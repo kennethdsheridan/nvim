@@ -1,5 +1,6 @@
 -- Native Neovim 0.11+ LSP Configuration
 -- Uses the new vim.lsp.config API (no external dependencies)
+print("LSP config loading")
 
 -- 1. Completion setup
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
@@ -103,18 +104,16 @@ local function rust_root_dir(fname)
         while current ~= '/' and current ~= '' do
             local cargo_path = current .. '/Cargo.toml'
             if vim.fn.filereadable(cargo_path) == 1 then
-                vim.notify("Found Cargo.toml at: " .. current, vim.log.levels.DEBUG)
                 return current
             end
             current = vim.fn.fnamemodify(current, ':h')
         end
         return nil
     end
-    
+
     local dir = vim.fn.fnamemodify(fname, ':h')
     local root = find_cargo_toml(dir)
     if not root then
-        vim.notify("No Cargo.toml found for " .. fname .. ", using cwd", vim.log.levels.WARN)
         root = vim.fn.getcwd()
     end
     return root
@@ -122,12 +121,13 @@ end
 
 -- 6. Language Server Configurations using vim.lsp.config
 
--- Auto-start rust-analyzer for Rust files using the working approach
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "rust",
+-- Auto-start rust-analyzer for Rust files using BufReadPost
+vim.api.nvim_create_autocmd("BufReadPost", {
+    pattern = "*.rs",
     callback = function(ev)
+        print("BufReadPost *.rs triggered for buffer " .. ev.buf)
         local bufnr = ev.buf
-        
+
         -- Check if LSP is already attached
         local clients = vim.lsp.get_clients({ bufnr = bufnr })
         for _, client in ipairs(clients) do
@@ -135,46 +135,33 @@ vim.api.nvim_create_autocmd("FileType", {
                 return -- Already attached
             end
         end
-        
+
         -- Start rust-analyzer
         vim.lsp.start({
             name = 'rust-analyzer',
-            cmd = { 'rust-analyzer' },
+            cmd = { '/home/kenny/.nix-profile/bin/rust-analyzer' },
             root_dir = rust_root_dir(vim.api.nvim_buf_get_name(bufnr)),
             capabilities = capabilities,
             on_attach = function(client, buf)
-                on_attach(client, buf)
-                
-                -- Enable inlay hints for Rust
-                if client.server_capabilities.inlayHintProvider then
-                    vim.lsp.inlay_hint.enable(true, { bufnr = buf })
-                end
-                
-                vim.notify("rust-analyzer attached to buffer " .. buf, vim.log.levels.INFO)
-            end,
+                 on_attach(client, buf)
+
+                 -- Enable inlay hints for Rust
+                 if client.server_capabilities.inlayHintProvider then
+                     vim.lsp.inlay_hint.enable(true, { bufnr = buf })
+                 end
+
+                 print("rust-analyzer attached to buffer " .. buf)
+             end,
             settings = {
-                ["rust-analyzer"] = {
-                    cargo = {
-                        buildScripts = { enable = true },
-                        allFeatures = true,
-                    },
-                    checkOnSave = {
-                        enable = true,
-                        command = "clippy",
-                    },
-                    diagnostics = {
-                        enable = true,
-                    },
-                    hover = {
-                        documentation = { enable = true },
-                    },
-                    completion = {
-                        addCallArgumentSnippets = true,
-                        addCallParenthesis = true,
-                        autoimport = { enable = true },
-                    },
-                }
-            },
+                 ["rust-analyzer"] = {
+                     cargo = {
+                         allFeatures = true,
+                     },
+                     checkOnSave = {
+                         enable = true,
+                     },
+                 }
+             },
         })
     end,
 })

@@ -160,10 +160,8 @@ return {
     },
 
     -- �����������������������������������������������������������������������������
-    -- Rust Owl
-    -- �����������������������������������������������������������������������������
-    { "cordx56/rustowl",     dependencies = { "neovim/nvim-lspconfig" }, enabled = false },
-    { "mrcjkb/rustaceanvim", enabled = false }, -- Disable rustaceanvim temporarily
+     -- Rust Owl
+     { 'cordx56/rustowl',     dependencies = { 'neovim/nvim-lspconfig' }, enabled = false }
 
     -- �����������������������������������������������������������������������������
     -- Augment Code completion
@@ -418,16 +416,17 @@ return {
     -- },
 
     -- �����������������������������������������������������������������������������
-    -- RUSTACEANVIM (Commented Out)
-    -- �����������������������������������������������������������������������������
-    {
-        "mrcjkb/rustaceanvim",
-        version = "^5",
-        ft = { "rust" },
-        config = function()
-            -- ...
-        end,
-    },
+     -- RUSTACEANVIM (Disabled for native LSP)
+     -- �����������������������������������������������������������������������������
+     {
+         "mrcjkb/rustaceanvim",
+         version = "^5",
+         ft = { "rust" },
+         enabled = false,
+         config = function()
+             -- ...
+         end,
+     },
 
     -- �����������������������������������������������������������������������������
     -- Project management

@@ -65,7 +65,11 @@ end, { desc = "Dismiss all notifications" })
 -------------------------------------------------------------------------------
 -- CLIPBOARD INTEGRATION
 -------------------------------------------------------------------------------
-vim.o.clipboard = "unnamedplus"
+if vim.fn.has('macunix') then
+    vim.o.clipboard = 'unnamed'  -- macOS uses pbcopy/pbpaste
+else
+    vim.o.clipboard = 'unnamedplus'  -- Linux uses xclip/wl-copy
+end
 
 -------------------------------------------------------------------------------
 -- MASON SETUP (SIMPLE APPROACH)
