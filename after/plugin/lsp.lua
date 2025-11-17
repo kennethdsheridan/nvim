@@ -139,7 +139,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         -- Start rust-analyzer
         vim.lsp.start({
             name = 'rust-analyzer',
-            cmd = { '/home/kenny/.nix-profile/bin/rust-analyzer' },
+            cmd = { 'rust-analyzer' },
             root_dir = rust_root_dir(vim.api.nvim_buf_get_name(bufnr)),
             capabilities = capabilities,
             on_attach = function(client, buf)

@@ -382,25 +382,26 @@ end)
 --------------------------------------------------------------------------------
 --  Telescope Keymaps
 --------------------------------------------------------------------------------
-local telescope = require("telescope.builtin")
+local telescope_ok, telescope = pcall(require, "telescope.builtin")
+if telescope_ok then
+    -- 1) Basic pickers
+    vim.keymap.set("n", "<leader>pf", telescope.find_files, { desc = "Telescope: Find Files" })
+    vim.keymap.set("n", "<C-p>", telescope.git_files, { desc = "Telescope: Git Files" })
 
--- 1) Basic pickers
-vim.keymap.set("n", "<leader>pf", telescope.find_files, { desc = "Telescope: Find Files" })
-vim.keymap.set("n", "<C-p>", telescope.git_files, { desc = "Telescope: Git Files" })
+    vim.keymap.set("n", "<leader>ps", function()
+        telescope.grep_string({ search = vim.fn.input("Grep > ") })
+    end, { desc = "Telescope: Grep String (prompt)" })
 
-vim.keymap.set("n", "<leader>ps", function()
-    telescope.grep_string({ search = vim.fn.input("Grep > ") })
-end, { desc = "Telescope: Grep String (prompt)" })
+    vim.keymap.set("n", "<leader>/", telescope.live_grep, { desc = "Telescope: Live Grep" })
+    vim.keymap.set("n", "<leader>pb", telescope.buffers, { desc = "Telescope: Buffers" })
+    vim.keymap.set("n", "<leader>po", telescope.oldfiles, { desc = "Telescope: Old Files" })
+    vim.keymap.set("n", "<leader>ph", telescope.help_tags, { desc = "Telescope: Help Tags" })
 
-vim.keymap.set("n", "<leader>/", telescope.live_grep, { desc = "Telescope: Live Grep" })
-vim.keymap.set("n", "<leader>pb", telescope.buffers, { desc = "Telescope: Buffers" })
-vim.keymap.set("n", "<leader>po", telescope.oldfiles, { desc = "Telescope: Old Files" })
-vim.keymap.set("n", "<leader>ph", telescope.help_tags, { desc = "Telescope: Help Tags" })
-
--- 2) LSP-related pickers (using <leader> prefix to avoid conflicts)
-vim.keymap.set("n", "<leader>lr", telescope.lsp_references, { desc = "Telescope: LSP References" })
-vim.keymap.set("n", "<leader>ld", telescope.lsp_definitions, { desc = "Telescope: LSP Definitions" })
-vim.keymap.set("n", "<leader>li", telescope.lsp_implementations, { desc = "Telescope: LSP Implementations" })
+    -- 2) LSP-related pickers (using <leader> prefix to avoid conflicts)
+    vim.keymap.set("n", "<leader>lr", telescope.lsp_references, { desc = "Telescope: LSP References" })
+    vim.keymap.set("n", "<leader>ld", telescope.lsp_definitions, { desc = "Telescope: LSP Definitions" })
+    vim.keymap.set("n", "<leader>li", telescope.lsp_implementations, { desc = "Telescope: LSP Implementations" })
+end
 
 -- Toggle inlay hints (type hints)
 vim.keymap.set("n", "<leader>ih", function()

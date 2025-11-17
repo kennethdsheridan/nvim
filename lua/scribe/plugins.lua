@@ -161,7 +161,7 @@ return {
 
     -- �����������������������������������������������������������������������������
      -- Rust Owl
-     { 'cordx56/rustowl',     dependencies = { 'neovim/nvim-lspconfig' }, enabled = false }
+     { 'cordx56/rustowl',     dependencies = { 'neovim/nvim-lspconfig' }, enabled = false },
 
     -- �����������������������������������������������������������������������������
     -- Augment Code completion
