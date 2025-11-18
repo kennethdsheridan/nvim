@@ -2,8 +2,53 @@
 -- Uses the new vim.lsp.config API (no external dependencies)
 print("LSP config loading")
 
+-- Create a command to show full documentation in a split
+vim.api.nvim_create_user_command('LspDoc', function()
+    -- Open hover documentation in a new split
+    vim.lsp.buf.hover()
+    vim.cmd('wincmd L')  -- Move to the right
+    vim.cmd('vertical resize 80')  -- Set width
+end, { desc = 'Show LSP documentation in split' })
+
+-- Configure LSP UI for better documentation display
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+    vim.lsp.handlers.hover, {
+        border = "rounded",
+        max_width = 100,
+        max_height = 40,
+        focusable = true,
+    }
+)
+
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+    vim.lsp.handlers.signature_help, {
+        border = "rounded",
+        max_width = 80,
+        focusable = true,
+    }
+)
+
+-- Better diagnostic display
+vim.diagnostic.config({
+    virtual_text = {
+        prefix = "●",
+        source = "if_many",
+    },
+    float = {
+        border = "rounded",
+        source = "always",
+        header = "",
+        prefix = "",
+    },
+    signs = true,
+    underline = true,
+    update_in_insert = false,
+    severity_sort = true,
+})
+
 -- 1. Completion setup
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'preview' }
+vim.opt.pumheight = 20  -- Show more items in completion menu
 
 -- 2. Mason setup (optional, for installing LSP servers)
 local mason_ok, mason = pcall(require, 'mason')
@@ -32,6 +77,12 @@ if mason_ok then
         if vim.fn.executable('bash-language-server') == 0 then
             table.insert(servers_to_install, 'bash-language-server')
         end
+        if vim.fn.executable('shellcheck') == 0 then
+            table.insert(servers_to_install, 'shellcheck')
+        end
+        if vim.fn.executable('shfmt') == 0 then
+            table.insert(servers_to_install, 'shfmt')
+        end
         
         if #servers_to_install > 0 then
             vim.notify("Installing language servers via Mason: " .. table.concat(servers_to_install, ", "), vim.log.levels.INFO)
@@ -50,6 +101,17 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { 'documentation', 'detail', 'additionalTextEdits' }
 }
+capabilities.textDocument.hover = {
+    dynamicRegistration = false,
+    contentFormat = { 'markdown', 'plaintext' },
+}
+capabilities.textDocument.signatureHelp = {
+    dynamicRegistration = false,
+    signatureInformation = {
+        documentationFormat = { 'markdown', 'plaintext' },
+        activeParameterSupport = true,
+    },
+}
 
 -- DISABLED: -- Update capabilities with cmp if available
 -- DISABLED: local cmp_ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
@@ -61,8 +123,15 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
 local function on_attach(client, bufnr)
     local opts = { buffer = bufnr, noremap = true, silent = true }
     
-    -- Override the default K mapping explicitly for LSP hover
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    -- Enhanced hover with better window settings
+    vim.keymap.set("n", "K", function()
+        vim.lsp.buf.hover({
+            border = "rounded",
+            max_width = 80,
+            max_height = 30,
+            focusable = true,
+        })
+    end, opts)
     
     -- Standard LSP navigation
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
@@ -70,11 +139,29 @@ local function on_attach(client, bufnr)
     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
     
-    -- Alternative hover mapping in case K doesn't work
-    vim.keymap.set("n", "<leader>k", vim.lsp.buf.hover, opts)
+    -- Alternative hover mapping with larger window
+    vim.keymap.set("n", "<leader>k", function()
+        vim.lsp.buf.hover({
+            border = "double",
+            max_width = 120,
+            max_height = 50,
+            focusable = true,
+        })
+    end, opts)
     
-    -- Diagnostics
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+    -- Show full signature help
+    vim.keymap.set("n", "<leader>sh", vim.lsp.buf.signature_help, opts)
+    
+    -- Diagnostics with enhanced float window
+    vim.keymap.set("n", "<leader>vd", function()
+        vim.diagnostic.open_float({
+            border = "rounded",
+            max_width = 100,
+            focusable = true,
+            scope = "cursor",
+            source = true,
+        })
+    end, opts)
     vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
     vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
     
@@ -156,8 +243,68 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                  ["rust-analyzer"] = {
                      cargo = {
                          allFeatures = true,
+                         loadOutDirsFromCheck = true,
                      },
                      checkOnSave = {
+                         enable = true,
+                         command = "clippy",
+                     },
+                     completion = {
+                         addCallArgumentSnippets = true,
+                         addCallParenthesis = true,
+                         postfix = {
+                             enable = true,
+                         },
+                     },
+                     hover = {
+                         documentation = {
+                             enable = true,
+                             keywords = {
+                                 enable = true,
+                             },
+                         },
+                         links = {
+                             enable = true,
+                         },
+                     },
+                     inlayHints = {
+                         bindingModeHints = {
+                             enable = true,
+                         },
+                         chainingHints = {
+                             enable = true,
+                         },
+                         closingBraceHints = {
+                             enable = true,
+                             minLines = 25,
+                         },
+                         parameterHints = {
+                             enable = true,
+                         },
+                         typeHints = {
+                             enable = true,
+                             hideClosureInitialization = false,
+                             hideNamedConstructor = false,
+                         },
+                     },
+                     lens = {
+                         enable = true,
+                         references = {
+                             adt = {
+                                 enable = true,
+                             },
+                             enumVariant = {
+                                 enable = true,
+                             },
+                             method = {
+                                 enable = true,
+                             },
+                             trait = {
+                                 enable = true,
+                             },
+                         },
+                     },
+                     procMacro = {
                          enable = true,
                      },
                  }
@@ -216,22 +363,69 @@ local function setup_language_server(filetype, server_name, cmd, root_patterns, 
     })
 end
 
--- Python (pyright)
+-- Python (pyright) with enhanced documentation
 setup_language_server(
     "python",
     "pyright",
     { "pyright-langserver", "--stdio" },
-    { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
+    { "pyproject.toml", "setup.py", "requirements.txt", "setup.cfg", "tox.ini", ".git" },
     {
         python = {
             analysis = {
                 typeCheckingMode = "basic",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
-            }
-        }
+                diagnosticMode = "workspace",
+                autoImportCompletions = true,
+                completeFunctionParens = true,
+                indexing = true,
+                inlayHints = {
+                    variableTypes = true,
+                    functionReturnTypes = true,
+                },
+            },
+            linting = {
+                enabled = true,
+            },
+            formatting = {
+                enabled = true,
+            },
+        },
+        pyright = {
+            disableOrganizeImports = false,
+        },
     }
 )
+
+-- Alternative: Python LSP Server (pylsp) - better for documentation
+-- Uncomment if you prefer pylsp over pyright
+-- setup_language_server(
+--     "python",
+--     "pylsp",
+--     { "pylsp" },
+--     { "pyproject.toml", "setup.py", "requirements.txt", ".git" },
+--     {
+--         pylsp = {
+--             plugins = {
+--                 jedi_completion = {
+--                     enabled = true,
+--                     include_params = true,
+--                     include_class_objects = true,
+--                     fuzzy = true,
+--                 },
+--                 jedi_hover = { enabled = true },
+--                 jedi_references = { enabled = true },
+--                 jedi_signature_help = { enabled = true },
+--                 jedi_symbols = { enabled = true },
+--                 pycodestyle = { enabled = true },
+--                 pydocstyle = { enabled = true },
+--                 pylint = { enabled = false },
+--                 yapf = { enabled = false },
+--                 rope_completion = { enabled = true },
+--             }
+--         }
+--     }
+-- )
 
 -- Go (gopls)
 setup_language_server(
@@ -276,15 +470,21 @@ setup_language_server(
     }
 )
 
--- Bash (bash-language-server)
+-- Bash (bash-language-server) with enhanced documentation
 setup_language_server(
     { "sh", "bash", "zsh" },
     "bashls",
     { "bash-language-server", "start" },
-    { ".git" },
+    { ".bashrc", ".zshrc", ".bash_profile", ".git" },
     {
         bashIde = {
-            globPattern = "*@(.sh|.inc|.bash|.command)",
+            globPattern = "*@(.sh|.inc|.bash|.command|.zsh)",
+            shellcheckPath = "shellcheck",
+            shellcheckArguments = { "--shell=bash", "--exclude=SC2086" },
+            includeAllWorkspaceSymbols = true,
+            showHover = true,
+            enableSourceErrorDiagnostics = true,
+            explainshellEndpoint = "https://explainshell.com",
         }
     }
 )
