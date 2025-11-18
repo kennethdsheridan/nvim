@@ -1,4 +1,6 @@
-_G.ColorMyPencils = function(color)
+-- ColorMyPencils is defined in plugin/00-colors.lua
+-- This file just contains additional configuration
+local function setup_additional_highlights()
     color = color or "kanagawa"
 
     -- Handle catppuccin specially
@@ -107,29 +109,9 @@ _G.ColorMyPencils = function(color)
     vim.api.nvim_set_hl(0, "@constructor", { fg = "#56b6c2" })
 end
 
--- Automatically apply colorscheme when Neovim starts
--- Use multiple events to ensure it runs
-vim.api.nvim_create_autocmd({"VimEnter", "UIEnter", "ColorScheme"}, {
-    callback = function()
-        -- Check if we've already run to avoid duplicates
-        if not vim.g.colorscheme_applied then
-            vim.g.colorscheme_applied = true
-            -- Use defer to ensure everything is loaded
-            vim.defer_fn(function()
-                ColorMyPencils()
-            end, 0)
-        end
-    end,
-    desc = "Apply custom colorscheme on startup"
-})
+setup_additional_highlights()
 
--- Also run immediately when this file is loaded
-vim.defer_fn(function()
-    if not vim.g.colorscheme_applied then
-        vim.g.colorscheme_applied = true
-        ColorMyPencils()
-    end
-end, 100)
+-- The main ColorMyPencils function is in plugin/00-colors.lua and runs automatically
 
 -- Command to easily switch themes
 vim.api.nvim_create_user_command('Theme', function(opts)

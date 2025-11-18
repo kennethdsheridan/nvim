@@ -53,7 +53,19 @@ _G.ColorMyPencils = function(color)
     vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#ffffff", bg = "#2c313c", bold = true })
 end
 
--- Apply immediately
-vim.schedule(function()
+-- Apply immediately when Neovim starts
+vim.api.nvim_create_autocmd({"VimEnter", "UIEnter"}, {
+    once = true,
+    callback = function()
+        -- Small delay to ensure all plugins are loaded
+        vim.defer_fn(function()
+            ColorMyPencils()
+        end, 10)
+    end,
+    desc = "Apply custom colors on startup"
+})
+
+-- Also apply immediately for when this file is sourced
+vim.defer_fn(function()
     ColorMyPencils()
-end)
+end, 0)

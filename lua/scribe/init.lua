@@ -52,20 +52,7 @@ require("scribe.markdown")
 -- Skip scribe.configs temporarily to isolate the LSP setup issue
 -- require("scribe.configs")
 
--------------------------------------------------------------------------------
--- COLOR SETUP - Ensure colors are applied
--------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("User", {
-    pattern = "LazyDone",
-    callback = function()
-        -- After Lazy loading is complete, apply colors
-        vim.defer_fn(function()
-            if _G.ColorMyPencils then
-                _G.ColorMyPencils()
-            end
-        end, 50)
-    end,
-})
+-- Color setup is handled by plugin/00-colors.lua which loads automatically
 
 
 
