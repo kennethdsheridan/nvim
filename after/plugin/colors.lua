@@ -25,8 +25,8 @@ function ColorMyPencils(color)
     
     -- Custom highlight groups for a relaxed dark theme
     -- Dark background with light text
-    vim.api.nvim_set_hl(0, "Normal", { bg = "#323338", fg = "#d4d4d4" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#323232", fg = "#d4d4d4" })
+    vim.api.nvim_set_hl(0, "Normal", { bg = "#21262b", fg = "#d4d4d4" })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#21262b", fg = "#d4d4d4" })
     
     -- Light syntax highlighting for dark background
     vim.api.nvim_set_hl(0, "Statement", { fg = "#87ceeb", bold = true })  -- Keywords in light blue
@@ -66,11 +66,11 @@ function ColorMyPencils(color)
     vim.api.nvim_set_hl(0, "@punctuation", { fg = "#abb2bf" })
     
     -- Line numbers and UI elements
-    vim.api.nvim_set_hl(0, "LineNr", { fg = "#5c6370", bg = "#323338" })
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#363636" })
-    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#abb2bf", bg = "#363636", bold = true })
-    vim.api.nvim_set_hl(0, "SignColumn", { bg = "#323338" })
-    vim.api.nvim_set_hl(0, "VertSplit", { fg = "#3e4452", bg = "#323338" })
+    vim.api.nvim_set_hl(0, "LineNr", { fg = "#5c6370", bg = "#21262b" })
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2c313c" })
+    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#abb2bf", bg = "#2c313c", bold = true })
+    vim.api.nvim_set_hl(0, "SignColumn", { bg = "#21262b" })
+    vim.api.nvim_set_hl(0, "VertSplit", { fg = "#3e4452", bg = "#21262b" })
     
     -- Status line
     vim.api.nvim_set_hl(0, "StatusLine", { bg = "#3e4452", fg = "#abb2bf" })
@@ -78,6 +78,16 @@ function ColorMyPencils(color)
     
     -- Visual selection
     vim.api.nvim_set_hl(0, "Visual", { bg = "#3e4452" })
+    
+    -- Additional UI elements for consistency
+    vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#21262b" })  -- Hide ~ at end of buffer
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#2c313c", fg = "#d4d4d4" })  -- Popup menu
+    vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#3e4452", fg = "#ffffff" })  -- Selected item in popup
+    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#21262b", fg = "#3e4452" })  -- Floating window borders
+    vim.api.nvim_set_hl(0, "NormalNC", { bg = "#21262b", fg = "#d4d4d4" })  -- Non-current windows
+    vim.api.nvim_set_hl(0, "TabLine", { bg = "#21262b", fg = "#abb2bf" })  -- Tab line
+    vim.api.nvim_set_hl(0, "TabLineFill", { bg = "#21262b" })  -- Tab line fill
+    vim.api.nvim_set_hl(0, "TabLineSel", { bg = "#2c313c", fg = "#ffffff" })  -- Selected tab
     
     -- Search highlighting
     vim.api.nvim_set_hl(0, "Search", { bg = "#3e5f7e", fg = "#ffffff" })
