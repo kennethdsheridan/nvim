@@ -1074,8 +1074,53 @@ return {
     { "glepnir/lspsaga.nvim" },
 
     -- �����������������������������������������������������������������������������
-    -- FILE EXPLORER (Oil.nvim - Better Performance)
+    -- FILE EXPLORERS (Multiple Options)
     -- �����������������������������������������������������������������������������
+    
+    -- NvimTree - Traditional sidebar tree explorer
+    {
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("nvim-tree").setup({
+                disable_netrw = false,  -- Keep netrw enabled
+                hijack_netrw = false,   -- Don't hijack netrw
+                hijack_directories = {
+                    enable = false,      -- Don't auto-open on directories
+                },
+                filters = {
+                    dotfiles = false,
+                    custom = { ".DS_Store", "thumbs.db" },
+                },
+                git = { 
+                    enable = true, 
+                    ignore = false 
+                },
+                renderer = { 
+                    highlight_opened_files = "all",
+                    icons = {
+                        show = {
+                            file = true,
+                            folder = true,
+                            folder_arrow = true,
+                            git = true,
+                        },
+                    },
+                },
+                view = { 
+                    width = 30,
+                    side = "left",
+                },
+                actions = {
+                    open_file = {
+                        quit_on_open = false,
+                    },
+                },
+            })
+        end,
+    },
+    
+    -- Oil.nvim - Modern buffer-based explorer
     {
         "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
