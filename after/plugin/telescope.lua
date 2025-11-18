@@ -100,3 +100,20 @@ vim.keymap.set('n', '<leader>ps', function()
     builtin.grep_string({ search = vim.fn.input("Grep > ")})
 end)
 
+-- Document symbols (functions, classes, variables in current file)
+vim.keymap.set('n', '<leader>ds', builtin.lsp_document_symbols, { desc = 'Document symbols' })
+vim.keymap.set('n', '<leader>fs', builtin.lsp_document_symbols, { desc = 'Find symbols/functions in file' })
+
+-- Workspace symbols (all functions across project)
+vim.keymap.set('n', '<leader>ws', builtin.lsp_workspace_symbols, { desc = 'Workspace symbols' })
+
+-- Treesitter-based symbol search (works without LSP)
+vim.keymap.set('n', '<leader>ts', builtin.treesitter, { desc = 'Treesitter symbols' })
+
+-- Quick access to current buffer functions only
+vim.keymap.set('n', '<leader>fu', function()
+    builtin.lsp_document_symbols({
+        symbols = { "function", "method" }
+    })
+end, { desc = 'Find functions only' })
+
