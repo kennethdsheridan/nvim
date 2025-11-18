@@ -1,8 +1,11 @@
 -- Set leader key
 vim.g.mapleader = " "
 
--- Project navigation - Use Oil.nvim instead of netrw
-vim.keymap.set("n", "<leader>pv", "<CMD>Oil<CR>", { desc = "Open file explorer" })
+-- Project navigation - Use netrw by default
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { desc = "Open netrw file explorer" })
+
+-- Alternative file explorer with Oil.nvim
+vim.keymap.set("n", "<leader>oil", "<CMD>Oil<CR>", { desc = "Open Oil file explorer" })
 
 -- GOTO declaration and documentation navigation (using standard LSP keys)
 -- These will be handled by the LSP on_attach function instead
