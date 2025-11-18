@@ -167,43 +167,31 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 })
 
 -- Lua Language Server
--- DISABLED: vim.lsp.config('lua_ls', {
--- DISABLED:     cmd = { 'lua-language-server' },
--- DISABLED:     filetypes = { 'lua' },
--- DISABLED:     root_dir = function(fname)
--- DISABLED:         local function find_project_root(path)
--- DISABLED:             local patterns = { '.luarc.json', '.luarc.jsonc', '.luacheckrc', '.stylua.toml', 'stylua.toml', 'selene.toml', 'selene.yml', '.git' }
--- DISABLED:             local current = path
--- DISABLED:             while current ~= '/' and current ~= '' do
--- DISABLED:                 for _, pattern in ipairs(patterns) do
--- DISABLED:                     if vim.fn.filereadable(current .. '/' .. pattern) == 1 or vim.fn.isdirectory(current .. '/' .. pattern) == 1 then
--- DISABLED:                         return current
--- DISABLED:                     end
--- DISABLED:                 end
--- DISABLED:                 current = vim.fn.fnamemodify(current, ':h')
--- DISABLED:             end
--- DISABLED:             return vim.fn.getcwd()
--- DISABLED:         end
--- DISABLED:         
--- DISABLED:         local dir = vim.fn.fnamemodify(fname, ':h')
--- DISABLED:         return find_project_root(dir)
--- DISABLED:     end,
--- DISABLED:     on_attach = on_attach,
--- DISABLED:     capabilities = capabilities,
--- DISABLED:     settings = {
--- DISABLED:         Lua = {
--- DISABLED:             diagnostics = { globals = { 'vim' } },
--- DISABLED:             workspace = {
--- DISABLED:                 library = vim.api.nvim_get_runtime_file("", true),
--- DISABLED:                 checkThirdParty = false,
--- DISABLED:             },
--- DISABLED:             telemetry = { enable = false },
--- DISABLED:         },
--- DISABLED:     },
--- DISABLED: })
-
--- Enable lua_ls
--- DISABLED: vim.lsp.enable('lua_ls')
+setup_language_server(
+    "lua",
+    "lua_ls",
+    { "lua-language-server" },
+    { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+    {
+        Lua = {
+            diagnostics = { 
+                globals = { 'vim', 'use' },
+                disable = { "missing-fields" }
+            },
+            workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+            },
+            telemetry = { enable = false },
+            format = { enable = false },
+            hint = {
+                enable = true,
+                arrayIndex = "Disable",
+                setType = true,
+            },
+        },
+    }
+)
 
 -- Helper function to start LSP servers for various languages
 local function setup_language_server(filetype, server_name, cmd, root_patterns, settings)
@@ -445,6 +433,14 @@ local other_servers = {
     { "dockerfile", "dockerls", { "docker-langserver", "--stdio" }, { "Dockerfile", ".git" } },
     { "html", "html", { "vscode-html-language-server", "--stdio" }, { ".git" } },
     { "css", "cssls", { "vscode-css-language-server", "--stdio" }, { ".git" } },
+    { "java", "jdtls", { "jdtls" }, { "pom.xml", "build.gradle", ".git" } },
+    { "ruby", "solargraph", { "solargraph", "stdio" }, { "Gemfile", ".git" } },
+    { "php", "intelephense", { "intelephense", "--stdio" }, { "composer.json", ".git" } },
+    { "vue", "vuels", { "vls" }, { "package.json", ".git" } },
+    { "svelte", "svelte", { "svelteserver", "--stdio" }, { "package.json", ".git" } },
+    { "kotlin", "kotlin_language_server", { "kotlin-language-server" }, { "build.gradle", ".git" } },
+    { "swift", "sourcekit", { "sourcekit-lsp" }, { "Package.swift", ".git" } },
+    { { "haskell", "lhaskell" }, "hls", { "haskell-language-server-wrapper", "--lsp" }, { "stack.yaml", "*.cabal", ".git" } },
 }
 
 for _, config in ipairs(other_servers) do

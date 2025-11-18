@@ -9,10 +9,10 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -------------------------------------------------------------------------------
--- ENABLE NETRW FOR DIRECTORY BROWSING
+-- DISABLE NETRW TO PREVENT AUTO-OPENING ON DIRECTORIES
 -------------------------------------------------------------------------------
--- vim.g.loaded_netrw = 1           -- Commented out to enable netrw
--- vim.g.loaded_netrwPlugin = 1     -- Commented out to enable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -------------------------------------------------------------------------------
 -- LAZY.NVIM BOOTSTRAP
@@ -57,36 +57,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
     command = "lua ColorMyPencils()",
 })
 
--------------------------------------------------------------------------------
--- FORCE NETRW ON DIRECTORY OPEN
--------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("VimEnter", {
-    nested = true,
-    callback = function(data)
-        -- Check if the buffer is a directory
-        local directory = vim.fn.isdirectory(data.file) == 1
-        
-        if directory then
-            -- Use vim.schedule to ensure this runs after other plugins load
-            vim.schedule(function()
-                -- Delete any other buffers that might have opened
-                for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                    local bufname = vim.api.nvim_buf_get_name(buf)
-                    local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
-                    -- Close scratch, alpha, nofile, or empty buffers
-                    if bufname == "" or bufname:match("alpha") or bufname:match("[Ss]cratch") or buftype == "nofile" then
-                        if buf ~= vim.api.nvim_get_current_buf() then
-                            pcall(vim.api.nvim_buf_delete, buf, { force = true })
-                        end
-                    end
-                end
-                
-                -- Open netrw explicitly
-                vim.cmd("edit " .. vim.fn.fnameescape(data.file))
-            end)
-        end
-    end,
-})
+
 
 -- Keybinding to dismiss all notifications
 vim.keymap.set("n", "<leader>nd", function()

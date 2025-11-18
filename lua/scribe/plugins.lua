@@ -1074,17 +1074,51 @@ return {
     { "glepnir/lspsaga.nvim" },
 
     -- �����������������������������������������������������������������������������
-    -- FILE EXPLORER (Nvim-Tree)
+    -- FILE EXPLORER (Oil.nvim - Better Performance)
     -- �����������������������������������������������������������������������������
     {
-        "nvim-tree/nvim-tree.lua",
+        "stevearc/oil.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("nvim-tree").setup({
-                hijack_netrw = false,
-                hijack_directories = {
-                    enable = false,
+            require("oil").setup({
+                default_file_explorer = true,
+                delete_to_trash = true,
+                skip_confirm_for_simple_edits = true,
+                view_options = {
+                    show_hidden = true,
+                    is_always_hidden = function(name, _)
+                        return name == ".DS_Store" or name == "thumbs.db"
+                    end,
                 },
+                float = {
+                    padding = 2,
+                    max_width = 90,
+                    max_height = 0,
+                },
+                win_options = {
+                    wrap = true,
+                    winblend = 0,
+                },
+                keymaps = {
+                    ["<C-h>"] = false,
+                    ["<C-l>"] = false,
+                    ["<C-k>"] = false,
+                    ["<C-j>"] = false,
+                },
+            })
+
+            vim.keymap.set("n", "<leader>ft", "<cmd>Oil<CR>", {
+                silent = true,
+                noremap = true,
+                desc = "Open Oil file explorer",
+            })
+            vim.keymap.set("n", "-", "<cmd>Oil<CR>", {
+                silent = true,
+                noremap = true,
+                desc = "Open parent directory",
+            })
+        end,
+    },
                 disable_netrw = false,
                 filters = {
                     dotfiles = false,
@@ -1203,101 +1237,7 @@ return {
         dependencies = { "nvim-lua/plenary.nvim" },
     },
 
-    -- �����������������������������������������������������������������������������
-    -- NOTIFICATIONS (NOICE + NOTIFY)
-    -- �����������������������������������������������������������������������������
-    {
-        "folke/noice.nvim",
-        event = "VeryLazy",
-        enabled = true,
-        dependencies = {
-            "MunifTanjim/nui.nvim",
-            "rcarriga/nvim-notify",
-        },
-        config = function()
-            require("noice").setup({
-                -- Required fields
-                cmdline = {
-                    enabled = true,
-                },
-                messages = {
-                    enabled = true,
-                },
-                popupmenu = {
-                    enabled = true,
-                },
-                redirect = {
-                    enabled = false,
-                },
-                commands = {
-                    enabled = true,
-                },
-                notify = {
-                    enabled = true,
-                    view = "notify",
-                },
-                markdown = {
-                    hover = { enabled = true },
-                    view = "popup", -- or "cmdline", etc.
-                },
-                health = {
-                    checker = true,
-                },
-                throttle = 1000, -- Throttling (ms) for Noice updates
 
-                -- Optional, but needed to avoid warnings if you want custom views
-                views = {
-                    -- Example: customize the cmdline or popupmenu
-                    cmdline = {
-                        position = { row = -1, col = "50%" },
-                        size = { height = 1 },
-                    },
-                    popupmenu = {
-                        relative = "editor",
-                        position = { row = 10, col = "50%" },
-                        size = { width = 60, height = 10 },
-                    },
-                },
-                routes = {
-                    -- Add filtering or routing rules here
-                },
-
-                -- Your LSP overrides
-                lsp = {
-                    override = {
-                        ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-                        ["vim.lsp.util.stylize_markdown"] = true,
-                        ["cmp.entry.get_documentation"] = true,
-                    },
-                },
-
-                -- Presets (your existing settings are fine here)
-                presets = {
-                    bottom_search = true,
-                    command_palette = true,
-                    long_message_to_split = true,
-                    inc_rename = false,
-                    lsp_doc_border = true,
-                },
-
-                -- Additional required fields
-                status = {
-                    enabled = true,
-                    view = "mini", -- or "cmdline", etc.
-                },
-                format = {
-                    enabled = true,
-                },
-                debug = false,
-                log = {
-                    enabled = false,
-                    level = 2,
-                    file = vim.fn.stdpath("data") .. "/noice.log",
-                },
-                log_max_size = 1024 * 1024, -- 1MB
-            })
-        end,
-    },
 
     -- �����������������������������������������������������������������������������
     -- COLORS & THEMES
@@ -1392,17 +1332,7 @@ return {
             })
         end,
     },
-    {
-        "karb94/neoscroll.nvim",
-        config = function()
-            require("neoscroll").setup({
-                stop_eof = true,
-                easing_function = "sine",
-                hide_cursor = true,
-                cursor_scrolls_alone = true,
-            })
-        end,
-    },
+
     {
         "windwp/nvim-spectre",
         enabled = false,
@@ -1493,114 +1423,10 @@ return {
         end,
     },
 
-    {
-        "utilyre/barbecue.nvim",
-        name = "barbecue",
-        version = "*",
-        dependencies = {
-            "SmiteshP/nvim-navic",
-            "nvim-tree/nvim-web-devicons",
-        },
-        opts = {},
-        config = function()
-            require("barbecue").setup({
-                -- Required keys:
-                attach_navic = true,
-                include_buftypes = { "" },
-                exclude_filetypes = {
-                    "gitcommit",
-                    "toggleterm",
-                    "DressingSelect",
-                    "dashboard",
-                    "cmp_menu",
-                    "cmp_docs",
-                    "noice",
-                    "",
-                },
-                modifiers = {
-                    dirname = ":~:.",
-                    basename = "",
-                },
-                show_dirname = true,
-                show_basename = true,
-                -- Called to get the modified flag (�) if the buffer is modified
-                modified = function(bufnr)
-                    return vim.bo[bufnr].modified and "�" or ""
-                end,
-                show_modified = false,
-                show_navic = true,
-                lead_custom_section = function() return "" end,
-                custom_section = function() return "" end,
-                theme = "auto", -- or "catppuccin", "onedark", "tokyonight", etc.
-                kinds = {
-                    Array = "",
-                    Boolean = "",
-                    Class = "",
-                    Color = "",
-                    Constant = "",
-                    Constructor = "",
-                    Enum = "",
-                    EnumMember = "",
-                    Event = "",
-                    Field = "",
-                    File = "",
-                    Folder = "",
-                    Function = "",
-                    Interface = "",
-                    Key = "",
-                    Keyword = "",
-                    Method = "",
-                    Module = "",
-                    Namespace = "",
-                    Null = "",
-                    Number = "",
-                    Object = "",
-                    Operator = "",
-                    Package = "",
-                    Property = "",
-                    Reference = "",
-                    Snippet = "",
-                    String = "",
-                    Struct = "",
-                    Text = "",
-                    TypeParameter = "",
-                    Unit = "",
-                    Value = "",
-                    Variable = "",
-                },
-
-                -- Your existing key:
-                create_autocmd = false,
-                -- Newly required
-                context_follow_icon_color = false,
-                symbols = {
-                    separator = "  ",
-                    modified = "�",
-                    ellipsis = "�",
-                },
 
 
-            })
-
-            -- Optionally auto-update barbecue on certain events
-            vim.api.nvim_create_autocmd(
-                { "WinScrolled", "BufWinEnter", "CursorHold", "InsertLeave" },
-                {
-                    group = vim.api.nvim_create_augroup("barbecue.updater", {}),
-                    callback = function()
-                        require("barbecue.ui").update()
-                    end,
-                }
-            )
-        end,
-    },
 
 
-    {
-        "folke/persistence.nvim",
-        event = "BufReadPre",
-        opts = {},
-    },
     {
         "danymat/neogen",
         enabled = true,
@@ -1666,36 +1492,9 @@ return {
         "MunifTanjim/nui.nvim",
     },
 
-    {
-        "rcarriga/nvim-notify",
-        config = function()
-            require("notify").setup({
-                -- Your current setting
-                background_colour = "#000000",
-                -- Required field to avoid the type-check warning:
-                merge_duplicates = false,
-            })
-        end,
-    },
 
-    {
-        "nvchad/showkeys",
-        cmd = "ShowkeysToggle",
-        opts = {
-            timeout = 1,
-            maxkeys = 6,
-            position = "bottom-right",
-        },
-        keys = {
-            {
-                "<leader>kt",
-                function()
-                    vim.cmd("ShowkeysToggle")
-                end,
-                desc = "Show key presses",
-            },
-        },
-    },
+
+
 
     -- �����������������������������������������������������������������������������
     -- CLOAK
@@ -1959,55 +1758,7 @@ return {
     -- �����������������������������������������������������������������������������
 
 
-    {
-        'jmbuhr/otter.nvim',
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter',
-        },
-        opts = {
-            lsp = {
-                -- Enable LSP for embedded languages
-                hover = {
-                    border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
-                },
-                -- Language-specific LSP configurations
-                diagnostic_update_events = { "BufWritePost", "InsertLeave", "TextChanged" },
-            },
-            buffers = {
-                -- Set to true to write to a temporary file and read from it instead of
-                -- redrawing the buffer
-                set_filetype = false,
-                -- Write to a temporary file and read from it instead of redrawing the buffer
-                write_to_disk = false,
-            },
-            strip_wrapping_quote_characters = { "'", '"', "`" },
-            -- Language specific highlighters
-            handle_leading_whitespace = true,
-        },
-        config = function(_, opts)
-            require('otter').setup(opts)
 
-            -- Only activate otter for languages with available treesitter parsers
-            local function has_parser(lang)
-                local ok, _ = pcall(vim.treesitter.language.require_language, lang)
-                return ok
-            end
-
-            local otter_languages = {
-                'python', 'javascript', 'typescript', 'lua', 'rust', 'bash', 'sh',
-                'go', 'cpp', 'c', 'java', 'ruby', 'php', 'perl', 'r', 'sql'
-            }
-
-            for _, lang in ipairs(otter_languages) do
-                if has_parser(lang) then
-                    local ok, err = pcall(require('otter').activate, { lang })
-                    if not ok then
-                        vim.notify("Failed to activate otter for " .. lang .. ": " .. err, vim.log.levels.DEBUG)
-                    end
-                end
-            end
-        end,
-    },
 
     -- �����������������������������������������������������������������������������
     -- RENDER MARKDOWN
