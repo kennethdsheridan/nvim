@@ -1090,32 +1090,47 @@ return {
                         return name == ".DS_Store" or name == "thumbs.db"
                     end,
                 },
+                -- Use floating window as a sidebar
                 float = {
                     padding = 2,
-                    max_width = 90,
-                    max_height = 0,
+                    max_width = 40,  -- Narrower for sidebar feel
+                    max_height = 0,  -- Full height
+                    border = "rounded",
+                    win_options = {
+                        winblend = 0,
+                    },
                 },
                 win_options = {
-                    wrap = true,
-                    winblend = 0,
+                    wrap = false,
+                    signcolumn = "no",
+                    cursorcolumn = false,
+                    foldcolumn = "0",
+                    spell = false,
+                    list = false,
+                    conceallevel = 3,
+                    concealcursor = "nvic",
                 },
                 keymaps = {
                     ["<C-h>"] = false,
                     ["<C-l>"] = false,
                     ["<C-k>"] = false,
                     ["<C-j>"] = false,
+                    ["q"] = "actions.close",
+                    ["<ESC>"] = "actions.close",
                 },
             })
 
-            vim.keymap.set("n", "<leader>ft", "<cmd>Oil<CR>", {
+            vim.keymap.set("n", "<leader>ft", function()
+                require("oil").open_float()
+            end, {
                 silent = true,
                 noremap = true,
-                desc = "Open Oil file explorer",
+                desc = "Toggle Oil file explorer (floating)",
             })
             vim.keymap.set("n", "-", "<cmd>Oil<CR>", {
                 silent = true,
                 noremap = true,
-                desc = "Open parent directory",
+                desc = "Open parent directory in current buffer",
             })
         end,
     },
