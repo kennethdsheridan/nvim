@@ -53,9 +53,19 @@ require("scribe.markdown")
 -- require("scribe.configs")
 
 -------------------------------------------------------------------------------
--- OPTIONAL: AUTOCMD / COLOR SETUP
+-- COLOR SETUP - Ensure colors are applied
 -------------------------------------------------------------------------------
--- Removed - will be handled in after/plugin/colors.lua
+vim.api.nvim_create_autocmd("User", {
+    pattern = "LazyDone",
+    callback = function()
+        -- After Lazy loading is complete, apply colors
+        vim.defer_fn(function()
+            if _G.ColorMyPencils then
+                _G.ColorMyPencils()
+            end
+        end, 50)
+    end,
+})
 
 
 

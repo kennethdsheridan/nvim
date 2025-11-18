@@ -1,4 +1,4 @@
-function ColorMyPencils(color)
+_G.ColorMyPencils = function(color)
     color = color or "kanagawa"
 
     -- Handle catppuccin specially
@@ -23,41 +23,41 @@ function ColorMyPencils(color)
     -- Apply colorscheme
     vim.cmd.colorscheme(color)
     
-    -- Custom highlight groups for a relaxed dark theme
-    -- Dark background with light text
-    vim.api.nvim_set_hl(0, "Normal", { bg = "#21262b", fg = "#d4d4d4" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#21262b", fg = "#d4d4d4" })
+    -- Custom highlight groups for a relaxed dark theme with good contrast
+    -- Dark background with brighter text for better readability
+    vim.api.nvim_set_hl(0, "Normal", { bg = "#21262b", fg = "#e0e0e0" })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#21262b", fg = "#e0e0e0" })
     
-    -- Light syntax highlighting for dark background
-    vim.api.nvim_set_hl(0, "Statement", { fg = "#87ceeb", bold = true })  -- Keywords in light blue
-    vim.api.nvim_set_hl(0, "Function", { fg = "#87ceeb" })               -- Functions in light blue
-    vim.api.nvim_set_hl(0, "Keyword", { fg = "#87ceeb", bold = true })   -- Keywords in light blue
+    -- Enhanced contrast syntax highlighting for dark background
+    vim.api.nvim_set_hl(0, "Statement", { fg = "#69b7f0", bold = true })  -- Keywords in brighter blue
+    vim.api.nvim_set_hl(0, "Function", { fg = "#69b7f0" })               -- Functions in brighter blue
+    vim.api.nvim_set_hl(0, "Keyword", { fg = "#69b7f0", bold = true })   -- Keywords in brighter blue
     
-    -- Light gray for variables and identifiers
-    vim.api.nvim_set_hl(0, "Identifier", { fg = "#b8b8b8" })             -- Variables in light gray
-    vim.api.nvim_set_hl(0, "@variable", { fg = "#b8b8b8" })              -- TreeSitter variables
-    vim.api.nvim_set_hl(0, "@parameter", { fg = "#b8b8b8" })             -- Function parameters
-    vim.api.nvim_set_hl(0, "@field", { fg = "#b8b8b8" })                 -- Object fields
-    vim.api.nvim_set_hl(0, "@property", { fg = "#b8b8b8" })              -- Properties
+    -- Better contrast for variables and identifiers
+    vim.api.nvim_set_hl(0, "Identifier", { fg = "#d0d0d0" })             -- Variables in light gray
+    vim.api.nvim_set_hl(0, "@variable", { fg = "#d0d0d0" })              -- TreeSitter variables
+    vim.api.nvim_set_hl(0, "@parameter", { fg = "#f0b752" })             -- Function parameters in warm yellow
+    vim.api.nvim_set_hl(0, "@field", { fg = "#d0d0d0" })                 -- Object fields
+    vim.api.nvim_set_hl(0, "@property", { fg = "#d0d0d0" })              -- Properties
     
-    -- Strings and literals in soft green
-    vim.api.nvim_set_hl(0, "String", { fg = "#98c379" })
-    vim.api.nvim_set_hl(0, "@string", { fg = "#98c379" })
+    -- Strings and literals in brighter green for contrast
+    vim.api.nvim_set_hl(0, "String", { fg = "#89ca78" })
+    vim.api.nvim_set_hl(0, "@string", { fg = "#89ca78" })
     
-    -- Comments in medium gray
-    vim.api.nvim_set_hl(0, "Comment", { fg = "#7f7f7f", italic = true })
-    vim.api.nvim_set_hl(0, "@comment", { fg = "#7f7f7f", italic = true })
+    -- Comments in warmer gray (easier on eyes but still readable)
+    vim.api.nvim_set_hl(0, "Comment", { fg = "#6b737f", italic = true })
+    vim.api.nvim_set_hl(0, "@comment", { fg = "#6b737f", italic = true })
     
-    -- Numbers and constants in soft purple
-    vim.api.nvim_set_hl(0, "Number", { fg = "#c678dd" })
-    vim.api.nvim_set_hl(0, "Constant", { fg = "#c678dd" })
-    vim.api.nvim_set_hl(0, "@constant", { fg = "#c678dd" })
-    vim.api.nvim_set_hl(0, "Boolean", { fg = "#c678dd" })
+    -- Numbers and constants in brighter purple
+    vim.api.nvim_set_hl(0, "Number", { fg = "#d19a66" })  -- Warm orange for numbers
+    vim.api.nvim_set_hl(0, "Constant", { fg = "#e06c75" })  -- Soft red for constants
+    vim.api.nvim_set_hl(0, "@constant", { fg = "#e06c75" })
+    vim.api.nvim_set_hl(0, "Boolean", { fg = "#d19a66" })
     
-    -- Types in soft cyan
-    vim.api.nvim_set_hl(0, "Type", { fg = "#56b6c2" })
-    vim.api.nvim_set_hl(0, "@type", { fg = "#56b6c2" })
-    vim.api.nvim_set_hl(0, "@type.builtin", { fg = "#56b6c2" })
+    -- Types in brighter cyan
+    vim.api.nvim_set_hl(0, "Type", { fg = "#46d9d9" })
+    vim.api.nvim_set_hl(0, "@type", { fg = "#46d9d9" })
+    vim.api.nvim_set_hl(0, "@type.builtin", { fg = "#46d9d9" })
     
     -- Operators and delimiters
     vim.api.nvim_set_hl(0, "Operator", { fg = "#abb2bf" })
@@ -79,13 +79,13 @@ function ColorMyPencils(color)
     -- Visual selection
     vim.api.nvim_set_hl(0, "Visual", { bg = "#3e4452" })
     
-    -- Additional UI elements for consistency
+    -- Additional UI elements with better contrast
     vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#21262b" })  -- Hide ~ at end of buffer
-    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#2c313c", fg = "#d4d4d4" })  -- Popup menu
+    vim.api.nvim_set_hl(0, "Pmenu", { bg = "#2c313c", fg = "#e0e0e0" })  -- Popup menu
     vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#3e4452", fg = "#ffffff" })  -- Selected item in popup
-    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#21262b", fg = "#3e4452" })  -- Floating window borders
-    vim.api.nvim_set_hl(0, "NormalNC", { bg = "#21262b", fg = "#d4d4d4" })  -- Non-current windows
-    vim.api.nvim_set_hl(0, "TabLine", { bg = "#21262b", fg = "#abb2bf" })  -- Tab line
+    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#21262b", fg = "#4b5263" })  -- Floating window borders (brighter)
+    vim.api.nvim_set_hl(0, "NormalNC", { bg = "#21262b", fg = "#e0e0e0" })  -- Non-current windows
+    vim.api.nvim_set_hl(0, "TabLine", { bg = "#21262b", fg = "#c0c0c0" })  -- Tab line
     vim.api.nvim_set_hl(0, "TabLineFill", { bg = "#21262b" })  -- Tab line fill
     vim.api.nvim_set_hl(0, "TabLineSel", { bg = "#2c313c", fg = "#ffffff" })  -- Selected tab
     
@@ -108,18 +108,28 @@ function ColorMyPencils(color)
 end
 
 -- Automatically apply colorscheme when Neovim starts
-vim.api.nvim_create_autocmd("VimEnter", {
+-- Use multiple events to ensure it runs
+vim.api.nvim_create_autocmd({"VimEnter", "UIEnter", "ColorScheme"}, {
     callback = function()
-        -- Use vim.schedule to ensure all plugins are loaded
-        vim.schedule(function()
-            ColorMyPencils()
-        end)
+        -- Check if we've already run to avoid duplicates
+        if not vim.g.colorscheme_applied then
+            vim.g.colorscheme_applied = true
+            -- Use defer to ensure everything is loaded
+            vim.defer_fn(function()
+                ColorMyPencils()
+            end, 0)
+        end
     end,
     desc = "Apply custom colorscheme on startup"
 })
 
--- Also apply immediately for when this file is sourced
-ColorMyPencils()
+-- Also run immediately when this file is loaded
+vim.defer_fn(function()
+    if not vim.g.colorscheme_applied then
+        vim.g.colorscheme_applied = true
+        ColorMyPencils()
+    end
+end, 100)
 
 -- Command to easily switch themes
 vim.api.nvim_create_user_command('Theme', function(opts)
