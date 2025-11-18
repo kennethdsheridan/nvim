@@ -1613,11 +1613,11 @@ return {
     },
 
     -- �����������������������������������������������������������������������������
-    -- Aerial VIM (Code outline - disabled by default to avoid conflicts)
+    -- Aerial VIM (Code outline for functions and structs)
     -- �����������������������������������������������������������������������������
     {
         "stevearc/aerial.nvim",
-        enabled = false, -- Disabled to avoid keymap conflicts
+        enabled = true,  -- Enabled for structure outline
         config = function()
             require("aerial").setup({
                 backends = { "lsp", "treesitter", "markdown", "man" },
@@ -1643,7 +1643,7 @@ return {
                 },
                 focus_on_open = false,
                 layout = {
-                    width = 70,
+                    width = 40,  -- Narrower for sidebar feel
                     placement = "edge",
                     preserve_equality = true,
                 },
@@ -1651,14 +1651,12 @@ return {
                 close_on_select = false,
                 center_on_jump = true,
                 on_attach = function(bufnr)
-                    -- Use non-conflicting keybindings for Aerial navigation
-                    vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Aerial: Previous symbol" })
-                    vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Aerial: Next symbol" })
-                    vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>", { buffer = bufnr, desc = "Aerial: Toggle outline" })
+                    -- Main keybinding for structure outline
+                    vim.keymap.set("n", "<leader>str", "<cmd>AerialToggle!<CR>", { buffer = bufnr, desc = "Toggle structure/function sidebar" })
                     
-                    -- Use leader-based keys instead of conflicting with { and }
-                    vim.keymap.set("n", "<leader>[", "<cmd>AerialPrevUp<CR>", { buffer = bufnr, desc = "Aerial: Previous level up" })
-                    vim.keymap.set("n", "<leader>]", "<cmd>AerialNextUp<CR>", { buffer = bufnr, desc = "Aerial: Next level up" })
+                    -- Navigation keybindings
+                    vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Previous symbol" })
+                    vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Next symbol" })
 
                     vim.api.nvim_create_autocmd("QuitPre", {
                         buffer = bufnr,

@@ -1,49 +1,26 @@
--- Optional Aerial.nvim setup
--- Aerial is disabled by default to avoid keymap conflicts
--- Use these commands to enable it when needed
+-- Aerial.nvim setup for structure outline
+-- Provides a sidebar showing functions, structs, classes, etc.
 
--- Command to enable Aerial for current session
-vim.api.nvim_create_user_command('AerialEnable', function()
-    -- Load Aerial plugin
-    local ok, aerial = pcall(require, 'aerial')
-    if not ok then
-        vim.notify("❌ Aerial plugin not available. Enable it in plugins.lua first.", vim.log.levels.ERROR)
-        return
-    end
-    
-    -- Setup Aerial with safe keybindings
-    aerial.setup({
-        backends = { "lsp", "treesitter", "markdown" },
-        show_guides = true,
-        layout = {
-            width = 30,
-            placement = "edge",
-        },
-        on_attach = function(bufnr)
-            -- Safe keybindings that don't conflict
-            vim.keymap.set("n", "<leader>ao", "<cmd>AerialOpen<CR>", { buffer = bufnr, desc = "Aerial: Open outline" })
-            vim.keymap.set("n", "<leader>ac", "<cmd>AerialClose<CR>", { buffer = bufnr, desc = "Aerial: Close outline" })
-            vim.keymap.set("n", "<leader>at", "<cmd>AerialToggle<CR>", { buffer = bufnr, desc = "Aerial: Toggle outline" })
-            vim.keymap.set("n", "<leader>an", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Aerial: Next symbol" })
-            vim.keymap.set("n", "<leader>ap", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Aerial: Previous symbol" })
-        end,
-    })
-    
-    vim.notify("✅ Aerial enabled! Use <leader>at to toggle outline", vim.log.levels.INFO)
-end, { desc = "Enable Aerial code outline plugin" })
+-- Since Aerial is now enabled in plugins.lua, we can use it directly
+local aerial_ok, aerial = pcall(require, 'aerial')
+if aerial_ok then
+    -- The main configuration is in plugins.lua
+    -- Here we just add the notification
+    vim.notify("Aerial structure outline available: Press <leader>str to toggle", vim.log.levels.INFO)
+end
 
--- Command to show Aerial keybindings
-vim.api.nvim_create_user_command('AerialHelp', function()
-    print("🗂️  Aerial Code Outline Commands:")
-    print("  :AerialEnable    - Enable Aerial for this session")
-    print("  <leader>ao       - Open outline")
-    print("  <leader>ac       - Close outline") 
-    print("  <leader>at       - Toggle outline")
-    print("  <leader>an       - Next symbol")
-    print("  <leader>ap       - Previous symbol")
+-- Command to show structure outline keybindings
+vim.api.nvim_create_user_command('StructureHelp', function()
+    print("🗂️  Structure Outline Commands:")
+    print("  <leader>str      - Toggle structure sidebar (functions, structs, classes)")
+    print("  [a               - Jump to previous symbol")
+    print("  ]a               - Jump to next symbol")
     print("")
-    print("💡 To enable permanently, set enabled = true in plugins.lua")
-end, { desc = "Show Aerial help" })
+    print("  Alternative commands:")
+    print("  <leader>fs       - Find symbols with fuzzy search (Telescope)")
+    print("  <leader>fu       - Find functions only (Telescope)")
+    print("  <leader>o        - Show outline in Telescope")
+end, { desc = "Show structure outline help" })
 
 -- Alternative outline using LSP symbols (always available)
 vim.api.nvim_create_user_command('Outline', function()

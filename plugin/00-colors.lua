@@ -76,6 +76,23 @@ _G.ColorMyPencils = function(color)
     vim.api.nvim_set_hl(0, "@lsp.type.parameter", { fg = "#f0b752" })
     vim.api.nvim_set_hl(0, "@lsp.type.variable", { fg = "#d0d0d0" })
     vim.api.nvim_set_hl(0, "@lsp.type.keyword", { fg = "#e06c75", bold = true })
+    
+    -- Aerial (structure outline) colors
+    vim.api.nvim_set_hl(0, "AerialNormal", { bg = "#1a1e23", fg = "#e0e0e0" })
+    vim.api.nvim_set_hl(0, "AerialBorder", { bg = "#1a1e23", fg = "#4b5263" })
+    vim.api.nvim_set_hl(0, "AerialClass", { fg = "#46d9d9", bold = true })
+    vim.api.nvim_set_hl(0, "AerialStruct", { fg = "#46d9d9", bold = true })
+    vim.api.nvim_set_hl(0, "AerialFunction", { fg = "#69b7f0" })
+    vim.api.nvim_set_hl(0, "AerialMethod", { fg = "#69b7f0" })
+    vim.api.nvim_set_hl(0, "AerialConstructor", { fg = "#89ca78" })
+    vim.api.nvim_set_hl(0, "AerialEnum", { fg = "#d19a66" })
+    vim.api.nvim_set_hl(0, "AerialInterface", { fg = "#e06c75" })
+    vim.api.nvim_set_hl(0, "AerialModule", { fg = "#f0b752" })
+    vim.api.nvim_set_hl(0, "AerialNamespace", { fg = "#f0b752" })
+    vim.api.nvim_set_hl(0, "AerialConstant", { fg = "#e06c75" })
+    vim.api.nvim_set_hl(0, "AerialVariable", { fg = "#d0d0d0" })
+    vim.api.nvim_set_hl(0, "AerialGuide", { fg = "#3e4452" })
+    vim.api.nvim_set_hl(0, "AerialLine", { bg = "#2c313c", bold = true })
 end
 
 -- Apply colors multiple times to ensure they stick

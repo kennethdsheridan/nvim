@@ -12,6 +12,9 @@ end, { desc = "Open Oil file explorer (floating sidebar)" })
 -- NvimTree file explorer (traditional tree view)
 vim.keymap.set("n", "<leader>tree", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle NvimTree sidebar" })
 
+-- Aerial structure outline (functions, structs, classes)
+vim.keymap.set("n", "<leader>str", "<cmd>AerialToggle!<CR>", { desc = "Toggle structure/function sidebar" })
+
 -- GOTO declaration and documentation navigation (using standard LSP keys)
 -- These will be handled by the LSP on_attach function instead
 -- vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
