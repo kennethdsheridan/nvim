@@ -10,19 +10,39 @@ vim.api.nvim_create_user_command('LspDoc', function()
     vim.cmd('vertical resize 80')  -- Set width
 end, { desc = 'Show LSP documentation in split' })
 
--- Configure LSP UI for better documentation display
+-- Configure LSP UI for beautiful and useful hover windows
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     vim.lsp.handlers.hover, {
-        border = "rounded",
+        border = {
+            {"╭", "FloatBorder"},
+            {"─", "FloatBorder"},
+            {"╮", "FloatBorder"},
+            {"│", "FloatBorder"},
+            {"╯", "FloatBorder"},
+            {"─", "FloatBorder"},
+            {"╰", "FloatBorder"},
+            {"│", "FloatBorder"},
+        },
         max_width = 100,
         max_height = 40,
         focusable = true,
+        pad_top = 1,
+        pad_bottom = 1,
     }
 )
 
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
     vim.lsp.handlers.signature_help, {
-        border = "rounded",
+        border = {
+            {"╭", "FloatBorder"},
+            {"─", "FloatBorder"},
+            {"╮", "FloatBorder"},
+            {"│", "FloatBorder"},
+            {"╯", "FloatBorder"},
+            {"─", "FloatBorder"},
+            {"╰", "FloatBorder"},
+            {"│", "FloatBorder"},
+        },
         max_width = 80,
         focusable = true,
     }
@@ -123,14 +143,17 @@ capabilities.textDocument.signatureHelp = {
 local function on_attach(client, bufnr)
     local opts = { buffer = bufnr, noremap = true, silent = true }
     
-    -- Enhanced hover with better window settings
+    -- Enhanced hover with beautiful window
     vim.keymap.set("n", "K", function()
-        vim.lsp.buf.hover({
-            border = "rounded",
-            max_width = 80,
-            max_height = 30,
-            focusable = true,
-        })
+        -- Close any existing hover windows first
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local config = vim.api.nvim_win_get_config(win)
+            if config.relative ~= "" then
+                vim.api.nvim_win_close(win, true)
+            end
+        end
+        -- Open new hover window
+        vim.lsp.buf.hover()
     end, opts)
     
     -- Standard LSP navigation

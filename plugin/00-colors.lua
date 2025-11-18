@@ -51,21 +51,69 @@ _G.ColorMyPencils = function(color)
     -- Better cursor visibility
     vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2c313c" })
     vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#ffffff", bg = "#2c313c", bold = true })
+    
+    -- Beautiful hover window styling
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1a1e23", fg = "#e0e0e0" })  -- Darker than main background
+    vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#1a1e23", fg = "#4b5263" })
+    vim.api.nvim_set_hl(0, "FloatTitle", { bg = "#1a1e23", fg = "#69b7f0", bold = true })
+    
+    -- LSP hover specific highlights for better readability
+    vim.api.nvim_set_hl(0, "LspInfoBorder", { bg = "#1a1e23", fg = "#4b5263" })
+    
+    -- Markdown styling in hover docs
+    vim.api.nvim_set_hl(0, "@markup.heading", { fg = "#69b7f0", bold = true })
+    vim.api.nvim_set_hl(0, "@markup.strong", { fg = "#e06c75", bold = true })
+    vim.api.nvim_set_hl(0, "@markup.italic", { fg = "#89ca78", italic = true })
+    vim.api.nvim_set_hl(0, "@markup.raw", { bg = "#2c313c", fg = "#d19a66" })
+    vim.api.nvim_set_hl(0, "@markup.raw.block", { bg = "#2c313c", fg = "#d19a66" })
+    vim.api.nvim_set_hl(0, "@markup.link", { fg = "#46d9d9", underline = true })
+    vim.api.nvim_set_hl(0, "@markup.list", { fg = "#69b7f0" })
+    
+    -- Code blocks in documentation
+    vim.api.nvim_set_hl(0, "@lsp.type.class", { fg = "#46d9d9", bold = true })
+    vim.api.nvim_set_hl(0, "@lsp.type.function", { fg = "#69b7f0" })
+    vim.api.nvim_set_hl(0, "@lsp.type.method", { fg = "#69b7f0" })
+    vim.api.nvim_set_hl(0, "@lsp.type.parameter", { fg = "#f0b752" })
+    vim.api.nvim_set_hl(0, "@lsp.type.variable", { fg = "#d0d0d0" })
+    vim.api.nvim_set_hl(0, "@lsp.type.keyword", { fg = "#e06c75", bold = true })
 end
 
--- Apply immediately when Neovim starts
-vim.api.nvim_create_autocmd({"VimEnter", "UIEnter"}, {
-    once = true,
-    callback = function()
-        -- Small delay to ensure all plugins are loaded
-        vim.defer_fn(function()
-            ColorMyPencils()
-        end, 10)
-    end,
-    desc = "Apply custom colors on startup"
-})
+-- Apply colors multiple times to ensure they stick
+-- Immediately when this file loads
+ColorMyPencils()
 
--- Also apply immediately for when this file is sourced
+-- After a tiny delay
 vim.defer_fn(function()
     ColorMyPencils()
-end, 0)
+end, 1)
+
+-- When UI is ready
+vim.api.nvim_create_autocmd("UIEnter", {
+    callback = function()
+        ColorMyPencils()
+    end,
+})
+
+-- When Vim fully enters
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        vim.schedule(function()
+            ColorMyPencils()
+        end)
+    end,
+})
+
+-- After colorscheme changes (in case another plugin overrides)
+vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = function()
+        vim.defer_fn(function()
+            -- Reapply our custom highlights
+            vim.api.nvim_set_hl(0, "Normal", { bg = "#21262b", fg = "#e0e0e0" })
+            vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1a1e23", fg = "#e0e0e0" })
+            vim.api.nvim_set_hl(0, "NormalNC", { bg = "#21262b", fg = "#e0e0e0" })
+            vim.api.nvim_set_hl(0, "LineNr", { fg = "#5c6370", bg = "#21262b" })
+            vim.api.nvim_set_hl(0, "SignColumn", { bg = "#21262b" })
+            vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = "#21262b" })
+        end, 1)
+    end,
+})
