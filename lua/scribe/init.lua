@@ -104,8 +104,11 @@ end
 -------------------------------------------------------------------------------
 -- MASON SETUP (SIMPLE APPROACH)
 -------------------------------------------------------------------------------
--- First, set up mason
-require('mason').setup()
+-- First, set up mason (with error handling)
+local mason_ok, mason = pcall(require, 'mason')
+if mason_ok then
+    mason.setup()
+end
 
 -------------------------------------------------------------------------------
 -- LSP configuration is now handled in after/plugin/lsp.lua

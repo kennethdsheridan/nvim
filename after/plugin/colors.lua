@@ -1,5 +1,5 @@
 function ColorMyPencils(color)
-    color = color or "everforest"
+    color = color or "kanagawa"
 
     -- Handle catppuccin specially
     if color == "catppuccin" or color:find("catppuccin") then

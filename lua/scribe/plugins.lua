@@ -1119,29 +1119,6 @@ return {
             })
         end,
     },
-                disable_netrw = false,
-                filters = {
-                    dotfiles = false,
-                    custom = { ".DS_Store", "thumbs.db" },
-                },
-                git = { enable = true, ignore = false },
-                renderer = { highlight_opened_files = "all" },
-                view = { width = 30 },
-            })
-
-            --vim.api.nvim_create_autocmd("VimEnter", {
-            --    callback = function()
-            --        require("nvim-tree.api").tree.open()
-            --    end,
-            --})
-
-            vim.keymap.set("n", "<leader>ft", "<cmd>NvimTreeToggle<CR>", {
-                silent = true,
-                noremap = true,
-                desc = "Toggle NvimTree",
-            })
-        end,
-    },
 
     -- �����������������������������������������������������������������������������
     -- GIT / DIFF / TROUBLE

@@ -166,33 +166,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end,
 })
 
--- Lua Language Server
-setup_language_server(
-    "lua",
-    "lua_ls",
-    { "lua-language-server" },
-    { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
-    {
-        Lua = {
-            diagnostics = { 
-                globals = { 'vim', 'use' },
-                disable = { "missing-fields" }
-            },
-            workspace = {
-                library = vim.api.nvim_get_runtime_file("", true),
-                checkThirdParty = false,
-            },
-            telemetry = { enable = false },
-            format = { enable = false },
-            hint = {
-                enable = true,
-                arrayIndex = "Disable",
-                setType = true,
-            },
-        },
-    }
-)
-
 -- Helper function to start LSP servers for various languages
 local function setup_language_server(filetype, server_name, cmd, root_patterns, settings)
     vim.api.nvim_create_autocmd("FileType", {
@@ -273,6 +246,33 @@ setup_language_server(
             },
             staticcheck = true,
         }
+    }
+)
+
+-- Lua Language Server
+setup_language_server(
+    "lua",
+    "lua_ls",
+    { "lua-language-server" },
+    { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+    {
+        Lua = {
+            diagnostics = { 
+                globals = { 'vim', 'use' },
+                disable = { "missing-fields" }
+            },
+            workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+            },
+            telemetry = { enable = false },
+            format = { enable = false },
+            hint = {
+                enable = true,
+                arrayIndex = "Disable",
+                setType = true,
+            },
+        },
     }
 )
 
