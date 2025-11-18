@@ -107,6 +107,20 @@ function ColorMyPencils(color)
     vim.api.nvim_set_hl(0, "@constructor", { fg = "#56b6c2" })
 end
 
+-- Automatically apply colorscheme when Neovim starts
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        -- Use vim.schedule to ensure all plugins are loaded
+        vim.schedule(function()
+            ColorMyPencils()
+        end)
+    end,
+    desc = "Apply custom colorscheme on startup"
+})
+
+-- Also apply immediately for when this file is sourced
+ColorMyPencils()
+
 -- Command to easily switch themes
 vim.api.nvim_create_user_command('Theme', function(opts)
     local theme = opts.args ~= '' and opts.args or 'everforest'

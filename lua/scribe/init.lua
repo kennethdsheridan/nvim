@@ -55,9 +55,7 @@ require("scribe.markdown")
 -------------------------------------------------------------------------------
 -- OPTIONAL: AUTOCMD / COLOR SETUP
 -------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("VimEnter", {
-    command = "lua ColorMyPencils()",
-})
+-- Removed - will be handled in after/plugin/colors.lua
 
 
 
@@ -220,31 +218,4 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end,
 })
 
--------------------------------------------------------------------------------
--- PARCHMENT COLORSCHEME FUNCTION
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
--- GRUVBOX COLORSCHEME FUNCTION
--------------------------------------------------------------------------------
-function ColorMyPencils(color)
-    color = color or "gruvbox"
-    
-    if color == "gruvbox" then
-        -- Setup Gruvbox with configuration
-        require("gruvbox").setup({
-            contrast = "medium", -- or "soft" for softer contrast
-            transparent_mode = false,
-            palette_overrides = {},
-            overrides = {},
-        })
-        vim.cmd.colorscheme("gruvbox")
-        print("Applied Gruvbox colorscheme - warm and retro coding vibes")
-    else
-        vim.cmd.colorscheme(color)
-    end
-    
-    -- Optional: Keep backgrounds opaque
-    -- Remove these lines if you want transparency
-    -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-    -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-end
+-- ColorMyPencils function moved to after/plugin/colors.lua
