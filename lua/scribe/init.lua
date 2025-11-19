@@ -18,7 +18,7 @@ require("scribe.colors-init").apply_colors()
 -------------------------------------------------------------------------------
 -- Keep netrw enabled but prevent auto-opening on directories
 vim.g.netrw_browse_split = 0
-vim.g.netrw_banner = 0
+vim.g.netrw_banner = 1  -- Show the banner/heading
 vim.g.netrw_winsize = 25
 
 -------------------------------------------------------------------------------
