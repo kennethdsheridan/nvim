@@ -265,12 +265,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
             settings = {
                  ["rust-analyzer"] = {
                      cargo = {
+                         target = "x86_64-unknown-linux-musl",
                          allFeatures = true,
                          loadOutDirsFromCheck = true,
                      },
                      checkOnSave = {
                          enable = true,
                          command = "clippy",
+                         allTargets = false,
+                         extraArgs = { "--target", "x86_64-unknown-linux-musl" },
                      },
                      completion = {
                          addCallArgumentSnippets = true,
