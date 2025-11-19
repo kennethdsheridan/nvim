@@ -1,6 +1,42 @@
 -- Native Neovim 0.11+ LSP Configuration
 -- Uses the new vim.lsp.config API (no external dependencies)
-print("LSP config loading")
+
+-- Aesthetic icons and symbols
+local icons = {
+    error = " ",
+    warn = " ",
+    hint = " ",
+    info = " ",
+    ok = "✓ ",
+    server = " ",
+    package = " ",
+    dot = "●",
+    arrow = "➜",
+    branch = " ",
+    gear = " ",
+    magic = "✨",
+    rocket = "🚀",
+}
+
+-- Silent startup (remove print statement)
+-- print("LSP config loading")
+
+-- Suppress LSP exit error messages
+vim.lsp.set_log_level("ERROR")
+vim.notify = (function()
+    local original_notify = vim.notify
+    return function(msg, level, opts)
+        -- Filter out LSP server exit messages
+        if msg and type(msg) == "string" then
+            if msg:match("Client %d+ quit with exit code") or
+               msg:match("marksman quit") or
+               msg:match("LSP.*quit.*exit") then
+                return -- Suppress these messages
+            end
+        end
+        return original_notify(msg, level, opts)
+    end
+end)()
 
 -- Create a command to show full documentation in a split
 vim.api.nvim_create_user_command('LspDoc', function()
@@ -9,6 +45,15 @@ vim.api.nvim_create_user_command('LspDoc', function()
     vim.cmd('wincmd L')  -- Move to the right
     vim.cmd('vertical resize 80')  -- Set width
 end, { desc = 'Show LSP documentation in split' })
+
+-- Set up highlight groups for lighter LSP windows
+vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#3a3a3a', fg = '#e0e0e0' })
+vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#3a3a3a', fg = '#808080' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatError', { bg = '#3a3a3a', fg = '#ff6b6b' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatWarn', { bg = '#3a3a3a', fg = '#ffd93d' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatInfo', { bg = '#3a3a3a', fg = '#6bcf7f' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatHint', { bg = '#3a3a3a', fg = '#a8dadc' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatBorder', { bg = '#3a3a3a', fg = '#606060' })
 
 -- Configure LSP UI for beautiful and useful hover windows
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
@@ -48,17 +93,60 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
     }
 )
 
--- Better diagnostic display
+-- Define diagnostic signs with aesthetic icons
+local signs = {
+    { name = "DiagnosticSignError", text = icons.error },
+    { name = "DiagnosticSignWarn", text = icons.warn },
+    { name = "DiagnosticSignHint", text = icons.hint },
+    { name = "DiagnosticSignInfo", text = icons.info },
+}
+
+for _, sign in ipairs(signs) do
+    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
+end
+
+-- Better diagnostic display with aesthetic configuration
 vim.diagnostic.config({
     virtual_text = {
-        prefix = "●",
+        prefix = icons.dot,
         source = "if_many",
+        spacing = 4,
+        format = function(diagnostic)
+            local severity_icon = ({
+                [vim.diagnostic.severity.ERROR] = icons.error,
+                [vim.diagnostic.severity.WARN] = icons.warn,
+                [vim.diagnostic.severity.INFO] = icons.info,
+                [vim.diagnostic.severity.HINT] = icons.hint,
+            })[diagnostic.severity] or icons.dot
+            
+            return string.format("%s%s", severity_icon, diagnostic.message)
+        end,
     },
     float = {
-        border = "rounded",
+        border = {
+            {"╭", "DiagnosticFloatBorder"},
+            {"─", "DiagnosticFloatBorder"},
+            {"╮", "DiagnosticFloatBorder"},
+            {"│", "DiagnosticFloatBorder"},
+            {"╯", "DiagnosticFloatBorder"},
+            {"─", "DiagnosticFloatBorder"},
+            {"╰", "DiagnosticFloatBorder"},
+            {"│", "DiagnosticFloatBorder"},
+        },
         source = "always",
         header = "",
-        prefix = "",
+        prefix = function(diagnostic, i, total)
+            local severity_icon = ({
+                [vim.diagnostic.severity.ERROR] = icons.error,
+                [vim.diagnostic.severity.WARN] = icons.warn,
+                [vim.diagnostic.severity.INFO] = icons.info,
+                [vim.diagnostic.severity.HINT] = icons.hint,
+            })[diagnostic.severity] or icons.dot
+            return severity_icon .. " ", ""
+        end,
+        focusable = false,
+        style = "minimal",
+        max_width = 80,
     },
     signs = true,
     underline = true,
@@ -105,14 +193,15 @@ if mason_ok then
         end
         
         if #servers_to_install > 0 then
-            vim.notify("Installing language servers via Mason: " .. table.concat(servers_to_install, ", "), vim.log.levels.INFO)
+            vim.notify(icons.package .. " Installing language servers: " .. table.concat(servers_to_install, ", "), vim.log.levels.INFO)
             for _, server in ipairs(servers_to_install) do
                 vim.cmd('MasonInstall ' .. server)
             end
         end
     end, 2000)
 else
-    vim.notify("Mason not available", vim.log.levels.WARN)
+    -- Silent when Mason not available (less noisy)
+    -- vim.notify("Mason not available", vim.log.levels.WARN)
 end
 
 -- 3. LSP capabilities for completion
@@ -202,8 +291,36 @@ local function on_attach(client, bufnr)
     -- Show LSP info
     vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<cr>", opts)
     
-    -- Debug: Show that LSP is attached
-    vim.notify("LSP attached: " .. client.name .. " to buffer " .. bufnr, vim.log.levels.INFO)
+    -- Aesthetic LSP attachment notification with capabilities info
+    local capabilities_summary = {}
+    if client.server_capabilities.hoverProvider then
+        table.insert(capabilities_summary, "hover")
+    end
+    if client.server_capabilities.completionProvider then
+        table.insert(capabilities_summary, "completion")
+    end
+    if client.server_capabilities.definitionProvider then
+        table.insert(capabilities_summary, "definition")
+    end
+    if client.server_capabilities.referencesProvider then
+        table.insert(capabilities_summary, "references")
+    end
+    if client.server_capabilities.documentFormattingProvider then
+        table.insert(capabilities_summary, "formatting")
+    end
+    if client.server_capabilities.codeActionProvider then
+        table.insert(capabilities_summary, "code-actions")
+    end
+    
+    vim.notify(
+        string.format("%s %s attached\n%s Capabilities: %s", 
+            icons.server, 
+            client.name, 
+            icons.arrow,
+            table.concat(capabilities_summary, ", ")
+        ), 
+        vim.log.levels.INFO
+    )
 end
 
 -- 5. Root directory detection
@@ -235,7 +352,7 @@ end
 vim.api.nvim_create_autocmd("BufReadPost", {
     pattern = "*.rs",
     callback = function(ev)
-        print("BufReadPost *.rs triggered for buffer " .. ev.buf)
+        -- Silent operation (removed debug print)
         local bufnr = ev.buf
 
         -- Check if LSP is already attached
@@ -259,8 +376,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
                  if client.server_capabilities.inlayHintProvider then
                      vim.lsp.inlay_hint.enable(true, { bufnr = buf })
                  end
-
-                 print("rust-analyzer attached to buffer " .. buf)
              end,
             settings = {
                  ["rust-analyzer"] = {
@@ -541,14 +656,83 @@ setup_language_server(
     }
 )
 
--- Markdown (marksman)
-setup_language_server(
-    "markdown",
-    "marksman",
-    { "marksman", "server" },
-    { ".git", "README.md" },
-    {}
-)
+-- Markdown (marksman) - with proper URI handling
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "markdown",
+    callback = function(ev)
+        local bufnr = ev.buf
+        
+        -- Check if LSP is already attached
+        local clients = vim.lsp.get_clients({ bufnr = bufnr })
+        for _, client in ipairs(clients) do
+            if client.name == "marksman" then
+                return -- Already attached
+            end
+        end
+        
+        -- Check if marksman is available
+        if vim.fn.executable("marksman") == 0 then
+            return
+        end
+        
+        -- Get the file path and find a proper root
+        local filepath = vim.api.nvim_buf_get_name(bufnr)
+        if filepath == "" then
+            return -- Don't start for unnamed buffers
+        end
+        
+        local root_dir = vim.fn.getcwd()
+        
+        -- Look for markdown project markers
+        local markers = { ".marksman.toml", ".git", "README.md", "readme.md" }
+        local dir = vim.fn.fnamemodify(filepath, ':h')
+        
+        while dir ~= '/' and dir ~= '' do
+            for _, marker in ipairs(markers) do
+                if vim.fn.filereadable(dir .. '/' .. marker) == 1 or 
+                   vim.fn.isdirectory(dir .. '/' .. marker) == 1 then
+                    root_dir = dir
+                    break
+                end
+            end
+            if root_dir ~= vim.fn.getcwd() then
+                break
+            end
+            dir = vim.fn.fnamemodify(dir, ':h')
+        end
+        
+        -- Start marksman with explicit settings
+        vim.lsp.start({
+            name = 'marksman',
+            cmd = { 'marksman', 'server' },
+            root_dir = root_dir,
+            capabilities = capabilities,
+            on_attach = on_attach,
+            settings = {},
+            init_options = {
+                -- Ensure proper URI handling
+                clientInfo = {
+                    name = "Neovim",
+                    version = vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch
+                }
+            },
+            handlers = {
+                -- Override the exit handler to suppress error messages
+                ["$/exit"] = function()
+                    -- Silent exit
+                end,
+            },
+            on_exit = function(code, signal)
+                if code ~= 0 then
+                    -- Silent exit, don't show error
+                end
+            end,
+            on_error = function(code, err)
+                -- Silent error handling
+            end,
+        })
+    end,
+})
 
 -- Vim (vim-language-server)
 setup_language_server(
@@ -698,13 +882,13 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
         vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
         
-        -- Also wait for LSP and notify when attached
+        -- Silent attachment check
         vim.defer_fn(function()
             local clients = vim.lsp.get_clients({ bufnr = bufnr })
             if #clients > 0 then
-                vim.notify("LSP attached: " .. clients[1].name .. " to Rust buffer " .. bufnr, vim.log.levels.INFO)
+                -- Silently attached
             else
-                vim.notify("Warning: No LSP clients attached to Rust buffer " .. bufnr, vim.log.levels.WARN)
+                vim.notify(icons.warn .. " No LSP client for Rust buffer", vim.log.levels.WARN)
             end
         end, 2000)
     end,
@@ -727,7 +911,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
                 vim.lsp.buf.hover()
             end, opts)
             
-            vim.notify("rust-analyzer attached! K should now work for hover.", vim.log.levels.INFO)
+            -- Show subtle success notification
+            vim.notify(icons.ok .. " rust-analyzer ready", vim.log.levels.INFO)
         end
     end,
 })
@@ -836,37 +1021,165 @@ vim.api.nvim_create_user_command('NavigationHelp', function()
     print("  :LspRestart - Restart LSP")
 end, { desc = "Show all navigation commands" })
 
+-- Enhanced LSP Info command with detailed language information
+vim.api.nvim_create_user_command('LspInfo', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.get_clients({ bufnr = bufnr })
+    local filetype = vim.bo.filetype
+    
+    -- Create a new buffer for the info
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+    
+    local lines = {}
+    
+    -- Header
+    table.insert(lines, "╭─────────────────────────────────────────────╮")
+    table.insert(lines, "│            " .. icons.magic .. " LSP Information " .. icons.magic .. "           │")
+    table.insert(lines, "╰─────────────────────────────────────────────╯")
+    table.insert(lines, "")
+    
+    -- Current file info
+    table.insert(lines, icons.arrow .. " Current File")
+    table.insert(lines, "  File Type: " .. filetype)
+    table.insert(lines, "  Buffer: " .. bufnr)
+    table.insert(lines, "")
+    
+    -- Active LSP clients
+    if #clients > 0 then
+        table.insert(lines, icons.server .. " Active Language Servers")
+        for _, client in ipairs(clients) do
+            table.insert(lines, "")
+            table.insert(lines, "  " .. icons.dot .. " " .. client.name)
+            table.insert(lines, "    ID: " .. client.id)
+            table.insert(lines, "    Root: " .. (client.config.root_dir or "N/A"))
+            
+            -- Capabilities
+            local caps = {}
+            local sc = client.server_capabilities
+            if sc.hoverProvider then table.insert(caps, "hover") end
+            if sc.completionProvider then table.insert(caps, "completion") end
+            if sc.definitionProvider then table.insert(caps, "definition") end
+            if sc.referencesProvider then table.insert(caps, "references") end
+            if sc.documentFormattingProvider then table.insert(caps, "formatting") end
+            if sc.codeActionProvider then table.insert(caps, "actions") end
+            if sc.inlayHintProvider then table.insert(caps, "inlay-hints") end
+            
+            table.insert(lines, "    Features: " .. table.concat(caps, ", "))
+        end
+    else
+        table.insert(lines, icons.warn .. " No LSP clients attached")
+    end
+    
+    table.insert(lines, "")
+    table.insert(lines, "╭─────────────────────────────────────────────╮")
+    table.insert(lines, "│              Keybindings                    │")
+    table.insert(lines, "╰─────────────────────────────────────────────╯")
+    table.insert(lines, "  K          → Hover documentation")
+    table.insert(lines, "  gd         → Go to definition")
+    table.insert(lines, "  gr         → Find references")
+    table.insert(lines, "  gi         → Go to implementation")
+    table.insert(lines, "  <leader>ca → Code actions")
+    table.insert(lines, "  <leader>rn → Rename symbol")
+    table.insert(lines, "  <leader>f  → Format document")
+    table.insert(lines, "  [d / ]d    → Navigate diagnostics")
+    
+    -- Set content
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+    
+    -- Open in floating window
+    local width = 50
+    local height = #lines
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = 'editor',
+        width = width,
+        height = height,
+        col = (vim.o.columns - width) / 2,
+        row = (vim.o.lines - height) / 2,
+        style = 'minimal',
+        border = 'rounded',
+    })
+    
+    -- Set window highlights
+    vim.api.nvim_win_set_option(win, 'winhl', 'Normal:NormalFloat,FloatBorder:FloatBorder')
+    
+    -- Close on escape
+    vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', ':close<CR>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':close<CR>', { noremap = true, silent = true })
+end, { desc = "Show detailed LSP information" })
+
 -- Command to check language server support
 vim.api.nvim_create_user_command('LspStatus', function()
     local servers = {
-        { "🦀 Rust", "rust-analyzer", "rust" },
-        { "🌙 Lua", "lua-language-server", "lua" },
-        { "🐍 Python", "pyright-langserver", "python" },
-        { "🐹 Go", "gopls", "go" },
-        { "🐚 Bash", "bash-language-server", "bash/sh" },
-        { "❄️  Nix", "nixd", "nix" },
-        { "📝 Markdown", "marksman", "markdown" },
-        { "📄 Vim", "vim-language-server", "vim" },
-        { "🟨 TypeScript/JS", "typescript-language-server", "typescript/javascript" },
-        { "📋 TOML", "taplo", "toml" },
-        { "📄 JSON", "vscode-json-language-server", "json" },
-        { "⚡ C/C++", "clangd", "c/cpp" },
-        { "🌐 HTML", "vscode-html-language-server", "html" },
-        { "🎨 CSS", "vscode-css-language-server", "css" },
-        { "📊 YAML", "yaml-language-server", "yaml" },
+        { "🦀 Rust", "rust-analyzer", "rust", "*.rs" },
+        { "🌙 Lua", "lua-language-server", "lua", "*.lua" },
+        { "🐍 Python", "pyright-langserver", "python", "*.py" },
+        { "🐹 Go", "gopls", "go", "*.go" },
+        { "🐚 Bash", "bash-language-server", "sh,bash,zsh", "*.sh,*.bash" },
+        { "❄️  Nix", "nixd", "nix", "*.nix" },
+        { "📝 Markdown", "marksman", "markdown", "*.md" },
+        { "📄 Vim", "vim-language-server", "vim", "*.vim,init.vim" },
+        { "🟨 TypeScript/JS", "typescript-language-server", "typescript,javascript", "*.ts,*.js,*.tsx,*.jsx" },
+        { "📋 TOML", "taplo", "toml", "*.toml" },
+        { "📄 JSON", "vscode-json-language-server", "json", "*.json" },
+        { "⚡ C/C++", "clangd", "c,cpp", "*.c,*.cpp,*.h,*.hpp" },
+        { "🌐 HTML", "vscode-html-language-server", "html", "*.html" },
+        { "🎨 CSS", "vscode-css-language-server", "css", "*.css" },
+        { "📊 YAML", "yaml-language-server", "yaml", "*.yml,*.yaml" },
     }
     
-    print("=== Language Server Status ===")
+    -- Create a buffer for the status display
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+    
+    local lines = {}
+    table.insert(lines, "╭───────────────────────────────────────────────────────╮")
+    table.insert(lines, "│             " .. icons.rocket .. " Language Server Status " .. icons.rocket .. "            │")
+    table.insert(lines, "╰───────────────────────────────────────────────────────╯")
+    table.insert(lines, "")
+    
     for _, server in ipairs(servers) do
-        local icon, cmd, lang = server[1], server[2], server[3]
-        local status = vim.fn.executable(cmd) == 1 and "✅ Ready" or "❌ Not installed"
-        print(string.format("%s %-20s %s", icon, lang, status))
+        local icon, cmd, lang, files = server[1], server[2], server[3], server[4]
+        local status = vim.fn.executable(cmd) == 1 and icons.ok or "✗"
+        local status_text = vim.fn.executable(cmd) == 1 and "Ready" or "Missing"
+        table.insert(lines, string.format("%s %s %-20s %s", status, icon, lang, status_text))
+        table.insert(lines, string.format("     Files: %s", files))
+        table.insert(lines, "")
     end
     
-    print("\n📦 Install missing servers with:")
-    print("  :MasonInstall <server-name>")
-    print("  Or use package manager (brew, nix, npm, etc.)")
-    print("\n🔍 Check current buffer: :LspDebug")
+    table.insert(lines, "╭───────────────────────────────────────────────────────╮")
+    table.insert(lines, "│                    Commands                          │")
+    table.insert(lines, "╰───────────────────────────────────────────────────────╯")
+    table.insert(lines, "  " .. icons.package .. " Install: :MasonInstall <server-name>")
+    table.insert(lines, "  " .. icons.info .. " Info: :LspInfo")
+    table.insert(lines, "  " .. icons.gear .. " Debug: :LspDebug")
+    
+    -- Set content
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+    vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+    
+    -- Open in floating window
+    local width = 60
+    local height = #lines
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = 'editor',
+        width = width,
+        height = math.min(height, 30),
+        col = (vim.o.columns - width) / 2,
+        row = (vim.o.lines - height) / 2,
+        style = 'minimal',
+        border = 'rounded',
+    })
+    
+    -- Set window highlights
+    vim.api.nvim_win_set_option(win, 'winhl', 'Normal:NormalFloat,FloatBorder:FloatBorder')
+    
+    -- Close on escape
+    vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', ':close<CR>', { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':close<CR>', { noremap = true, silent = true })
 end, { desc = "Show language server support status" })
 
 -- DISABLED: -- 7. Completion setup with nvim-cmp (Fixed version)
@@ -925,4 +1238,4 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-print("🚀 Native LSP-only configuration loaded")
+-- Silent startup - configuration loaded
