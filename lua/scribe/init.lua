@@ -207,17 +207,6 @@ end, { desc = 'Run cargo clippy' })
 print("Completed importing requirements for Scribe configuration")
 print("LSP configuration completed successfully")
 
--------------------------------------------------------------------------------
--- DISABLE TAB COMPLETION AFTER EVERYTHING LOADS
--------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        vim.schedule(function()
-            -- Force disable Tab completion
-            vim.keymap.set('i', '<Tab>', '\t', { noremap = true, silent = true })
-            print("Tab completion forcefully disabled")
-        end)
-    end,
-})
+-- Tab completion is now handled by nvim-cmp in after/plugin/completion.lua
 
 -- ColorMyPencils function moved to after/plugin/colors.lua

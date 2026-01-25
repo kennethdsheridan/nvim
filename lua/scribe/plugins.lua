@@ -1031,9 +1031,8 @@ return {
             local cmp = require("cmp")
             local luasnip = require("luasnip")
 
-    -- DISABLED: Force disable nvim-cmp for native LSP only
-    cmp.setup({ enabled = false })
-    return
+    -- nvim-cmp is now ENABLED - see after/plugin/completion.lua for full setup
+    -- The setup below is a fallback, but after/plugin/completion.lua takes precedence
             cmp.setup({
                 snippet = {
                     expand = function(args)
