@@ -630,7 +630,8 @@ setup_language_server(
     }
 )
 
--- Nix (nixd - more advanced than nil)
+-- Nix (nixd - most advanced Nix LSP)
+-- Features: completions, hover docs, go-to-definition, diagnostics, option completions
 setup_language_server(
     "nix",
     "nixd",
@@ -642,14 +643,17 @@ setup_language_server(
                 command = { "nixpkgs-fmt" },
             },
             nixpkgs = {
-                expr = "import <nixpkgs> { }",
+                -- Use flake nixpkgs for better completions
+                expr = "import (builtins.getFlake \"/Users/kennysheridan/macos-nix-config\").inputs.nixpkgs { }",
             },
             options = {
-                nixos = {
-                    expr = "(builtins.getFlake \"/etc/nixos\").nixosConfigurations.<hostname>.options",
+                -- nix-darwin options (for macOS)
+                darwin = {
+                    expr = "(builtins.getFlake \"/Users/kennysheridan/macos-nix-config\").darwinConfigurations.\"sfc-darwin-arm64\".options",
                 },
+                -- home-manager options
                 home_manager = {
-                    expr = "(builtins.getFlake \"/etc/nixos\").homeConfigurations.<username>.options",
+                    expr = "(builtins.getFlake \"/Users/kennysheridan/macos-nix-config\").homeConfigurations.\"sfc-darwin-arm64\".options",
                 },
             },
         }

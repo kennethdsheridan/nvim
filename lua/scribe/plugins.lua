@@ -505,9 +505,11 @@ return {
                 return
             end
 
-            -- FIXED: Add error handling for codelldb package
-            local codelldb_ok, codelldb = pcall(mason_registry.get_package, "codelldb")
-            if not codelldb_ok then
+            -- FIXED: Check if codelldb is installed via Mason using path-based detection
+            local mason_packages_path = vim.fn.stdpath('data') .. '/mason/packages'
+            local codelldb_path_base = mason_packages_path .. '/codelldb'
+            local is_installed = vim.fn.isdirectory(codelldb_path_base) == 1
+            if not is_installed then
                 vim.notify("CodeLLDB not installed via Mason - skipping Rust debugging setup", vim.log.levels.INFO)
                 -- Still setup DAP UI without Rust debugging
                 dapui.setup({
@@ -521,7 +523,7 @@ return {
             end
 
             -- 1. Get codelldb paths from Mason
-            local extension_path = codelldb:get_install_path() .. "/extension/"
+            local extension_path = codelldb_path_base .. "/extension/"
             local codelldb_path = extension_path .. "adapter/codelldb"
             local liblldb_path = extension_path .. "lldb/lib/liblldb.dylib" -- Adjust if needed
 
@@ -1016,6 +1018,8 @@ return {
     -- AUTOCOMPLETION (CMP) + TABNINE
     -- �����������������������������������������������������������������������������
     { "hrsh7th/cmp-buffer" },
+    { "hrsh7th/cmp-path" },      -- Path completions
+    { "hrsh7th/cmp-cmdline" },   -- Command-line completions (:, /, ?)
     {
         "codota/tabnine-nvim",
         build = "./dl_binaries.sh",
@@ -1161,6 +1165,28 @@ return {
                     ["<C-j>"] = false,
                     ["q"] = "actions.close",
                     ["<ESC>"] = "actions.close",
+                    -- Open file in previous window (main editor) and close oil sidebar
+                    ["<CR>"] = {
+                        callback = function()
+                            local oil = require("oil")
+                            local entry = oil.get_cursor_entry()
+                            if entry and entry.type == "file" then
+                                local dir = oil.get_current_dir()
+                                local filepath = dir .. entry.name
+                                -- Close oil window
+                                vim.cmd("close")
+                                -- Open file in main window
+                                vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+                            else
+                                -- For directories, just navigate into them
+                                oil.select()
+                            end
+                        end,
+                        desc = "Open file in main window",
+                    },
+                    -- Open file in split
+                    ["<C-s>"] = "actions.select_split",
+                    ["<C-v>"] = "actions.select_vsplit",
                 },
             })
 

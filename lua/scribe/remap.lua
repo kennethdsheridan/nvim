@@ -4,10 +4,20 @@ vim.g.mapleader = " "
 -- Project navigation - Use netrw by default
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { desc = "Open netrw file explorer" })
 
--- Alternative file explorer with Oil.nvim (opens as floating sidebar)
+-- Alternative file explorer with Oil.nvim (opens as pinned sidebar)
 vim.keymap.set("n", "<leader>oil", function()
-    require("oil").open_float()
-end, { desc = "Open Oil file explorer (floating sidebar)" })
+    -- Check if oil is already open in a window
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == "oil" then
+            vim.api.nvim_win_close(win, true)
+            return
+        end
+    end
+    -- Open oil in a left sidebar
+    vim.cmd("topleft 40vsplit")
+    require("oil").open()
+end, { desc = "Toggle Oil file explorer sidebar" })
 
 -- NvimTree file explorer (traditional tree view)
 vim.keymap.set("n", "<leader>tree", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle NvimTree sidebar" })

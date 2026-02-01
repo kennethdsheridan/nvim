@@ -23,8 +23,12 @@ _G.ColorMyPencils = function(color)
     -- Set dark background for other themes
     vim.o.background = "dark"
 
-    -- Apply colorscheme
-    vim.cmd.colorscheme(color)
+    -- Apply colorscheme (with protection for when lazy.nvim hasn't loaded it yet)
+    local ok, err = pcall(vim.cmd.colorscheme, color)
+    if not ok then
+        -- Colorscheme not available yet, will be applied later via autocmds
+        return
+    end
     
     -- Custom highlight groups with #21262b background and better contrast
     -- Main text - brighter for better contrast without eye strain
