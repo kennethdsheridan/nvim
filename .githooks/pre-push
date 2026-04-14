@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+echo "Running local pre-push Neovim validation..."
+
+cd "$repo_root"
+
+nvim --headless '+q'
+
+echo "Local pre-push validation passed."

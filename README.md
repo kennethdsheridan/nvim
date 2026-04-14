@@ -92,3 +92,17 @@ Push commands:
 git push origin main
 git push github main
 ```
+
+## Local pre-push validation
+
+Install the local git hook once:
+
+```bash
+./scripts/install-git-hooks.sh
+```
+
+After that, every push validates that Neovim starts cleanly:
+
+```bash
+nvim --headless '+q'
+```
