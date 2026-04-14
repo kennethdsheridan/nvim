@@ -10,6 +10,14 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 - **Git Integration**: Fugitive, Gitsigns, and Diffview
 - **File Navigation**: Telescope fuzzy finder and Harpoon
 - **Debugging**: DAP (Debug Adapter Protocol) support
+- **AI tools**: OpenCode side split and Claude terminal launcher
+
+## Current status
+
+- Neovim 0.12-compatible configuration
+- Augment removed from the active setup
+- `nvim-treesitter/playground` removed because it is incompatible with the current treesitter API
+- Forgejo is the default git remote for this repo
 
 ## Key Bindings
 
@@ -25,6 +33,10 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 - `<leader>mp` - Toggle Markdown Preview (browser-based)
 - `<leader>pk` - Open Peek preview (native webview)
 - `<leader>pc` - Close Peek preview
+
+### AI
+- `<leader>oc` - Open OpenCode in a side split
+- `<leader>cc` - Open Claude in a top terminal split
 
 ### File Navigation
 - `<leader>pf` - Find files
@@ -52,73 +64,31 @@ My personal Neovim configuration with LSP support, AI integration, and customize
 - Custom status line with git integration
 - Automatic formatting on save for supported languages
 
-## Nix Flake Support
+## Source of truth
 
-This configuration is available as a Nix flake for easy installation on NixOS and other Nix-based systems.
+This repo is synced into `~/.config/nvim` by Home Manager from the separate system configuration repo.
 
-### Using the Flake
-
-#### On NixOS
-Add to your `flake.nix` inputs:
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    neovim-config.url = "github:kennethdsheridan/nvim";
-  };
-  
-  outputs = { self, nixpkgs, neovim-config }: {
-    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
-      # ... your config
-      modules = [
-        {
-          environment.systemPackages = [
-            neovim-config.packages.${system}.default
-          ];
-        }
-      ];
-    };
-  };
-}
-```
-
-#### Direct Usage
+## Local Development
 ```bash
-# Run Neovim with this config
-nix run github:kennethdsheridan/nvim
-
-# Enter development shell with all tools
-nix develop github:kennethdsheridan/nvim
-
-# Install locally
-nix profile install github:kennethdsheridan/nvim
-```
-
-#### Home Manager
-```nix
-{
-  inputs.neovim-config.url = "github:kennethdsheridan/nvim";
-  
-  # In your home.nix
-  home.packages = [
-    inputs.neovim-config.packages.${pkgs.system}.default
-  ];
-}
-```
-
-### Development Shell
-The flake provides a development shell with all necessary tools:
-- Language servers (lua-language-server, rust-analyzer, nil, nixd, etc.)
-- Formatters (stylua, nixpkgs-fmt, rustfmt, prettier, black)
-- Utilities (ripgrep, fd, fzf, lazygit)
-
-### Local Development
-```bash
-# Clone and enter development environment
-git clone https://github.com/kennethdsheridan/nvim ~/.config/nvim
+# Clone and work locally
+git clone ssh://forgejo@parrisisland.netmaker:2224/kenneth/nvim.git ~/.config/nvim
 cd ~/.config/nvim
-nix develop
+```
 
-# Or with direnv (if .envrc is present)
-direnv allow
+## Git remotes
+
+Forgejo is the default remote for this repo.
+
+```bash
+git remote -v
+```
+
+- `origin` points to the private Forgejo repository
+- `github` points to GitHub
+
+Push commands:
+
+```bash
+git push origin main
+git push github main
 ```
