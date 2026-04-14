@@ -247,16 +247,9 @@ return {
             vim.g.opencode_opts = {
                 auto_reload = true,
                 auto_open = false,
-                provider = {
-                    snacks = {
-                        win = {
-                            position = "bottom",
-                            height = 0.3,
-                        },
-                    },
+                server = {
                     terminal = {
-                        split = "below",
-                        height = math.floor(vim.o.lines * 0.3),
+                        split = "right",
                     },
                 },
             }
@@ -264,13 +257,7 @@ return {
             -- Required for vim.g.opencode_opts.auto_reload
             vim.opt.autoread = true
 
-            -- Basic keymaps
-            vim.keymap.set("n", "<leader>OC", function() require("opencode").toggle() end,
-                { desc = "OpenCode bottom split" })
-            vim.keymap.set("n", "<leader>CC", function()
-                vim.cmd("aboveleft 10split")
-                vim.cmd("terminal claude")
-            end, { desc = "Claude top split" })
+            -- Basic keymaps are defined in lua/scribe/remap.lua so they are always available.
             vim.keymap.set("n", "<leader>oa", function() require("opencode").ask("@cursor: ") end,
                 { desc = "Ask about this" })
             vim.keymap.set("x", "<leader>oa", function() require("opencode").ask("@selection: ") end,
@@ -1036,6 +1023,7 @@ return {
     { "hrsh7th/cmp-cmdline" },   -- Command-line completions (:, /, ?)
     {
         "codota/tabnine-nvim",
+        enabled = false,
         build = "./dl_binaries.sh",
         event = "InsertEnter",
     },
@@ -1341,7 +1329,6 @@ return {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
     },
-    { "nvim-treesitter/playground" },
 
     -- �����������������������������������������������������������������������������
     -- MISC UTILITIES

@@ -164,9 +164,6 @@ cmp.setup.cmdline(':', {
     matching = { disallow_symbol_nonprefix_matching = false }
 })
 
--- Auto-show completion menu when typing (optional)
-vim.o.completeopt = "menu,menuone,noselect"
-
 -- Optional: Show completion menu after typing 2 characters
 -- Integration with autopairs if installed
 local autopairs_ok, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')

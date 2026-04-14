@@ -123,17 +123,17 @@ return {
 
     -- Lua Documentation
     {
-        "folke/neodev.nvim",
+        "folke/lazydev.nvim",
         ft = "lua",
-        config = function()
-            require("neodev").setup({
-                library = {
-                    plugins = { "nvim-dap-ui" },
-                    types = true,
-                },
-            })
+        opts = {
+            library = {
+                { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+                { path = "LazyVim", words = { "LazyVim" } },
+            },
+        },
+        config = function(_, opts)
+            require("lazydev").setup(opts)
 
-            -- Keymaps for Lua documentation
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = "lua",
                 callback = function()

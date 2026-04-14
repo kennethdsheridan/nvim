@@ -25,7 +25,7 @@ vim.g.netrw_winsize = 25
 -- LAZY.NVIM BOOTSTRAP
 -------------------------------------------------------------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
         "git", "clone",
         "--filter=blob:none",
@@ -159,6 +159,7 @@ end
 -------------------------------------------------------------------------------
 local tabnine_ok, tabnine = pcall(require, 'tabnine')
 if tabnine_ok then
+    -- Disabled in plugin specs while upstream runtime downloads are failing.
     tabnine.setup({
         disable_auto_comment = true,
         -- accept_keymap = "<Tab>",  -- DISABLED TAB ACCEPTANCE

@@ -22,7 +22,7 @@ local icons = {
 -- print("LSP config loading")
 
 -- Suppress LSP exit error messages
-vim.lsp.set_log_level("ERROR")
+vim.lsp.log.set_level(vim.log.levels.ERROR)
 vim.notify = (function()
     local original_notify = vim.notify
     return function(msg, level, opts)
@@ -56,8 +56,8 @@ vim.api.nvim_set_hl(0, 'DiagnosticFloatHint', { bg = '#3a3a3a', fg = '#a8dadc' }
 vim.api.nvim_set_hl(0, 'DiagnosticFloatBorder', { bg = '#3a3a3a', fg = '#606060' })
 
 -- Configure LSP UI for beautiful and useful hover windows
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-    vim.lsp.handlers.hover, {
+vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+    return vim.lsp.handlers.hover(err, result, ctx, vim.tbl_deep_extend("force", config or {}, {
         border = {
             {"╭", "FloatBorder"},
             {"─", "FloatBorder"},
@@ -73,11 +73,11 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
         focusable = true,
         pad_top = 1,
         pad_bottom = 1,
-    }
-)
+    }))
+end
 
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-    vim.lsp.handlers.signature_help, {
+vim.lsp.handlers["textDocument/signatureHelp"] = function(err, result, ctx, config)
+    return vim.lsp.handlers.signature_help(err, result, ctx, vim.tbl_deep_extend("force", config or {}, {
         border = {
             {"╭", "FloatBorder"},
             {"─", "FloatBorder"},
@@ -90,19 +90,7 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
         },
         max_width = 80,
         focusable = true,
-    }
-)
-
--- Define diagnostic signs with aesthetic icons
-local signs = {
-    { name = "DiagnosticSignError", text = icons.error },
-    { name = "DiagnosticSignWarn", text = icons.warn },
-    { name = "DiagnosticSignHint", text = icons.hint },
-    { name = "DiagnosticSignInfo", text = icons.info },
-}
-
-for _, sign in ipairs(signs) do
-    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
+    }))
 end
 
 -- Better diagnostic display with aesthetic configuration
@@ -148,7 +136,20 @@ vim.diagnostic.config({
         style = "minimal",
         max_width = 80,
     },
-    signs = true,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = icons.error,
+            [vim.diagnostic.severity.WARN] = icons.warn,
+            [vim.diagnostic.severity.INFO] = icons.info,
+            [vim.diagnostic.severity.HINT] = icons.hint,
+        },
+        numhl = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.INFO] = "",
+            [vim.diagnostic.severity.HINT] = "",
+        },
+    },
     underline = true,
     update_in_insert = false,
     severity_sort = true,
