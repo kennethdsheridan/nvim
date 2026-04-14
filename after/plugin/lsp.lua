@@ -22,7 +22,7 @@ local icons = {
 -- print("LSP config loading")
 
 -- Suppress LSP exit error messages
-vim.lsp.set_log_level("ERROR")
+vim.lsp.log.set_level(vim.log.levels.ERROR)
 vim.notify = (function()
     local original_notify = vim.notify
     return function(msg, level, opts)
@@ -56,8 +56,8 @@ vim.api.nvim_set_hl(0, 'DiagnosticFloatHint', { bg = '#3a3a3a', fg = '#a8dadc' }
 vim.api.nvim_set_hl(0, 'DiagnosticFloatBorder', { bg = '#3a3a3a', fg = '#606060' })
 
 -- Configure LSP UI for beautiful and useful hover windows
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-    vim.lsp.handlers.hover, {
+vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+    return vim.lsp.handlers.hover(err, result, ctx, vim.tbl_deep_extend("force", config or {}, {
         border = {
             {"╭", "FloatBorder"},
             {"─", "FloatBorder"},
@@ -73,11 +73,11 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
         focusable = true,
         pad_top = 1,
         pad_bottom = 1,
-    }
-)
+    }))
+end
 
-vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-    vim.lsp.handlers.signature_help, {
+vim.lsp.handlers["textDocument/signatureHelp"] = function(err, result, ctx, config)
+    return vim.lsp.handlers.signature_help(err, result, ctx, vim.tbl_deep_extend("force", config or {}, {
         border = {
             {"╭", "FloatBorder"},
             {"─", "FloatBorder"},
@@ -90,8 +90,8 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
         },
         max_width = 80,
         focusable = true,
-    }
-)
+    }))
+end
 
 -- Define diagnostic signs with aesthetic icons
 local signs = {

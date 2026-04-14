@@ -376,6 +376,33 @@ vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
 -- Markdown Preview
 vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", { desc = "Toggle Markdown Preview" })
 
+-- AI assistant launchers
+vim.keymap.set("n", "<leader>oc", function()
+    local ok_cmd = pcall(vim.cmd, "Lazy load opencode.nvim")
+    if not ok_cmd then
+        vim.notify("Could not load opencode.nvim", vim.log.levels.ERROR)
+        return
+    end
+
+    local ok, opencode = pcall(require, "opencode")
+    if not ok then
+        vim.notify("OpenCode is not available", vim.log.levels.ERROR)
+        return
+    end
+
+    opencode.toggle()
+end, { desc = "OpenCode side split" })
+
+vim.keymap.set("n", "<leader>cc", function()
+    if vim.fn.executable("claude") ~= 1 then
+        vim.notify("'claude' is not on PATH", vim.log.levels.ERROR)
+        return
+    end
+
+    vim.cmd("aboveleft 10split")
+    vim.cmd("terminal claude")
+end, { desc = "Claude top split" })
+
 -- Peek Preview (safe loading)
 vim.keymap.set("n", "<leader>pk", function() 
     local ok, peek = pcall(require, "peek")
