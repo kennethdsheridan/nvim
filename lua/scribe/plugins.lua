@@ -246,17 +246,31 @@ return {
         config = function()
             vim.g.opencode_opts = {
                 auto_reload = true,
-                split_direction = "horizontal",
-                split_size = 0.3,
                 auto_open = false,
+                provider = {
+                    snacks = {
+                        win = {
+                            position = "bottom",
+                            height = 0.3,
+                        },
+                    },
+                    terminal = {
+                        split = "below",
+                        height = math.floor(vim.o.lines * 0.3),
+                    },
+                },
             }
 
             -- Required for vim.g.opencode_opts.auto_reload
             vim.opt.autoread = true
 
             -- Basic keymaps
-            vim.keymap.set("n", "<leader>ot", function() require("opencode").toggle() end,
-                { desc = "Toggle embedded opencode" })
+            vim.keymap.set("n", "<leader>OC", function() require("opencode").toggle() end,
+                { desc = "OpenCode bottom split" })
+            vim.keymap.set("n", "<leader>CC", function()
+                vim.cmd("aboveleft 10split")
+                vim.cmd("terminal claude")
+            end, { desc = "Claude top split" })
             vim.keymap.set("n", "<leader>oa", function() require("opencode").ask("@cursor: ") end,
                 { desc = "Ask about this" })
             vim.keymap.set("x", "<leader>oa", function() require("opencode").ask("@selection: ") end,
